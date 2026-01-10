@@ -1,0 +1,265 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+    ViewData["BodyClass"] = "welcome-page";
+    Layout = "_Layout";
+}
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="@Url.Action("Index", "Welcome")" class="logo">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                </svg>
+            </div>
+            <span class="logo-text">AuthVault</span>
+        </a>
+        <ul class="nav-menu">
+            <li><a href="#features" class="btn btn-ghost">Features</a></li>
+            <li><a href="#" class="btn btn-ghost">Support</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero section -->
+<section class="hero">
+    <div class="grid-pattern"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+            </span>
+            <span>
+                THE MOST SECURE PASSWORD MANAGER
+            </span>
+        </div>
+
+        <h1 class="hero-title">
+            One key —<br />
+            Everything that matters
+        </h1>
+
+        <p class="hero-subtitle">
+            Store passwords, cards, and important notes in one secure place.
+        </p>
+
+        <div class="hero-actions">
+            <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-large">Sign up</a>
+            <a href="@Url.Action("Login", "Account")" class="btn btn-white btn-large">Log in</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features section -->
+<section class="features" id="features">
+    <div class="features-container">
+        <h2 class="section-title">Why choose us?</h2>
+
+        <div class="features-grid">
+
+            <!-- Feature: Encryption -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="16" r="1" />
+                        <rect x="3" y="10" width="18" height="12" rx="2" />
+                        <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                    </svg>
+                </div>
+                <h3 class="feature-title"></h3>
+                <p class="feature-description">
+
+                </p>
+            </div>
+
+            <!-- Feature: Sync -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                        <path d="M2 12h20" />
+                    </svg>
+                </div>
+                <h3 class="feature-title"></h3>
+                <p class="feature-description">
+
+                </p>
+            </div>
+
+            <!-- Feature: Password generator -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M11 10.27 7 3.34" />
+                        <path d="m11 13.73-4 6.93" />
+                        <path d="M12 22v-2" />
+                        <path d="M12 2v2" />
+                        <path d="M14 12h8" />
+                        <path d="m17 20.66-1-1.73" />
+                        <path d="m17 3.34-1 1.73" />
+                        <path d="M2 12h2" />
+                        <path d="m20.66 17-1.73-1" />
+                        <path d="m20.66 7-1.73 1" />
+                        <path d="m3.34 17 1.73-1" />
+                        <path d="m3.34 7 1.73 1" />
+                        <circle cx="12" cy="12" r="2" />
+                        <circle cx="12" cy="12" r="8" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Password generator</h3>
+                <p class="feature-description">
+                    Create strong and unique passwords with one click.
+                    Customizable length and complexity for maximum security.
+                </p>
+            </div>
+
+            <!-- Feature: Organization -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M20 5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2.5a1.5 1.5 0 0 1 1.2.6l.6.8a1.5 1.5 0 0 0 1.2.6z" />
+                        <path d="M3 8.268a2 2 0 0 0-1 1.738V19a2 2 0 0 0 2 2h11a2 2 0 0 0 1.732-1" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Smart organization</h3>
+                <p class="feature-description">
+
+                    Find any entry in seconds using fast search.
+                </p>
+            </div>
+
+            <!-- Feature: Card storage -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M16 10h2" />
+                        <path d="M16 14h2" />
+                        <path d="M6.17 15a3 3 0 0 1 5.66 0" />
+                        <circle cx="9" cy="11" r="2" />
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Secure card storage</h3>
+                <p class="feature-description">
+                    Safely store credit cards and payment details.
+
+                </p>
+            </div>
+
+            <!-- Feature: Two-factor authentication -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="36"
+                         height="36"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                        <path d="M6.376 18.91a6 6 0 0 1 11.249.003" />
+                        <circle cx="12" cy="11" r="4" />
+                    </svg>
+                </div>
+                <h3 class="feature-title"> </h3>
+                <p class="feature-description">
+
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Call-to-action section -->
+<section class="cta">
+    <div class="cta-content">
+        <h2 class="cta-title">Ready to get started?</h2>
+        <p class="cta-subtitle">
+            Join thousands of users who trust us with their digital security
+        </p>
+        <a href="@Url.Action("Register", "Account")" class="btn btn-white btn-large">
+            Create a free account →
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2026 AuthVault. All rights reserved.</p>
+</footer>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/welcome.css" asp-append-version="true" />
+}

@@ -1,0 +1,300 @@
+﻿@model List<VaultItemViewModel>
+
+@{
+    ViewData["Title"] = "Vault";
+    ViewData["EnablePasswordGenerator"] = true;
+    Layout = "_Layout";
+}
+
+<div class="vault-page">
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                        </svg>
+                    </div>
+                    <span class="logo-text">AuthVault</span>
+                </div>
+
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         class="toggle-icon">
+                        <path d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Vault</div>
+
+                    <a href="@Url.Action("Index", "Vault")" class="nav-item active">
+                        <span class="nav-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" />
+                                <path d="m21 2-9.6 9.6" />
+                                <circle cx="7.5" cy="15.5" r="5.5" />
+                            </svg>
+                        </span>
+                        <span class="nav-item-text">All Items</span>
+                        <span class="nav-item-count">@Model.Count</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="#" class="nav-item" onclick="openGenerator(event)">
+                        <span class="nav-item-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="m10.852 14.772-.383.923" />
+                                <path d="M13.148 14.772a3 3 0 1 0-2.296-5.544l-.383-.923" />
+                                <path d="m13.148 9.228.383-.923" />
+                                <path d="m13.53 15.696-.382-.924a3 3 0 1 1-2.296-5.544" />
+                                <path d="m14.772 10.852.923-.383" />
+                                <path d="m14.772 13.148.923.383" />
+                                <path d="M4.5 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-.5" />
+                                <path d="M4.5 14H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-.5" />
+                                <path d="M6 18h.01" />
+                                <path d="M6 6h.01" />
+                                <path d="m9.228 10.852-.923-.383" />
+                                <path d="m9.228 13.148-.923.383" />
+                            </svg>
+                        </span>
+                        <span class="nav-item-text">Password Generator</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="account-section">
+                <div class="account-item">
+                    <div class="account-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="5" />
+                            <path d="M20 21a8 8 0 0 0-16 0" />
+                        </svg>
+                    </div>
+                    <div class="account-info">
+                        <div class="account-name">
+                            @(User.Identity?.IsAuthenticated == true
+                                                        ? User.Identity!.Name
+                                                        : "Guest")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content">
+
+            <header class="header">
+                <div class="search-bar">
+                    <span class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="m21 21-4.34-4.34" />
+                            <circle cx="11" cy="11" r="8" />
+                        </svg>
+                    </span>
+                    <input type="text" placeholder="Search...">
+                </div>
+
+                <div class="header-actions">
+                    <button class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M11.35 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5.35" />
+                            <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                            <path d="M14 19h6" />
+                            <path d="M17 16v6" />
+                        </svg> Add Item
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="content-header">
+                    <h1 class="content-title">All Items</h1>
+                    <p class="content-subtitle">
+                        @Model.Count items in your vault
+                    </p>
+                </div>
+
+                <div class="items-grid">
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state">
+                            <p>The vault is empty</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <div class="item-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="24"
+                                             height="24"
+                                             viewBox="0 0 24 24"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="2"
+                                             stroke-linecap="round"
+                                             stroke-linejoin="round">
+                                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                    </div>
+
+                                    <div class="item-info">
+                                        <div class="item-name">@item.Name</div>
+                                        <div class="item-username">@item.Username</div>
+                                    </div>
+
+                                    <div class="item-actions">
+                                        @if (!string.IsNullOrEmpty(item.Password))
+                                        {
+                                            <button class="item-action-btn"
+                                                    title="Copy password"
+                                                    data-copy="@item.Password"
+                                                    onclick="copyFromData(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="24"
+                                                     height="24"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2"
+                                                     stroke-linecap="round"
+                                                     stroke-linejoin="round">
+                                                    <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                                                    <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                                                    <path d="M16 4h2a2 2 0 0 1 2 2v4" />
+                                                    <path d="M21 14H11" />
+                                                    <path d="m15 10-4 4 4 4" />
+                                                </svg>
+                                            </button>
+                                        }
+
+                                        <a href="@Url.Action("EditItem", "Vault", new { id = item.Id })"
+                                           class="item-action-btn"
+                                           title="Edit">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="24"
+                                                 height="24"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round">
+                                                <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                <path d="m15 5 4 4" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="item-details">
+                                    @if (!string.IsNullOrEmpty(item.Url))
+                                    {
+                                        <div class="item-detail">
+                                            <div class="item-detail-label">URL</div>
+                                            <div class="item-detail-value">@item.Url</div>
+                                        </div>
+                                    }
+
+                                    <div class="item-detail">
+                                        <div class="item-detail-label">Type</div>
+                                        <div class="item-detail-value">@item.ItemType</div>
+                                    </div>
+
+                                    <div class="item-detail">
+                                        <div class="item-detail-label">Created</div>
+                                        <div class="item-detail-value">
+                                            @item.CreatedAt.ToString("yyyy-MM-dd")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyFromData(btn) {
+            const value = btn.dataset.copy;
+            if (!value) return;
+            navigator.clipboard.writeText(value);
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vault.css" asp-append-version="true" />
+}
+

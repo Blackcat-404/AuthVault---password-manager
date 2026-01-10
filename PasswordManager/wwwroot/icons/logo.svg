@@ -1,0 +1,21 @@
+<svg viewBox="0 0 400 120" class="logo-svg">
+	<!-- OUTLINE -->
+	<text
+        x="50%"
+        y="50%"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        class="logo-text-outline">
+		AuthVault
+	</text>
+
+	<!-- FILL -->
+	<text
+        x="50%"
+        y="50%"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        class="logo-text-fill">
+		AuthVault
+	</text>
+</svg>

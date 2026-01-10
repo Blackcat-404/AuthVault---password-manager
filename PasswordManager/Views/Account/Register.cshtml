@@ -1,0 +1,163 @@
+﻿@using PasswordManager.ViewModels
+@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+    ViewData["BodyClass"] = "auth-page";
+    Layout = "_Layout";
+}
+
+<div class="login-container">
+
+    <!-- Application logo -->
+    <div class="logo">
+        <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+            </svg>
+        </div>
+
+        <div class="logo-title">
+            <svg viewBox="0 0 400 120" class="logo-svg">
+                <text x="50%" y="50%" text-anchor="middle"
+                      dominant-baseline="middle"
+                      class="logo-text-outline">
+                    AuthVault
+                </text>
+                <text x="50%" y="50%" text-anchor="middle"
+                      dominant-baseline="middle"
+                      class="logo-text-fill">
+                    AuthVault
+                </text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Tagline -->
+    <div class="tagline">
+        <p>Secure storage for your sensitive data</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <a asp-action="Login" asp-controller="Account" class="tab">Log in</a>
+        <a asp-action="Register" asp-controller="Account" class="tab active">Sign up</a>
+    </div>
+
+    <!-- Validation summary -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error-message show">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+    }
+
+    <!-- Register form -->
+    <form asp-action="Register" asp-controller="Account" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name"
+                   class="form-control"
+                   placeholder="Your name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email"
+                   class="form-control"
+                   placeholder="your@email.com" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <div class="password-wrapper">
+                <input asp-for="Password"
+                       id="register-password"
+                       class="form-control"
+                       placeholder="Create a strong password" />
+
+                <button type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('register-password', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="m15 18-.722-3.25" />
+                        <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+                        <path d="m20 15-1.726-2.05" />
+                        <path d="m4 15 1.726-2.05" />
+                        <path d="m9 18 .722-3.25" />
+                    </svg>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ConfirmPassword"></label>
+            <div class="password-wrapper">
+                <input asp-for="ConfirmPassword"
+                       id="register-password-confirm"
+                       class="form-control"
+                       placeholder="Repeat your password" />
+
+                <button type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('register-password-confirm', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="m15 18-.722-3.25" />
+                        <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+                        <path d="m20 15-1.726-2.05" />
+                        <path d="m4 15 1.726-2.05" />
+                        <path d="m9 18 .722-3.25" />
+                    </svg>
+                </button>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="checkbox-group">
+            <input asp-for="AcceptTerms" />
+            <label asp-for="AcceptTerms">
+                I accept the terms of service
+            </label>
+            <span asp-validation-for="AcceptTerms" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Create account
+        </button>
+    </form>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

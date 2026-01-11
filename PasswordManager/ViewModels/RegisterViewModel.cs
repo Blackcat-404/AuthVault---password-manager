@@ -22,7 +22,7 @@ namespace PasswordManager.ViewModels
         [Compare("Password", ErrorMessage = "Passwords don't match")]
         public string? ConfirmPassword { get; set; }
 
-        [Required(ErrorMessage = "You must accept the terms of use")]
         public bool AcceptTerms { get; set; }
+
     }
 }

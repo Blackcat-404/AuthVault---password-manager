@@ -18,7 +18,7 @@ namespace PasswordManager.Controllers
         private readonly EmailService _emailService;
         private readonly AppDbContext _appDbContext;
 
-        public AccountController(EmailService emailService,AppDbContext appDbContext)
+        public AccountController(EmailService emailService, AppDbContext appDbContext)
         {
             _emailService = emailService;
             _appDbContext = appDbContext;
@@ -41,13 +41,6 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-
-            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
-            {
-                ViewBag.Error = "Please enter both email and password";
-                return View();
-            }
-
             // Temporary: redirect without authentication for testing UI
             return RedirectToAction("Index", "Vault");
         }
@@ -78,23 +71,10 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-
-            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+            
+            if (!ModelState.IsValid)
             {
-                ViewBag.Error = "Please fill in all required fields";
-                return View();
-            }
-
-            if (model.Password != model.ConfirmPassword)
-            {
-                ViewBag.Error = "Passwords do not match";
-                return View();
-            }
-
-            if (!model.AcceptTerms)
-            {
-                ViewBag.Error = "You must accept the terms of service";
-                return View();
+                return View(model);
             }
 
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
@@ -103,17 +83,29 @@ namespace PasswordManager.Controllers
 
             if (user != null && user.EmailVerificationStatus == EmailVerificationStatus.Verified)
             {
-                ViewBag.Error = "An account with this email already exists.";
-                return View();
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "An account with this email already exists"
+                );
+                return View(model);
+            }
+
+            if (!model.AcceptTerms)
+            {
+                ModelState.AddModelError(
+                    nameof(model.AcceptTerms),
+                    "You must accept the terms of use"
+                );
+                return View(model);
             }
 
             if (user == null)
             {
                 var userNew = new User
                 {
-                    Login = model.Name,
-                    Email = model.Email,
-                    PasswordHash = PasswordHasher.Hash(model.Password),
+                    Login = model.Name!,
+                    Email = model.Email!,
+                    PasswordHash = PasswordHasher.Hash(model.Password!),
                     EmailVerificationStatus = EmailVerificationStatus.NotVerified,
                     EmailVerificationCode = verificationCode,
                     EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5),
@@ -125,25 +117,24 @@ namespace PasswordManager.Controllers
             }
             else
             {
-                user.Login = model.Name;
-                user.PasswordHash = PasswordHasher.Hash(model.Password);
+                user.Login = model.Name!;
+                user.PasswordHash = PasswordHasher.Hash(model.Password!);
                 user.EmailVerificationCode = verificationCode;
                 user.EmailVerificationExpiresAt = expiresAt;
             }
 
-            string bodystr = "Hello " + model.Name + "\nYour verification code is: " + verificationCode + 
+            string bodystr = "Hello " + model.Name + "\nYour verification code is: " + verificationCode +
                 "\n\nThis code expires in 5 minutes\n" +
                 "If you did not register, please ignore this email.";
 
             await _appDbContext.SaveChangesAsync();
             await _emailService.SendAsync(
-                    to: model.Email,
+                    to: model.Email!,
                     subject: "Email verification code",
-                    body:bodystr
+                    body: bodystr
             );
 
-            ViewBag.Success = "Account created successfully! Please log in.";
-            return RedirectToAction("Login");
+            return RedirectToAction("EmailVerification", "Account");
         }
 
         /// <summary>
@@ -166,8 +157,31 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public IActionResult ForgotPassword()
         {
-            
+
             return View();
         }
+
+
+
+        [HttpGet]
+        public IActionResult EmailVerification()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// POST: /Account/EmailVerification
+        /// Processes email verification
+        /// </summary>
+        /// <param name="codeVerification">Verification code</param>
+        /// <returns>Redirects to vault on success, returns view with error on failure</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EmailVerification(EmailVerificationViewModel model)
+        {
+            // Temporary: redirect without authentication for testing UI
+            return RedirectToAction("Index", "Vault");
+        }
+
     }
 }

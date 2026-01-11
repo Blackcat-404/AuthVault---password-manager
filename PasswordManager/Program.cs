@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
+using PasswordManager.Infrastructure.Email;
+using PasswordManager.Models.Email;
 
 namespace PasswordManager
 {
@@ -10,11 +12,16 @@ namespace PasswordManager
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container
-            builder.Services.AddControllersWithViews();
 
-            // TODO: Add your DbContext here
-            // builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
+                ));
+
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings")
+            );
+            builder.Services.AddScoped<EmailService>();
 
             // TODO: Add Authentication services
             // builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

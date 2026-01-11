@@ -1,4 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PasswordManager.Data;
+using PasswordManager.Domain.Entities;
+using PasswordManager.Domain.Enums;
+using PasswordManager.Infrastructure.Email;
+using PasswordManager.Infrastructure.Security;
+using PasswordManager.ViewModels;
 
 namespace PasswordManager.Controllers
 {
@@ -7,7 +14,16 @@ namespace PasswordManager.Controllers
     /// </summary>
     public class AccountController : Controller
     {
-        
+
+        private readonly EmailService _emailService;
+        private readonly AppDbContext _appDbContext;
+
+        public AccountController(EmailService emailService,AppDbContext appDbContext)
+        {
+            _emailService = emailService;
+            _appDbContext = appDbContext;
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -23,10 +39,10 @@ namespace PasswordManager.Controllers
         /// <returns>Redirects to vault on success, returns view with error on failure</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
                 ViewBag.Error = "Please enter both email and password";
                 return View();
@@ -60,26 +76,71 @@ namespace PasswordManager.Controllers
         /// <returns>Redirects to login on success, returns view with error on failure</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(string name, string email, string password, string passwordConfirm, bool acceptTerms = false)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
 
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(model.Name) || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
                 ViewBag.Error = "Please fill in all required fields";
                 return View();
             }
 
-            if (password != passwordConfirm)
+            if (model.Password != model.ConfirmPassword)
             {
                 ViewBag.Error = "Passwords do not match";
                 return View();
             }
 
-            if (!acceptTerms)
+            if (!model.AcceptTerms)
             {
                 ViewBag.Error = "You must accept the terms of service";
                 return View();
             }
+
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            int verificationCode = VerificationCodeGenerator.Generate();
+            DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
+
+            if (user != null && user.EmailVerificationStatus == EmailVerificationStatus.Verified)
+            {
+                ViewBag.Error = "An account with this email already exists.";
+                return View();
+            }
+
+            if (user == null)
+            {
+                var userNew = new User
+                {
+                    Login = model.Name,
+                    Email = model.Email,
+                    PasswordHash = PasswordHasher.Hash(model.Password),
+                    EmailVerificationStatus = EmailVerificationStatus.NotVerified,
+                    EmailVerificationCode = verificationCode,
+                    EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                    LastLoginAt = null,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _appDbContext.Users.Add(userNew);
+            }
+            else
+            {
+                user.Login = model.Name;
+                user.PasswordHash = PasswordHasher.Hash(model.Password);
+                user.EmailVerificationCode = verificationCode;
+                user.EmailVerificationExpiresAt = expiresAt;
+            }
+
+            string bodystr = "Hello " + model.Name + "\nYour verification code is: " + verificationCode + 
+                "\n\nThis code expires in 5 minutes\n" +
+                "If you did not register, please ignore this email.";
+
+            await _appDbContext.SaveChangesAsync();
+            await _emailService.SendAsync(
+                    to: model.Email,
+                    subject: "Email verification code",
+                    body:bodystr
+            );
 
             ViewBag.Success = "Account created successfully! Please log in.";
             return RedirectToAction("Login");

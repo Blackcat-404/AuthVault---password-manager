@@ -58,12 +58,20 @@
         <div class="form-group">
             <label asp-for="VerificationCode"></label>
 
+            <input type="hidden" asp-for="Email" />
             <input asp-for="VerificationCode"
                    type="text"
                    inputmode="numeric"
                    pattern="[0-9]*"
                    class="form-control"
                    placeholder="Enter verification code" />
+
+            @if (ViewContext.HttpContext.Request.Method == "POST" && !ViewData.ModelState.IsValid)
+            {
+                <div class="error-message show">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                </div>
+            }
 
             <span asp-validation-for="VerificationCode"
                   class="text-danger"></span>
@@ -80,10 +88,13 @@
               asp-controller="Account"
               method="post">
             @Html.AntiForgeryToken()
+            <input asp-for="Email" type="hidden"/>
             <button type="submit" class="resend-btn">
                 Resend verification code
             </button>
         </form>
+
+        
     </div>
 
 </div>

@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
 using PasswordManager.Infrastructure.Email;
+using PasswordManager.Infrastructure.Login;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.ViewModels;
+using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
@@ -17,11 +21,15 @@ namespace PasswordManager.Controllers
 
         private readonly EmailService _emailService;
         private readonly AppDbContext _appDbContext;
+        private readonly EmailVerificationService _emailVerificationService;
+        private readonly LoginService _loginService;
 
-        public AccountController(EmailService emailService, AppDbContext appDbContext)
+        public AccountController(EmailService emailService, AppDbContext appDbContext, EmailVerificationService emailVerificationService, LoginService loginService)
         {
             _emailService = emailService;
             _appDbContext = appDbContext;
+            _emailVerificationService = emailVerificationService;
+            _loginService = loginService;
         }
 
         [HttpGet]
@@ -41,8 +49,35 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            // Temporary: redirect without authentication for testing UI
-            return RedirectToAction("Index", "Vault");
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                var user = await _loginService.VerifyLoginAsync(
+                    model.Email!,
+                    model.Password!);
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                };
+
+                var identity = new ClaimsIdentity(
+                    claims,
+                    CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity));
+
+                return RedirectToAction("Index", "Vault");
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(nameof(model.Email), ex.Message);
+                return View(model);
+            }
         }
 
         /// <summary>
@@ -74,6 +109,31 @@ namespace PasswordManager.Controllers
             
             if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            //Condition where the mail that sends the code hasn't been entered. Change example@gmail.com
+            /*if (model.Email == "example@gmail.com") 
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Are you serious, dude?"
+                );
+
+                return View(model);
+            }*/
+
+            var loginExists = await _appDbContext.Users.AnyAsync(
+                u => u.Login == model.Name && 
+                u.EmailVerificationStatus == EmailVerificationStatus.Verified
+            );
+            if (loginExists)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "This login is already taken"
+                );
+
                 return View(model);
             }
 
@@ -123,7 +183,7 @@ namespace PasswordManager.Controllers
                 user.EmailVerificationExpiresAt = expiresAt;
             }
 
-            string bodystr = "Hello " + model.Name + "\nYour verification code is: " + verificationCode +
+            string bodystr = "Hello, " + model.Name + "\nYour verification code is: " + verificationCode +
                 "\n\nThis code expires in 5 minutes\n" +
                 "If you did not register, please ignore this email.";
 
@@ -134,7 +194,7 @@ namespace PasswordManager.Controllers
                     body: bodystr
             );
 
-            return RedirectToAction("EmailVerification", "Account");
+            return RedirectToAction("EmailVerification", new { email = model.Email });
         }
 
         /// <summary>
@@ -162,11 +222,20 @@ namespace PasswordManager.Controllers
         }
 
 
+        //EmailStuff
 
         [HttpGet]
-        public IActionResult EmailVerification()
+        public IActionResult EmailVerification(string email)
         {
-            return View();
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Register");
+            }
+
+            return View(new EmailVerificationViewModel
+            {
+                Email = email
+            });
         }
 
         /// <summary>
@@ -179,9 +248,49 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EmailVerification(EmailVerificationViewModel model)
         {
-            // Temporary: redirect without authentication for testing UI
-            return RedirectToAction("Index", "Vault");
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                await _emailVerificationService.VerifyAsync(model.Email, model.VerificationCode);
+                return RedirectToAction("Login");
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(
+                    nameof(model.VerificationCode), 
+                    ex.Message
+                );
+                return View(model);
+            }    
         }
 
+        /// <summary>
+        /// POST: /Account/ResendVerificationCode
+        /// Send new verification code
+        /// </summary>
+        /// <param name="codeVerification">Verification code</param>
+        /// <returns>Redirects to vault on success, returns view with error on failure</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendVerificationCode([Bind("Email")] EmailVerificationViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("EmailVerification", model);
+
+            try
+            {
+                await _emailVerificationService.ResendAsync(model.Email);
+                ViewBag.Success = "Verification code sent again";
+
+                return View("EmailVerification", model);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("EmailVerification", model);
+            }
+        }
     }
 }

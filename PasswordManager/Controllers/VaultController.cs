@@ -18,7 +18,13 @@ namespace PasswordManager.Controllers
         /// <returns>Vault dashboard view</returns>
         public async Task<IActionResult> Index()
         {
-            // Temporary: return view without data for UI testing
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
+            int id = int.Parse(userId);
+
             var items = new List<VaultItemViewModel>(); // TODO: replace with DB query
             return View(items);
         }

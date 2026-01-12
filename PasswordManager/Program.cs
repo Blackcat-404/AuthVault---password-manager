@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
+using PasswordManager.Infrastructure.Login;
 using PasswordManager.Models.Email;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace PasswordManager
 {
@@ -22,14 +24,18 @@ namespace PasswordManager
                 builder.Configuration.GetSection("EmailSettings")
             );
             builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<EmailVerificationService>();
+            builder.Services.AddScoped<LoginService>();
 
-            // TODO: Add Authentication services
-            // builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //     .AddCookie(options =>
-            //     {
-            //         options.LoginPath = "/Account/Login";
-            //         options.LogoutPath = "/Account/Logout";
-            //     });
+            builder.Services
+            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/Login";
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true;
+            });
 
             var app = builder.Build();
 

@@ -180,31 +180,36 @@ input {
         color: #ffffff;
     }
 
+
 .checkbox-group {
+    margin-bottom: 28px;
+}
+
+.checkbox {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 24px;
+    margin-bottom: 2px;
 }
 
-    .checkbox-group input[type="checkbox"] {
+    .checkbox input[type="checkbox"] {
         width: auto;
         margin-top: 0px;
         margin-left: 6px;
     }
 
-    .checkbox-group label {
+    .checkbox label {
         margin-top: 4px;
         font-weight: 400;
         color: #8b92a7;
         cursor: pointer;
-    }
+    }     
 
 .submit-btn {
     width: 100%;
     padding: 14px;
     margin-top: 14px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #459dd7 0%, #044876 100%);
     border: none;
     border-radius: 8px;
     color: #ffffff;
@@ -238,6 +243,34 @@ input {
             text-decoration: underline;
         }
 
+
+
+.verify-password {
+    text-align: center;
+    margin-top: 28px;
+}
+
+.resend-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #a6c7dd 0%, #7cbfeb 100%);
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+    .resend-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgb(119, 119, 207, 0.40);
+    }
+
+    .resend-btn:active {
+        transform: translateY(0);
+    }
+
 /*
 .back-to-home {
     text-align: center;
@@ -264,6 +297,7 @@ input {
 
 */
 
+/*
 .error-message {
     background: rgba(231, 76, 60, 0.1);
     border: 1px solid rgba(231, 76, 60, 0.3);
@@ -278,6 +312,7 @@ input {
     .error-message.show {
         display: block;
     }
+*/
 
 .text-danger {
     color: #e74c3c;

@@ -52,14 +52,6 @@
         <a asp-action="Register" asp-controller="Account" class="tab active">Sign up</a>
     </div>
 
-    <!-- Validation summary -->
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="error-message show">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        </div>
-    }
-
     <!-- Register form -->
     <form asp-action="Register" asp-controller="Account" method="post">
         @Html.AntiForgeryToken()
@@ -139,10 +131,12 @@
         </div>
 
         <div class="checkbox-group">
-            <input asp-for="AcceptTerms" />
-            <label asp-for="AcceptTerms">
-                I accept the terms of service
-            </label>
+            <div class="checkbox">
+                <input asp-for="AcceptTerms" />
+                <label asp-for="AcceptTerms">
+                   I accept the terms of service
+                </label>
+            </div>
             <span asp-validation-for="AcceptTerms" class="text-danger"></span>
         </div>
 

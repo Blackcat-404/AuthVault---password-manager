@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
+using PasswordManager.Infrastructure.Email;
+using PasswordManager.Infrastructure.Login;
+using PasswordManager.Models.Email;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace PasswordManager
 {
@@ -10,19 +14,28 @@ namespace PasswordManager
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container
+
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
+                ));
 
-            // TODO: Add your DbContext here
-            // builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings")
+            );
+            builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<EmailVerificationService>();
+            builder.Services.AddScoped<LoginService>();
 
-            // TODO: Add Authentication services
-            // builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //     .AddCookie(options =>
-            //     {
-            //         options.LoginPath = "/Account/Login";
-            //         options.LogoutPath = "/Account/Logout";
-            //     });
+            builder.Services
+            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/Login";
+                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.SlidingExpiration = true;
+            });
 
             var app = builder.Build();
 

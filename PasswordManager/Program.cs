@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Login;
+using PasswordManager.Application.Account.Register;
+using PasswordManager.Application.Account.Login;
 using PasswordManager.Models.Email;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using PasswordManager.Infrastructure.Register;
 
 namespace PasswordManager
 {
@@ -25,7 +28,8 @@ namespace PasswordManager
             );
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<EmailVerificationService>();
-            builder.Services.AddScoped<LoginService>();
+            builder.Services.AddScoped<ILoginService, LoginService>();
+            builder.Services.AddScoped<IRegisterService,RegisterService>();
 
             builder.Services
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -55,10 +59,16 @@ namespace PasswordManager
             // app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapGet("/", context =>
+            {
+                context.Response.Redirect("/Welcome");
+                return Task.CompletedTask;
+            });
+
             // Configure routes
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Welcome}/{action=Index}/{id?}");
+                pattern: "{controller=Welcome}/{action=IndexWelcome}/{id?}");
 
             app.Run();
         }

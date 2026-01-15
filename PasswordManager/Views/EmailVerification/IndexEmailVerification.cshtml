@@ -49,9 +49,7 @@
     </div>
 
     <!-- Verification form -->
-    <form asp-action="EmailVerification"
-          asp-controller="Account"
-          method="post">
+    <form asp-action="EmailVerification" asp-controller="Register" method="post">
 
         @Html.AntiForgeryToken()
 
@@ -66,15 +64,7 @@
                    class="form-control"
                    placeholder="Enter verification code" />
 
-            @if (ViewContext.HttpContext.Request.Method == "POST" && !ViewData.ModelState.IsValid)
-            {
-                <div class="error-message show">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                </div>
-            }
-
-            <span asp-validation-for="VerificationCode"
-                  class="text-danger"></span>
+            <span asp-validation-for="VerificationCode" class="text-danger"></span>
         </div>
 
         <button type="submit" class="submit-btn">
@@ -85,7 +75,7 @@
     <!-- Resend code -->
     <div class="verify-password">
         <form asp-action="ResendVerificationCode"
-              asp-controller="Account"
+              asp-controller="EmailVerification"
               method="post">
             @Html.AntiForgeryToken()
             <input asp-for="Email" type="hidden"/>

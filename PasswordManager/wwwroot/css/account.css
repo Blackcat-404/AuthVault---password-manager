@@ -297,7 +297,7 @@ input {
 
 */
 
-/*
+
 .error-message {
     background: rgba(231, 76, 60, 0.1);
     border: 1px solid rgba(231, 76, 60, 0.3);
@@ -309,10 +309,10 @@ input {
     display: none;
 }
 
-    .error-message.show {
+    .error-message show {
         display: block;
     }
-*/
+
 
 .text-danger {
     color: #e74c3c;

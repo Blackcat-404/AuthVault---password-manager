@@ -7,7 +7,7 @@
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="@Url.Action("Index", "Welcome")" class="logo">
+        <a href="@Url.Action("IndexWelcome", "Welcome")" class="logo">
             <div class="logo-icon">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="24"
@@ -64,8 +64,9 @@
         </p>
 
         <div class="hero-actions">
-            <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-large">Sign up</a>
-            <a href="@Url.Action("Login", "Account")" class="btn btn-white btn-large">Log in</a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-large">Sign up</a>
+
+            <a asp-controller="Account" asp-action="Login" class="btn btn-white btn-large">Log in</a>
         </div>
     </div>
 </section>

@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
 using PasswordManager.Domain.Enums;
+using PasswordManager.Domain.Entities;
 using PasswordManager.Infrastructure.Security;
+using PasswordManager.Application;
+using PasswordManager.Application.Account.Email;
 
 namespace PasswordManager.Infrastructure.Email
 {
@@ -16,36 +19,66 @@ namespace PasswordManager.Infrastructure.Email
             _emailService = emailService;
         }
 
-        public async Task VerifyAsync(string email, int code)
+        public async Task<Result<User>> VerifyAsync(EmailVerificationDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var result = new Result<User>();
+
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Email == dto.Email ||
+                    u.Login == dto.Email);
+
             if (user == null)
-                throw new InvalidOperationException("User not found");
+            {
+                result.AddError(nameof(dto.Email), "User not found");
+                return result;
+            }
 
             if (user.EmailVerificationExpiresAt < DateTime.UtcNow)
-                throw new InvalidOperationException("Verification code expired");
+            {
+                result.AddError(nameof(dto.VerificationCode), "Verification code expired");
+                return result;
+            }
 
-            if (user.EmailVerificationCode != code)
-                throw new InvalidOperationException("Invalid verification code");
+            if (user.EmailVerificationCode != dto.VerificationCode)
+            {
+                result.AddError(nameof(dto.VerificationCode), "Invalid verification code");
+                return result;
+            }
 
             user.EmailVerificationStatus = EmailVerificationStatus.Verified;
             user.EmailVerificationCode = null;
             user.EmailVerificationExpiresAt = null;
 
+            user!.LastLoginAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
+
+            return Result<User>.Ok(user);
         }
 
-        public async Task ResendAsync(string email)
+        public async Task<Result> ResendAsync(EmailVerificationDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null)
-                throw new InvalidOperationException("User not found");
+            var result = new Result();
 
-            if (user.EmailVerificationExpiresAt > DateTime.UtcNow)
-                throw new InvalidOperationException("The code can still be used");
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+            if (user == null)
+            {
+                result.AddError(nameof(Email), "User not found");
+                return result;
+            }
+
+            if (user.EmailVerificationExpiresAt > DateTime.UtcNow.AddMinutes(4))
+            {
+                result.AddError(nameof(dto.VerificationCode), "The code can still be used");
+                return result;
+            }
 
             if (user.EmailVerificationStatus == EmailVerificationStatus.Verified)
-                throw new InvalidOperationException("Email is already confirmed");
+            {
+                result.AddError(nameof(Email), "Email is already confirmed");
+                return result;
+            }
 
             var code = VerificationCodeGenerator.Generate();
 
@@ -63,6 +96,8 @@ namespace PasswordManager.Infrastructure.Email
                 "Resending email verification code",
                 bodystr
             );
+
+            return result;
         }
     }
 }

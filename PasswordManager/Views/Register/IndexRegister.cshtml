@@ -1,8 +1,8 @@
 ﻿@using PasswordManager.ViewModels
-@model LoginViewModel
+@model RegisterViewModel
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Register";
     ViewData["BodyClass"] = "auth-page";
     Layout = "_Layout";
 }
@@ -48,13 +48,21 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <a asp-action="Login" asp-controller="Account" class="tab active">Log in</a>
-        <a asp-action="Register" asp-controller="Account" class="tab">Sign up</a>
+        <a asp-controller="Account" asp-action="Login" class="tab">Log in</a>
+        <a asp-controller="Account" asp-action="Register" class="tab active">Sign up</a>
     </div>
 
-    <!-- Login form -->
-    <form asp-action="Login" asp-controller="Account" method="post">
+    <!-- Register form -->
+    <form href="@Url.Action("Register", "Account")" method="post">
         @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name"
+                   class="form-control"
+                   placeholder="Your name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
 
         <div class="form-group">
             <label asp-for="Email"></label>
@@ -66,17 +74,15 @@
 
         <div class="form-group">
             <label asp-for="Password"></label>
-
             <div class="password-wrapper">
                 <input asp-for="Password"
-                       id="login-password"
+                       id="register-password"
                        class="form-control"
-                       placeholder="Enter your master password" />
+                       placeholder="Create a strong password" />
 
                 <button type="button"
                         class="toggle-password"
-                        onclick="togglePassword('login-password', this)">
-                    <!-- eye icon -->
+                        onclick="togglePassword('register-password', this)">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 24 24"
                          fill="none"
@@ -92,19 +98,52 @@
                     </svg>
                 </button>
             </div>
-
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="submit-btn">Log in</button>
+        <div class="form-group">
+            <label asp-for="ConfirmPassword"></label>
+            <div class="password-wrapper">
+                <input asp-for="ConfirmPassword"
+                       id="register-password-confirm"
+                       class="form-control"
+                       placeholder="Repeat your password" />
+
+                <button type="button"
+                        class="toggle-password"
+                        onclick="togglePassword('register-password-confirm', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="m15 18-.722-3.25" />
+                        <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+                        <path d="m20 15-1.726-2.05" />
+                        <path d="m4 15 1.726-2.05" />
+                        <path d="m9 18 .722-3.25" />
+                    </svg>
+                </button>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="checkbox-group">
+            <div class="checkbox">
+                <input asp-for="AcceptTerms" />
+                <label asp-for="AcceptTerms">
+                   I accept the terms of service
+                </label>
+            </div>
+            <span asp-validation-for="AcceptTerms" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Create account
+        </button>
     </form>
-
-    <div class="forgot-password">
-        <a asp-controller="Welcome" asp-action="Index">
-            Forgot your master password?
-        </a>
-    </div>
-
 </div>
 
 @section Styles {

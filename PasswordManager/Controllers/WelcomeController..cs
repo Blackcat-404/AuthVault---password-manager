@@ -8,11 +8,12 @@ namespace PasswordManager.Controllers
     public class WelcomeController : Controller
     {
         /// <summary>
-        /// GET: / or /Welcome or /Welcome/Index
+        /// GET: / or /Welcome or /Welcome/Home
         /// Displays the landing page with hero section and features
         /// </summary>
         /// <returns>Landing page view</returns>
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult IndexWelcome()
         {
             return View();
         }

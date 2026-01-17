@@ -16,6 +16,7 @@ namespace PasswordManager.Data
         public DbSet<LoginData> LoginData => Set<LoginData>();
         public DbSet<CardData> CardData => Set<CardData>();
         public DbSet<NoteData> NoteData => Set<NoteData>();
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

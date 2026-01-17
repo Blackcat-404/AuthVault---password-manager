@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Data;
-using PasswordManager.Infrastructure.Login;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.ViewModels;
 using System.Security.Claims;
@@ -12,15 +10,12 @@ namespace PasswordManager.Controllers
     [Route("Account")]
     public class LoginController : Controller
     {
-        private readonly AppDbContext _appDbContext;
         private readonly ILoginService _loginService;
 
-        public LoginController(AppDbContext appDbContext, ILoginService loginService)
+        public LoginController(ILoginService loginService)
         {
-            _appDbContext = appDbContext;
             _loginService = loginService;
         }
-
 
         [HttpGet("Login")]
         public IActionResult GetLogin()
@@ -58,14 +53,9 @@ namespace PasswordManager.Controllers
                 return View("IndexLogin", model);
             }
 
-            var user = result.Value!;
-
-            user.LastLoginAt = DateTime.UtcNow;
-            await _appDbContext.SaveChangesAsync();
-
             var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, result.Value!.Id.ToString()),
                 };
 
             var identity = new ClaimsIdentity(

@@ -8,7 +8,7 @@ namespace PasswordManager.Controllers
     [Route("Account")]
     public class RegisterController : Controller
     {
-        readonly IRegisterService _registerService;
+        private readonly IRegisterService _registerService;
 
         public RegisterController(IRegisterService registerService)
         {
@@ -64,8 +64,11 @@ namespace PasswordManager.Controllers
             }
 
             TempData["Email"] = model.Email;
-            return RedirectToAction("EmailVerification", "Register");
-
+            //return RedirectToAction("EmailVerification", "Register");
+            return RedirectToAction(
+                nameof(EmailVerificationController.GetEmailVerification),
+                "EmailVerification"
+            );
         }
     }
 }

@@ -1,23 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Data;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.ViewModels;
 using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
-    [Route("Register")]
+    [Route("Account/Register")]
     public class EmailVerificationController : Controller
     {
-        private readonly AppDbContext _appDbContext;
-        private readonly EmailVerificationService _emailVerificationService;
+        private readonly IEmailVerificationService _emailVerificationService;
 
-        public EmailVerificationController(AppDbContext appDbContext, EmailVerificationService emailVerificationService)
+        public EmailVerificationController(IEmailVerificationService emailVerificationService)
         {
-            _appDbContext = appDbContext;
             _emailVerificationService = emailVerificationService;
         }
 
@@ -91,7 +87,7 @@ namespace PasswordManager.Controllers
         /// </summary>
         /// <param name="codeVerification">Verification code</param>
         /// <returns>Redirects to vault on success, returns view with error on failure</returns>
-        [HttpPost]
+        [HttpPost("ResendVerificationCode")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResendVerificationCode([Bind("Email")] EmailVerificationViewModel model)
         {

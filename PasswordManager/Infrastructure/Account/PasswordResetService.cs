@@ -19,58 +19,57 @@ namespace PasswordManager.Infrastructure.ForgotPassword
             _emailService = emailService;
         }
 
-        public async Task CreateResetTokenAsync(ForgotPasswordDto dto)
-        {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null)
+            public async Task CreateResetTokenAsync(ForgotPasswordDto dto)
             {
-                return;
-            }
-
-            var token = Guid.NewGuid().ToString("N");
-            var expiresAt = DateTime.UtcNow.AddMinutes(30);
-
-            var existingToken = await _db.PasswordResetTokens.FirstOrDefaultAsync(t => t.UserId == user.Id);
-
-            if (existingToken != null)
-            {
-                if (existingToken.ExpiresAt > DateTime.UtcNow) //Check if 30 minutes passed since last sending
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+                if (user == null)
                 {
                     return;
                 }
 
-                existingToken.Token = token;
-                existingToken.ExpiresAt = expiresAt;
-                existingToken.UsedAt = null;
-            }
-            else
-            {
-                var resetToken = new PasswordResetToken
+                var token = await GenerateUniqueResetTokenAsync();
+                var expiresAt = DateTime.UtcNow.AddMinutes(30);
+
+                var existingToken = await _db.PasswordResetTokens.FirstOrDefaultAsync(t => t.UserId == user.Id);
+                if (existingToken != null)
                 {
-                    UserId = user.Id,
-                    Token = token,
-                    ExpiresAt = expiresAt,
-                    UsedAt = null
-                };
+                    if (existingToken.ExpiresAt > DateTime.UtcNow) //Check if 30 minutes passed since last sending
+                    {
+                        return;
+                    }
 
-                _db.PasswordResetTokens.Add(resetToken);
+                    existingToken.Token = token;
+                    existingToken.ExpiresAt = expiresAt;
+                    existingToken.UsedAt = null;
+                }
+                else
+                {
+                    var resetToken = new PasswordResetToken
+                    {
+                        UserId = user.Id,
+                        Token = token,
+                        ExpiresAt = expiresAt,
+                        UsedAt = null
+                    };
+
+                    _db.PasswordResetTokens.Add(resetToken);
+                }
+
+                await _db.SaveChangesAsync();
+
+                string bodystr = "Hello, " + user.Login + 
+                    "\n\nThis is your link to reset your password:\n" + 
+                    "https://localhost:7108/Account/ForgotPassword/ResetPassword?token=" + token +
+                    "\n\nWarning! This link can only be used once and resent after 30 minutes for security reasons!" +
+                    "\nThe link expires in 30 minutes." +
+                    "\nIf it's not you, please ignore this email.";
+
+                await _emailService.SendAsync(
+                        to: dto.Email,
+                        subject: "Reset password link",
+                        body: bodystr
+                );
             }
-
-            await _db.SaveChangesAsync();
-
-            string bodystr = "Hello, " + user.Login + 
-                "\n\nThis is your link to reset your password:\n" + 
-                "https://localhost:7108/Account/ForgotPassword/ResetPassword?token=" + token +
-                "\n\nWarning! This link can only be used once and resent after 30 minutes for security reasons!" +
-                "\nThe link expires in 30 minutes" +
-                "\nIf it's not you, please ignore this email.";
-
-            await _emailService.SendAsync(
-                    to: dto.Email,
-                    subject: "Reset password link",
-                    body: bodystr
-            );
-        }
 
         public async Task<Result> ValidateTokenAsync(string token)
         {
@@ -115,11 +114,25 @@ namespace PasswordManager.Infrastructure.ForgotPassword
                 return result;
             }
 
+            resetToken.Token = null;
             resetToken.UsedAt = DateTime.UtcNow;
             resetToken.User.PasswordHash = PasswordHasher.Hash(newPassword);
             await _db.SaveChangesAsync();
 
             return result;
+        }
+
+        private async Task<string> GenerateUniqueResetTokenAsync()
+        {
+            string token;
+
+            do
+            {
+                token = Guid.NewGuid().ToString("N");
+            }
+            while (await _db.PasswordResetTokens.AnyAsync(t => t.Token == token));
+
+            return token;
         }
     }
 }

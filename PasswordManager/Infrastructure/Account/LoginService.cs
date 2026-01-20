@@ -18,6 +18,11 @@ namespace PasswordManager.Infrastructure.Login
             _db = db;
         }
 
+        public Task Logout()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Result<User>> VerifyLoginAsync(LoginUserDto dto)
         {
             var result = new Result<User>();
@@ -46,6 +51,5 @@ namespace PasswordManager.Infrastructure.Login
 
             return Result<User>.Ok(user);
         }
-
     }
 }

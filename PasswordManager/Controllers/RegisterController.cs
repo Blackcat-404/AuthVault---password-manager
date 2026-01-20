@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Register;
 using PasswordManager.ViewModels;
 
 
 namespace PasswordManager.Controllers
 {
+    [AllowAnonymous]
     [Route("Account")]
     public class RegisterController : Controller
     {

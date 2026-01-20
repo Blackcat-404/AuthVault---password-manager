@@ -108,80 +108,6 @@ function toggleSidebar() {
     localStorage.setItem('sidebar', sidebar.classList.contains('collapsed'));
 }
 
-
-// Password Generator Modal
-function openGenerator() {
-    const modal = document.getElementById('generator-modal');
-    if (modal) {
-        modal.classList.add('show');
-        generatePassword();
-    }
-}
-
-function closeGenerator() {
-    const modal = document.getElementById('generator-modal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
-}
-
-// Update password length display
-function updateLength(value) {
-    const lengthValue = document.getElementById('length-value');
-    if (lengthValue) {
-        lengthValue.textContent = value;
-        generatePassword();
-    }
-}
-
-// Generate password
-function generatePassword() {
-    const lengthSlider = document.getElementById('length-slider');
-    const uppercaseCheckbox = document.getElementById('uppercase');
-    const lowercaseCheckbox = document.getElementById('lowercase');
-    const numbersCheckbox = document.getElementById('numbers');
-    const symbolsCheckbox = document.getElementById('symbols');
-    const display = document.getElementById('generated-password');
-
-    if (!lengthSlider || !display) return;
-
-    const length = parseInt(lengthSlider.value);
-    const useUppercase = uppercaseCheckbox ? uppercaseCheckbox.checked : true;
-    const useLowercase = lowercaseCheckbox ? lowercaseCheckbox.checked : true;
-    const useNumbers = numbersCheckbox ? numbersCheckbox.checked : true;
-    const useSymbols = symbolsCheckbox ? symbolsCheckbox.checked : true;
-
-    let charset = '';
-    if (useUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    if (useLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-    if (useNumbers) charset += '0123456789';
-    if (useSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-    // If no options selected, use lowercase by default
-    if (charset === '') {
-        charset = 'abcdefghijklmnopqrstuvwxyz';
-    }
-
-    let password = '';
-    for (let i = 0; i < length; i++) {
-        password += charset.charAt(Math.floor(Math.random() * charset.length));
-    }
-
-    display.textContent = password;
-}
-
-// Close modal when clicking outside
-document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('generator-modal');
-    if (modal) {
-        modal.addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeGenerator();
-            }
-        });
-    }
-});
-
 // Copy to clipboard function (for future use)
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -192,3 +118,250 @@ function copyToClipboard(text) {
         console.error('Failed to copy:', err);
     });
 }
+
+
+
+
+// Password Generator Functions
+
+function openGenerator(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('generator-modal');
+    if (modal) {
+        modal.classList.add('show');
+        generatePassword(); // Generate password immediately on open
+    }
+}
+
+function closeGenerator() {
+    const modal = document.getElementById('generator-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+function updateLength(value) {
+    const lengthValue = document.getElementById('length-value');
+    if (lengthValue) {
+        lengthValue.textContent = value;
+    }
+    generatePassword();
+}
+
+function generatePassword() {
+    const length = parseInt(document.getElementById('length-slider').value);
+    const useUppercase = document.getElementById('uppercase').checked;
+    const useLowercase = document.getElementById('lowercase').checked;
+    const useNumbers = document.getElementById('numbers').checked;
+    const useSymbols = document.getElementById('symbols').checked;
+
+    // Character sets
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+    let charset = '';
+    let password = '';
+
+    // Build character set
+    if (useUppercase) charset += uppercase;
+    if (useLowercase) charset += lowercase;
+    if (useNumbers) charset += numbers;
+    if (useSymbols) charset += symbols;
+
+    // If nothing selected, use lowercase
+    if (charset === '') {
+        charset = lowercase;
+    }
+
+    // Generate password
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+    }
+
+    // Display password
+    const passwordDisplay = document.getElementById('generated-password');
+    if (passwordDisplay) {
+        passwordDisplay.textContent = password;
+
+        // Appearance animation
+        passwordDisplay.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            passwordDisplay.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    // Update strength indicator
+    updatePasswordStrength(password, useUppercase, useLowercase, useNumbers, useSymbols);
+}
+
+function updatePasswordStrength(password, hasUpper, hasLower, hasNumber, hasSymbol) {
+    const length = password.length;
+    let score = 0;
+    let strengthText = '';
+    let strengthClass = '';
+
+    // Calculate password strength
+    if (length >= 8) score++;
+    if (length >= 12) score++;
+    if (length >= 16) score++;
+
+    let charTypesCount = 0;
+    if (hasUpper) charTypesCount++;
+    if (hasLower) charTypesCount++;
+    if (hasNumber) charTypesCount++;
+    if (hasSymbol) charTypesCount++;
+
+    if (charTypesCount >= 2) score++;
+    if (charTypesCount >= 3) score++;
+    if (charTypesCount >= 4) score++;
+
+    // Determine strength level
+    if (score <= 2) {
+        strengthText = 'Weak';
+        strengthClass = 'weak';
+    } else if (score <= 4) {
+        strengthText = 'Medium';
+        strengthClass = 'medium';
+    } else {
+        strengthText = 'Strong';
+        strengthClass = 'strong';
+    }
+
+    // Update indicators
+    const strengthTextEl = document.getElementById('strength-text');
+    if (strengthTextEl) {
+        strengthTextEl.textContent = strengthText;
+        strengthTextEl.className = `strength-text ${strengthClass}`;
+    }
+
+    // Update bars
+    const bars = [
+        document.getElementById('strength-bar-1'),
+        document.getElementById('strength-bar-2'),
+        document.getElementById('strength-bar-3'),
+        document.getElementById('strength-bar-4')
+    ];
+
+    bars.forEach((bar, index) => {
+        if (bar) {
+            bar.className = 'strength-bar';
+
+            if (strengthClass === 'weak' && index === 0) {
+                bar.classList.add('active');
+            } else if (strengthClass === 'medium' && index <= 1) {
+                bar.classList.add('active', 'medium');
+            } else if (strengthClass === 'strong' && index <= 3) {
+                bar.classList.add('active', 'strong');
+            }
+        }
+    });
+}
+
+function copyGeneratedPassword() {
+    const passwordDisplay = document.getElementById('generated-password');
+    if (!passwordDisplay) return;
+
+    const password = passwordDisplay.textContent;
+
+    if (password === 'Click Generate') {
+        showNotification('Please generate a password first!', 'warning');
+        return;
+    }
+
+    navigator.clipboard.writeText(password).then(() => {
+        showNotification('Password copied to clipboard!', 'success');
+
+        // Visual feedback
+        const copyBtn = document.querySelector('.copy-password-btn');
+        if (copyBtn) {
+            copyBtn.style.background = '#27ae60';
+            copyBtn.style.color = '#ffffff';
+
+            setTimeout(() => {
+                copyBtn.style.background = '';
+                copyBtn.style.color = '';
+            }, 1000);
+        }
+    }).catch(err => {
+        console.error('Copy failed:', err);
+        showNotification('Failed to copy password', 'error');
+    });
+}
+
+function showNotification(message, type = 'success') {
+    // Create notification
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+
+    // Determine color
+    let bgColor = '#27ae60'; // success
+    if (type === 'error') bgColor = '#e74c3c';
+    if (type === 'warning') bgColor = '#f39c12';
+
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: ${bgColor};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    `;
+
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('generator-modal');
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeGenerator();
+            }
+        });
+    }
+});
+
+// Animations for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);

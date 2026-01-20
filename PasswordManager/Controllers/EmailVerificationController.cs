@@ -1,26 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Security;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
-using PasswordManager.Application.Account.Email;
 using PasswordManager.ViewModels;
 using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
+    [AllowAnonymous]
     [Route("Register")]
     public class EmailVerificationController : Controller
     {
-        private readonly AppDbContext _appDbContext;
         private readonly EmailVerificationService _emailVerificationService;
+        private readonly IAuthService _authService;
 
-        public EmailVerificationController(AppDbContext appDbContext, EmailVerificationService emailVerificationService)
+        public EmailVerificationController(EmailVerificationService emailVerificationService, IAuthService authService)
         {
-            _appDbContext = appDbContext;
             _emailVerificationService = emailVerificationService;
+            _authService = authService;
         }
-
+         
         [HttpGet("EmailVerification")]
         public IActionResult GetEmailVerification()
         {
@@ -66,20 +67,7 @@ namespace PasswordManager.Controllers
 
             var user = result.Value;
 
-            var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user!.Id.ToString())
-                };
-
-            var identity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme
-            );
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity)
-            );
+            await _authService.SignInAsync(HttpContext, user!.Id);
 
             return RedirectToAction("Home", "Vault");
         }

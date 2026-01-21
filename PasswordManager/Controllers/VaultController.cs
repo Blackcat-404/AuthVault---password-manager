@@ -12,11 +12,12 @@ namespace PasswordManager.Controllers
     public class VaultController : Controller
     {
         /// <summary>
-        /// GET: /Vault or /Vault/Index
+        /// GET: /Vault or /Vault/Home
         /// Displays the main vault dashboard with all items
         /// </summary>
         /// <returns>Vault dashboard view</returns>
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Home()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -25,8 +26,10 @@ namespace PasswordManager.Controllers
 
             int id = int.Parse(userId);
 
+            Console.WriteLine("User ID: " + id);
+
             var items = new List<VaultItemViewModel>(); // TODO: replace with DB query
-            return View(items);
+            return View("IndexVault", items);
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(/* TODO: Add VaultItemViewModel parameter */)
         {
-            return RedirectToAction("Index");
+            return RedirectToAction("Home");
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditItem(int id, VaultItemViewModel model)
         {
-            return RedirectToAction("Index");
+            return RedirectToAction("Home");
         }
 
         /// <summary>
@@ -91,7 +94,7 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteItem(int id)
         {
-            return RedirectToAction("Index");
+            return RedirectToAction("Home");
         }
 
         /// <summary>
@@ -103,7 +106,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string query)
         {
-            return View("Index");
+            return View("Home");
         }
 
         /// <summary>
@@ -114,7 +117,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Favorites()
         {
-            return View("Index");
+            return View("Home");
         }
 
         /// <summary>
@@ -126,7 +129,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Folder(int folderId)
         {
-            return View("Index");
+            return View("Home");
         }
 
         /// <summary>
@@ -168,7 +171,7 @@ namespace PasswordManager.Controllers
             // TODO: Implement vault import
             // Import from other password managers or backup file
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Home");
         }
     }
 }

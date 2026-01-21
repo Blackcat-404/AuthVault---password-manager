@@ -1,45 +1,46 @@
-namespace PasswordManager.Infrastructure.Email;
-
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using PasswordManager.Models.Email;
 
-public class EmailService
+namespace PasswordManager.Infrastructure.Email
 {
-    private readonly EmailSettings _settings;
-
-    public EmailService(IOptions<EmailSettings> options)
+    public class EmailService
     {
-        _settings = options.Value;
-    }
+        private readonly EmailSettings _settings;
 
-    public async Task SendAsync(string to, string subject, string body)
-    {
-        var message = new MimeMessage();
-        message.From.Add(MailboxAddress.Parse(_settings.From));
-        message.To.Add(MailboxAddress.Parse(to));
-        message.Subject = subject;
-
-        message.Body = new TextPart("plain")
+        public EmailService(IOptions<EmailSettings> options)
         {
-            Text = body
-        };
+            _settings = options.Value;
+        }
 
-        using var client = new SmtpClient();
-        await client.ConnectAsync(
-            _settings.Host,
-            _settings.Port,
-            SecureSocketOptions.StartTls
-        );
+        public async Task SendAsync(string to, string subject, string body)
+        {
+            var message = new MimeMessage();
+            message.From.Add(MailboxAddress.Parse(_settings.From));
+            message.To.Add(MailboxAddress.Parse(to));
+            message.Subject = subject;
 
-        await client.AuthenticateAsync(
-            _settings.Username,
-            _settings.Password
-        );
+            message.Body = new TextPart("plain")
+            {
+                Text = body
+            };
 
-        await client.SendAsync(message);
-        await client.DisconnectAsync(true);
+            using var client = new SmtpClient();
+            await client.ConnectAsync(
+                _settings.Host,
+                _settings.Port,
+                SecureSocketOptions.StartTls
+            );
+
+            await client.AuthenticateAsync(
+                _settings.Username,
+                _settings.Password
+            );
+
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+        }
     }
 }

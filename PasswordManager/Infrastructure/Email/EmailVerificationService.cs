@@ -8,7 +8,7 @@ using PasswordManager.Application.Account.Email;
 
 namespace PasswordManager.Infrastructure.Email
 {
-    public class EmailVerificationService
+    public class EmailVerificationService : IEmailVerificationService
     {
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;

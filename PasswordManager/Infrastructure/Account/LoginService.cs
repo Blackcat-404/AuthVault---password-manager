@@ -49,6 +49,8 @@ namespace PasswordManager.Infrastructure.Login
                 return result;
             }
 
+            user.LastLoginAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
             return Result<User>.Ok(user);
         }
     }

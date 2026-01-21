@@ -10,13 +10,13 @@ using System.Security.Claims;
 namespace PasswordManager.Controllers
 {
     [AllowAnonymous]
-    [Route("Register")]
+    [Route("Account/Register")]
     public class EmailVerificationController : Controller
     {
-        private readonly EmailVerificationService _emailVerificationService;
+        private readonly IEmailVerificationService _emailVerificationService;
         private readonly IAuthService _authService;
 
-        public EmailVerificationController(EmailVerificationService emailVerificationService, IAuthService authService)
+        public EmailVerificationController(IEmailVerificationService emailVerificationService, IAuthService authService)
         {
             _emailVerificationService = emailVerificationService;
             _authService = authService;
@@ -79,7 +79,7 @@ namespace PasswordManager.Controllers
         /// </summary>
         /// <param name="codeVerification">Verification code</param>
         /// <returns>Redirects to vault on success, returns view with error on failure</returns>
-        [HttpPost]
+        [HttpPost("ResendVerificationCode")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResendVerificationCode([Bind("Email")] EmailVerificationViewModel model)
         {

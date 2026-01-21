@@ -17,15 +17,12 @@ namespace PasswordManager.Controllers
     {
         private readonly ILoginService _loginService;
         private readonly IAuthService _authService;
-        private readonly AppDbContext _db;
 
-        public LoginController(ILoginService loginService, IAuthService authService, AppDbContext db)
+        public LoginController(ILoginService loginService, IAuthService authService)
         {
             _loginService = loginService;
             _authService = authService;
-            _db = db;
         }
-
 
         [HttpGet("Login")]
         public IActionResult GetLogin()
@@ -64,8 +61,6 @@ namespace PasswordManager.Controllers
             }
 
             var user = result.Value!;
-            user.LastLoginAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
 
             await _authService.SignInAsync(HttpContext, user.Id);
 

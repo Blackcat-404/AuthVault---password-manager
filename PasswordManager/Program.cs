@@ -9,10 +9,14 @@ using PasswordManager.Application.Vault;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Login;
-using PasswordManager.Infrastructure.Register;
-using PasswordManager.Infrastructure.Security;
+using PasswordManager.Infrastructure.ForgotPassword;
 using PasswordManager.Infrastructure.Vault;
+using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using PasswordManager.Infrastructure.Register;
+using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Application.Account.Email;
 
 namespace PasswordManager
 {
@@ -34,12 +38,13 @@ namespace PasswordManager
                 builder.Configuration.GetSection("EmailSettings")
             );
             builder.Services.AddScoped<EmailService>();
-            builder.Services.AddScoped<EmailVerificationService>();
+            builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IRegisterService,RegisterService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IVaultHomeService, VaultService>();
             builder.Services.AddScoped<IVaultSidebarService, VaultService>();
+            builder.Services.AddScoped<IResetPasswordService, PasswordResetService>();
 
 
             builder.Services

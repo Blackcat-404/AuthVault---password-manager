@@ -1,10 +1,17 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using PasswordManager.Application.Account.Login;
+using PasswordManager.Application.Account.Register;
+using PasswordManager.Application.Security;
+using PasswordManager.Application.Vault;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Login;
 using PasswordManager.Infrastructure.ForgotPassword;
-using PasswordManager.Application.Account.Register;
-using PasswordManager.Application.Account.Login;
+using PasswordManager.Infrastructure.Vault;
+using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using PasswordManager.Infrastructure.Register;
@@ -22,10 +29,11 @@ namespace PasswordManager
             // Add services to the container
 
             builder.Services.AddControllersWithViews();
+
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
                 ));
-
+             
             builder.Services.Configure<EmailSettings>(
                 builder.Configuration.GetSection("EmailSettings")
             );
@@ -33,18 +41,29 @@ namespace PasswordManager
             builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IRegisterService,RegisterService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IVaultHomeService, VaultService>();
+            builder.Services.AddScoped<IVaultSidebarService, VaultService>();
             builder.Services.AddScoped<IResetPasswordService, PasswordResetService>();
 
 
             builder.Services
-            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Account/Login";
-                options.AccessDeniedPath = "/Account/Login";
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
-                options.SlidingExpiration = true;
-            });
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Welcome";
+                    options.AccessDeniedPath = "/Welcome";
+                    options.LogoutPath = "/Account/Logout"; 
+
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(200); ///
+                    options.SlidingExpiration = false;
+
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                });
+
+
 
             var app = builder.Build();
 
@@ -60,13 +79,16 @@ namespace PasswordManager
 
             app.UseRouting();
 
-            // TODO: Enable authentication
-            // app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapGet("/", context =>
             {
-                context.Response.Redirect("/Welcome");
+                if (context.User.Identity?.IsAuthenticated == true)
+                    context.Response.Redirect("/Vault/Home");
+                else
+                    context.Response.Redirect("/Welcome");
+
                 return Task.CompletedTask;
             });
 

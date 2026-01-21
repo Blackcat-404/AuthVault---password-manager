@@ -1,0 +1,153 @@
+﻿@{
+    ViewData["Title"] = "Add Folder";
+    Layout = "_VaultLayout";
+}
+
+<!-- Header -->
+<header class="header">
+    <div class="header-title-section">
+        <h1 class="page-title">Add New Folder</h1>
+        <p class="page-subtitle">Organize your vault items</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="@Url.Action("Home", "Vault")" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="m12 19-7-7 7-7" />
+                <path d="M19 12H5" />
+            </svg>
+            Cancel
+        </a>
+    </div>
+</header>
+
+<!-- Add Folder Content -->
+<div class="content-area">
+    <div class="form-container">
+        <form asp-action="AddFolder" asp-controller="Vault" method="post" class="vault-form">
+            @Html.AntiForgeryToken()
+
+            <!-- Folder Information -->
+            <div class="form-section">
+                <h3 class="form-section-title">Folder Information</h3>
+
+                <div class="form-group">
+                    <label for="folder-name">Folder Name *</label>
+                    <input type="text"
+                           id="folder-name"
+                           name="Name"
+                           class="form-input"
+                           placeholder="e.g. Work, Personal, Banking"
+                           required
+                           autofocus>
+                    <p class="form-hint">Choose a descriptive name for easy organization</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="folder-description">Description</label>
+                    <textarea id="folder-description"
+                              name="Description"
+                              class="form-textarea"
+                              rows="4"
+                              placeholder="Optional description for this folder..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="folder-color">Folder Color</label>
+                    <div class="color-picker">
+                        <input type="radio" name="Color" value="blue" id="color-blue" checked>
+                        <label for="color-blue" class="color-option" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%)"></label>
+
+                        <input type="radio" name="Color" value="green" id="color-green">
+                        <label for="color-green" class="color-option" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%)"></label>
+
+                        <input type="radio" name="Color" value="purple" id="color-purple">
+                        <label for="color-purple" class="color-option" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)"></label>
+
+                        <input type="radio" name="Color" value="orange" id="color-orange">
+                        <label for="color-orange" class="color-option" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%)"></label>
+
+                        <input type="radio" name="Color" value="red" id="color-red">
+                        <label for="color-red" class="color-option" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)"></label>
+
+                        <input type="radio" name="Color" value="teal" id="color-teal">
+                        <label for="color-teal" class="color-option" style="background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%)"></label>
+                    </div>
+                    <p class="form-hint">Select a color to easily identify this folder</p>
+                </div>
+            </div>
+
+            <!-- Folder Icon Preview -->
+            <div class="form-section">
+                <h3 class="form-section-title">Preview</h3>
+                <div class="folder-preview">
+                    <div class="preview-folder-icon" id="preview-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="48"
+                             height="48"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                        </svg>
+                    </div>
+                    <div class="preview-folder-name" id="preview-name">New Folder</div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="@Url.Action("Home", "Vault")" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                        <path d="M12 10v6" />
+                        <path d="M9 13h6" />
+                    </svg>
+                    Create Folder
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Live preview of folder name
+        document.getElementById('folder-name')?.addEventListener('input', function(e) {
+            const previewName = document.getElementById('preview-name');
+            previewName.textContent = e.target.value || 'New Folder';
+        });
+
+        // Update preview icon color
+        document.querySelectorAll('input[name="Color"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const previewIcon = document.getElementById('preview-icon');
+                const colorMap = {
+                    'blue': 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+                    'green': 'linear-gradient(135deg, #27ae60 0%, #229954 100%)',
+                    'purple': 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)',
+                    'orange': 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)',
+                    'red': 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+                    'teal': 'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)'
+                };
+                previewIcon.style.background = colorMap[this.value];
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vault-forms.css" asp-append-version="true" />
+}

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PasswordManager.Controllers
 {
     /// <summary>
     /// Controller for the welcome/landing page
     /// </summary>
+    [AllowAnonymous]
     public class WelcomeController : Controller
     {
         /// <summary>

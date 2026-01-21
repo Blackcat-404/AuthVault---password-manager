@@ -1,4 +1,292 @@
-﻿@page
-@model PasswordManager.Views.Vault.AddItemModel
+﻿@using PasswordManager.ViewModels.Vault
+@model AddItemViewModel
 @{
+    ViewData["Title"] = "Add Item";
+    ViewData["EnablePasswordGenerator"] = true;
+    Layout = "_VaultLayout";
+    var selectedType = Model.ItemType;
+}
+
+<!-- Header -->
+<header class="header">
+    <div class="header-title-section">
+        <h1 class="page-title">Add New Item</h1>
+        <p class="page-subtitle">Create a new vault entry</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="@Url.Action("Home", "Vault")" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="m12 19-7-7 7-7" />
+                <path d="M19 12H5" />
+            </svg>
+            Cancel
+        </a>
+    </div>
+</header>
+
+<!-- Add Item Content -->
+<div class="content-area">
+    <div class="form-container">
+        
+        <!-- Item Type Selector -->
+        <div class="type-selector">
+            <button class="type-btn @(selectedType == "login" ? "active" : "")" 
+                    data-type="login"
+                    onclick="switchItemType('login')">
+                <div class="type-icon login">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </div>
+                <span>Login</span>
+            </button>
+
+            <button class="type-btn @(selectedType == "card" ? "active" : "")" 
+                    data-type="card"
+                    onclick="switchItemType('card')">
+                <div class="type-icon card">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <rect width="20" height="14" x="2" y="5" rx="2" />
+                        <line x1="2" x2="22" y1="10" y2="10" />
+                    </svg>
+                </div>
+                <span>Card</span>
+            </button>
+
+            <button class="type-btn @(selectedType == "note" ? "active" : "")" 
+                    data-type="note"
+                    onclick="switchItemType('note')">
+                <div class="type-icon note">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                        <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                        <path d="M10 9H8" />
+                        <path d="M16 13H8" />
+                        <path d="M16 17H8" />
+                    </svg>
+                </div>
+                <span>Note</span>
+            </button>
+        </div>
+
+        <!-- Forms for each type -->
+        <form asp-action="AddItem" asp-controller="Vault" method="post" class="vault-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="item-type" name="ItemType" value="@selectedType" />
+
+            <!-- Common Fields -->
+            <div class="form-section">
+                <h3 class="form-section-title">General Information</h3>
+                
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" name="Title" class="form-input" placeholder="e.g. Google Account" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="folder">Folder</label>
+                    <select id="folder" name="FolderId" class="form-input">
+                        <option value="0">No Folder</option>
+                        <option value="1">Personal</option>
+                        <option value="2">Work</option>
+                        <option value="3">Banking</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-fields" class="type-fields @(selectedType == "login" ? "active" : "")">
+                <div class="form-section">
+                    <h3 class="form-section-title">Login Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="login-username">Username / Email</label>
+                        <input type="text" id="login-username" name="Login" class="form-input" placeholder="user@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="password-input-group">
+                            <input type="password" id="login-password" name="Password" class="form-input" placeholder="Enter password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                            <button type="button" class="generate-password-btn" onclick="openGenerator(event)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                                    <path d="M21 3v5h-5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-url">Website URL</label>
+                        <input type="url" id="login-url" name="Url" class="form-input" placeholder="https://example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-notes">Notes</label>
+                        <textarea id="login-notes" name="Notes" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Form -->
+            <div id="card-fields" class="type-fields @(selectedType == "card" ? "active" : "")">
+                <div class="form-section">
+                    <h3 class="form-section-title">Card Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="card-number">Card Number</label>
+                        <input type="text" id="card-number" name="CardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="card-exp-month">Expiry Month</label>
+                            <select id="card-exp-month" name="ExpireMonth" class="form-input">
+                                <option value="">Month</option>
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i.ToString("D2")">@i.ToString("D2")</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="card-exp-year">Expiry Year</label>
+                            <select id="card-exp-year" name="ExpireYear" class="form-input">
+                                <option value="">Year</option>
+                                @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 15; i++)
+                                {
+                                    <option value="@i.ToString().Substring(2)">@i</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-cvv">CVV</label>
+                        <input type="password" id="card-cvv" name="CVV" class="form-input" placeholder="123" maxlength="4">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-holder">Cardholder Name</label>
+                        <input type="text" id="card-holder" name="CardholderName" class="form-input" placeholder="JOHN DOE">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-notes">Notes</label>
+                        <textarea id="card-notes" name="Notes" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note Form -->
+            <div id="note-fields" class="type-fields @(selectedType == "note" ? "active" : "")">
+                <div class="form-section">
+                    <h3 class="form-section-title">Note Content</h3>
+                    
+                    <div class="form-group">
+                        <label for="note-content">Content</label>
+                        <textarea id="note-content" name="Content" class="form-textarea" rows="12" placeholder="Write your secure note here..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="@Url.Action("Home", "Vault")" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    Save Item
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function switchItemType(type) {
+            // Update hidden input
+            document.getElementById('item-type').value = type;
+
+            // Update type buttons
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+
+            // Show/hide corresponding fields
+            document.querySelectorAll('.type-fields').forEach(field => {
+                field.classList.remove('active');
+            });
+            document.getElementById(`${type}-fields`).classList.add('active');
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        // Format card number with spaces
+        document.getElementById('card-number')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vault-forms.css" asp-append-version="true" />
 }

@@ -8,6 +8,8 @@ using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Login;
 using PasswordManager.Infrastructure.ForgotPassword;
+using PasswordManager.Infrastructure.Vault;
+using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
 using PasswordManager.Infrastructure.Register;
 using PasswordManager.Infrastructure.Security;

@@ -58,9 +58,6 @@ namespace PasswordManager.Controllers
             }
 
             var user = result.Value!;
-            //user.LastLoginAt = DateTime.UtcNow;
-            //await _db.SaveChangesAsync();
-
             await _authService.SignInAsync(HttpContext, user.Id);
 
             return RedirectToAction("Home", "Vault");

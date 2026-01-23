@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Page Not Found";
+    ViewData["BodyClass"] = "error-page";
+    Layout = "_Layout";
+}
+
+<div class="error-container">
+    <!-- Animated background particles -->
+    <div class="error-background">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="error-content">
+        <!-- Main error message -->
+        <div class="error-main">
+            <h1 class="error-code notfound-code">404</h1>
+            <h2 class="error-title">Page Not Found</h2>
+            <p class="error-subtitle">The page you're looking for doesn't exist or has been moved.</p>
+        </div>
+
+        <!-- Help text -->
+        <div class="error-help">
+            <p>If you believe this is an error, please contact our support team.</p>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+}

@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Account.Register;
@@ -13,11 +11,11 @@ using PasswordManager.Infrastructure.ForgotPassword;
 using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using PasswordManager.Infrastructure.Register;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.Infrastructure.Vault;
-using PasswordManager.Models.Email;
+using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Account.ForgotPassword;
 
 namespace PasswordManager
 {
@@ -46,7 +44,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IVaultHomeService, VaultService>();
             builder.Services.AddScoped<IVaultSidebarService, VaultService>();
             builder.Services.AddScoped<IResetPasswordService, PasswordResetService>();
-
+            builder.Services.AddScoped<IAddItemService, AddItemService>();
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -69,17 +67,24 @@ namespace PasswordManager
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
-            if (!app.Environment.IsDevelopment())
+            /*if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+            }*/
+            app.UseExceptionHandler("/Error");
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            app.UseHsts();
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 

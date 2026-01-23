@@ -5,6 +5,7 @@
     ViewData["EnablePasswordGenerator"] = true;
     Layout = "_VaultLayout";
     var selectedType = Model.ItemType;
+    
 }
 
 <!-- Header -->
@@ -120,10 +121,7 @@
                 <div class="form-group">
                     <label for="folder">Folder</label>
                     <select id="folder" name="FolderId" class="form-input">
-                        <option value="0">No Folder</option>
-                        <option value="1">Personal</option>
-                        <option value="2">Work</option>
-                        <option value="3">Banking</option>
+                        <option value="">No Folder</option>
                     </select>
                 </div>
             </div>
@@ -135,13 +133,13 @@
                     
                     <div class="form-group">
                         <label for="login-username">Username / Email</label>
-                        <input type="text" id="login-username" name="Login" class="form-input" placeholder="user@example.com">
+                        <input type="text" id="login-username" name="LoginItem.Login" class="form-input" placeholder="user@example.com">
                     </div>
 
                     <div class="form-group">
                         <label for="login-password">Password</label>
                         <div class="password-input-group">
-                            <input type="password" id="login-password" name="Password" class="form-input" placeholder="Enter password">
+                            <input type="password" id="login-password" name="LoginItem.Password" class="form-input" placeholder="Enter password">
                             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -159,12 +157,12 @@
 
                     <div class="form-group">
                         <label for="login-url">Website URL</label>
-                        <input type="url" id="login-url" name="Url" class="form-input" placeholder="https://example.com">
+                        <input type="url" id="login-url" name="LoginItem.WebURL" class="form-input" placeholder="https://example.com">
                     </div>
 
                     <div class="form-group">
                         <label for="login-notes">Notes</label>
-                        <textarea id="login-notes" name="Notes" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
+                        <textarea id="login-notes" name="LoginItem.Note" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
                     </div>
                 </div>
             </div>
@@ -176,13 +174,13 @@
                     
                     <div class="form-group">
                         <label for="card-number">Card Number</label>
-                        <input type="text" id="card-number" name="CardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
+                        <input type="text" id="card-number" name="CardItem.CardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="card-exp-month">Expiry Month</label>
-                            <select id="card-exp-month" name="ExpireMonth" class="form-input">
+                            <select id="card-exp-month" name="CardItem.ExpireMonth" class="form-input">
                                 <option value="">Month</option>
                                 @for (int i = 1; i <= 12; i++)
                                 {
@@ -193,7 +191,7 @@
 
                         <div class="form-group">
                             <label for="card-exp-year">Expiry Year</label>
-                            <select id="card-exp-year" name="ExpireYear" class="form-input">
+                            <select id="card-exp-year" name="CardItem.ExpireYear" class="form-input">
                                 <option value="">Year</option>
                                 @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 15; i++)
                                 {
@@ -204,18 +202,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="card-cvv">CVV</label>
-                        <input type="password" id="card-cvv" name="CVV" class="form-input" placeholder="123" maxlength="4">
-                    </div>
-
-                    <div class="form-group">
                         <label for="card-holder">Cardholder Name</label>
-                        <input type="text" id="card-holder" name="CardholderName" class="form-input" placeholder="JOHN DOE">
+                        <input type="text" id="card-holder" name="CardItem.CardholderName" class="form-input" placeholder="JOHN DOE">
                     </div>
 
                     <div class="form-group">
                         <label for="card-notes">Notes</label>
-                        <textarea id="card-notes" name="Notes" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
+                        <textarea id="card-notes" name="CardItem.Note" class="form-textarea" rows="4" placeholder="Add any additional notes..."></textarea>
                     </div>
                 </div>
             </div>
@@ -227,7 +220,7 @@
                     
                     <div class="form-group">
                         <label for="note-content">Content</label>
-                        <textarea id="note-content" name="Content" class="form-textarea" rows="12" placeholder="Write your secure note here..."></textarea>
+                        <textarea id="note-content" name="NoteItem.Content" class="form-textarea" rows="12" placeholder="Write your secure note here..."></textarea>
                     </div>
                 </div>
             </div>

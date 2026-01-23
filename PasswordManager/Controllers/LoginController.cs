@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Security;
-using PasswordManager.Data;
-using PasswordManager.Infrastructure.Login;
 using PasswordManager.ViewModels;
-using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {

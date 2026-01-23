@@ -61,7 +61,6 @@ namespace PasswordManager.Controllers
             }
 
             var user = result.Value!;
-
             await _authService.SignInAsync(HttpContext, user.Id);
 
             return RedirectToAction("Home", "Vault");

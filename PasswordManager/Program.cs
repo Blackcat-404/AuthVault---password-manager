@@ -15,8 +15,9 @@ using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using PasswordManager.Infrastructure.Register;
-using PasswordManager.Application.Account.ForgotPassword;
-using PasswordManager.Application.Account.Email;
+using PasswordManager.Infrastructure.Security;
+using PasswordManager.Infrastructure.Vault;
+using PasswordManager.Models.Email;
 
 namespace PasswordManager
 {

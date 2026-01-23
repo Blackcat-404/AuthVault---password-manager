@@ -1,0 +1,245 @@
+﻿/* Settings Page Styles */
+
+.header-title-section {
+    padding: 0;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.page-subtitle {
+    font-size: 16px;
+    color: #8b92a7;
+}
+
+.settings-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Settings Sections */
+.settings-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(52, 152, 219, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3498db;
+    flex-shrink: 0;
+}
+
+    .section-icon.danger {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+    }
+
+.section-title-group {
+    flex: 1;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.section-description {
+    font-size: 14px;
+    color: #8b92a7;
+}
+
+/* Settings Cards */
+.settings-card {
+    background: #23273a;
+    border: 1px solid #2d3142;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.danger-card {
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #2d3142;
+}
+
+    .setting-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .setting-item:first-child {
+        padding-top: 0;
+    }
+
+.setting-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.setting-value {
+    font-size: 14px;
+    color: #8b92a7;
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-hint {
+    font-size: 13px;
+    color: #5a6070;
+    margin-top: 4px;
+}
+
+/* Setting Controls */
+.setting-select {
+    padding: 8px 12px;
+    background: #1a1d29;
+    border: 1px solid #3d4252;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+    .setting-select:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+}
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2d3142;
+    border-radius: 28px;
+    transition: 0.3s;
+}
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: #8b92a7;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+
+.toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+        background-color: #ffffff;
+    }
+
+/* Buttons */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.btn-danger {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+    .btn-danger:hover {
+        background: #e74c3c;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(231, 76, 60, 0.4);
+    }
+
+.btn-logout {
+    width: 100%;
+    padding: 16px;
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+    .btn-logout:hover {
+        background: #e74c3c;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(231, 76, 60, 0.4);
+    }
+
+.logout-form {
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 0 16px;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .setting-select,
+    .btn-sm {
+        width: 100%;
+    }
+}

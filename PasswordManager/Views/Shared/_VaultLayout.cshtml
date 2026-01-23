@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="vault-page">
+    <div class="app-container">
+
+        <!-- Sidebar - shared across all vault pages -->
+        @await Component.InvokeAsync("VaultSidebar")
+
+        <!-- Main content - changes based on page -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+</div>
+
+@if (ViewData["EnablePasswordGenerator"] as bool? == true)
+{
+    @await Html.PartialAsync("_PasswordGenerator")
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vault.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
+}
+
+@section Scripts {
+    <script src="~/js/vault.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+}

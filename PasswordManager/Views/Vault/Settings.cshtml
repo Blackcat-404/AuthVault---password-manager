@@ -1,0 +1,206 @@
+﻿@using PasswordManager.ViewModels.Vault
+@{
+    ViewData["Title"] = "Settings";
+    ViewData["EnablePasswordGenerator"] = true;
+    Layout = "_VaultLayout";
+    var userName = ViewBag.UserName ?? User.Identity?.Name ?? "Guest";
+    var userEmail = ViewBag.UserEmail ?? "user@example.com";
+}
+
+<!-- Header -->
+<header class="header">
+    <div class="header-title-section">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Manage your account and preferences</p>
+    </div>
+</header>
+
+<!-- Settings Content -->
+<div class="content-area">
+    <div class="settings-container">
+
+        <!-- Account Information Section -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="5" />
+                        <path d="M20 21a8 8 0 0 0-16 0" />
+                    </svg>
+                </div>
+                <div class="section-title-group">
+                    <h2 class="section-title">Account Information</h2>
+                    <p class="section-description">Your personal account details</p>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="setting-item">
+                    <div class="setting-label">Username</div>
+                    <div class="setting-value">@userName</div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-label">Email</div>
+                    <div class="setting-value">@userEmail</div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-label">Account Created</div>
+                    <div class="setting-value">January 15, 2026</div>
+                </div>
+
+                <button class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                        <path d="m15 5 4 4" />
+                    </svg>
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Security Section -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                    </svg>
+                </div>
+                <div class="section-title-group">
+                    <h2 class="section-title">Security</h2>
+                    <p class="section-description">Manage your security settings</p>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Master Password</div>
+                        <div class="setting-hint">Last changed 30 days ago</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm">Change</button>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Two-Factor Authentication</div>
+                        <div class="setting-hint">Add an extra layer of security</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Session Timeout</div>
+                        <div class="setting-hint">Automatically log out after inactivity</div>
+                    </div>
+                    <select class="setting-select">
+                        <option value="15">15 minutes</option>
+                        <option value="30" selected>30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="never">Never</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone Section -->
+        <div class="settings-section">
+            <div class="section-header">
+                <div class="section-icon danger">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="24"
+                         height="24"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <path d="M12 9v4" />
+                        <path d="M12 17h.01" />
+                    </svg>
+                </div>
+                <div class="section-title-group">
+                    <h2 class="section-title">Danger Zone</h2>
+                    <p class="section-description">Irreversible and destructive actions</p>
+                </div>
+            </div>
+
+            <div class="settings-card danger-card">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Export Data</div>
+                        <div class="setting-hint">Download all your vault data</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm">Export</button>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Delete Account</div>
+                        <div class="setting-hint">Permanently delete your account and all data</div>
+                    </div>
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Section -->
+        <div class="settings-section">
+            <form asp-controller="Account" asp-action="Logout" method="post" class="logout-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-logout">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+}

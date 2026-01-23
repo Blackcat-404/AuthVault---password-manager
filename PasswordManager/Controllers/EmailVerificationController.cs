@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Security;
+using PasswordManager.Data;
+using PasswordManager.Infrastructure.Email;
 using PasswordManager.ViewModels;
 using System.Security.Claims;
 
@@ -10,10 +13,10 @@ namespace PasswordManager.Controllers
     [Route("Account/Register")]
     public class EmailVerificationController : Controller
     {
-        private readonly EmailVerificationService _emailVerificationService;
+        private readonly IEmailVerificationService _emailVerificationService;
         private readonly IAuthService _authService;
 
-        public EmailVerificationController(EmailVerificationService emailVerificationService, IAuthService authService)
+        public EmailVerificationController(IEmailVerificationService emailVerificationService, IAuthService authService)
         {
             _emailVerificationService = emailVerificationService;
             _authService = authService;

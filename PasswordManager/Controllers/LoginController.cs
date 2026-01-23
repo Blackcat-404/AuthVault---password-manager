@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Login;
-using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Security;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Login;
@@ -18,13 +17,11 @@ namespace PasswordManager.Controllers
     {
         private readonly ILoginService _loginService;
         private readonly IAuthService _authService;
-        private readonly AppDbContext _db;
 
-        public LoginController(ILoginService loginService, IAuthService authService, AppDbContext db)
+        public LoginController(ILoginService loginService, IAuthService authService)
         {
             _loginService = loginService;
             _authService = authService;
-            _db = db;
         }
 
         [HttpGet("Login")]
@@ -64,9 +61,6 @@ namespace PasswordManager.Controllers
             }
 
             var user = result.Value!;
-            //user.LastLoginAt = DateTime.UtcNow;
-            //await _db.SaveChangesAsync();
-
             await _authService.SignInAsync(HttpContext, user.Id);
 
             return RedirectToAction("Home", "Vault");

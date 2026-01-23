@@ -49,7 +49,7 @@
     </div>
 
     <!-- Verification form -->
-    <form asp-action="EmailVerification" asp-controller="Register" method="post">
+    <form asp-action="PostEmailVerification" asp-controller="EmailVerification" method="post">
 
         @Html.AntiForgeryToken()
 

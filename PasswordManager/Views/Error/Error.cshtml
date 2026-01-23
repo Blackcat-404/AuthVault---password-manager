@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Error";
+    ViewData["BodyClass"] = "error-page";
+    Layout = "_Layout";
+}
+
+<div class="error-container">
+    <!-- Animated background particles -->
+    <div class="error-background">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="error-content">
+        <!-- Main error message -->
+        <div class="error-main">
+            <h1 class="error-code">500</h1>
+            <h2 class="error-title">Something Went Wrong</h2>
+            <p class="error-subtitle">This page may have appeared due to connection issues.</p>
+        </div>
+
+        <!-- Status message -->
+        <div class="error-status">
+            <div class="status-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                </svg>
+                <span>Our team has been notified</span>
+            </div>
+        </div>
+
+        <!-- Help text -->
+        <div class="error-help">
+            <p>Please try visiting the website again in a few moments.</p>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+}

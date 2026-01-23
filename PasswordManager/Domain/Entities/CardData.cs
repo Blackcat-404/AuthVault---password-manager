@@ -4,15 +4,16 @@ namespace PasswordManager.Domain.Entities
     {
         public string Title { get; set; } = null!;
 
-        public string CardNumberEncrypted { get; set; } = null!;
-        public string ExpireMonthEncrypted { get; set; } = null!;
-        public string ExpireYearEncrypted { get; set; } = null!;
-        public string NoteEncrypted { get; set; } = null!;
+        public string? CardholderName { get; set; }
+        public string? CardNumberEncrypted { get; set; }
+        public string? ExpireMonthEncrypted { get; set; }
+        public string? ExpireYearEncrypted { get; set; }
+        public string? NoteEncrypted { get; set; }
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
-        public int FolderId { get; set; }
-        public Folder Folder { get; set; } = null!;
+        public int? FolderId { get; set; }
+        public Folder? Folder { get; set; }
     }
 }

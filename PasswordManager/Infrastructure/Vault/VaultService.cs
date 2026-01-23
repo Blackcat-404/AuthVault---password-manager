@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Vault;
 using PasswordManager.Data;
-using PasswordManager.Domain.Entities;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
 
@@ -34,10 +33,15 @@ namespace PasswordManager.Infrastructure.Vault
               + await _db.CardData.CountAsync(x => x.UserId == userId)
               + await _db.NoteData.CountAsync(x => x.UserId == userId);
 
+            var name = await _db.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.Login)
+                .FirstOrDefaultAsync();
+
             return new VaultSidebarViewModel
             {
                 UserId = userId,
-                UserName = "AuthVault",
+                UserName = name,
                 CountAllItems = countItems
             };
         }
@@ -55,11 +59,9 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
-                    Login = x.Login,
+                    Login = x.LoginEncrypted,
                     Password = x.PasswordEncrypted,
-                    Note = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Note = x.NoteEncrypted
 
                 })
                 .ToListAsync();
@@ -76,9 +78,7 @@ namespace PasswordManager.Infrastructure.Vault
                     CardNumber = x.CardNumberEncrypted,
                     ExpireMonth = x.ExpireMonthEncrypted,
                     ExpireYear = x.ExpireYearEncrypted,
-                    Note = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Note = x.NoteEncrypted
                 })
                 .ToListAsync();
 
@@ -91,9 +91,7 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
-                    Content = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Content = x.NoteEncrypted
                 })
                 .ToListAsync();
 
@@ -103,56 +101,5 @@ namespace PasswordManager.Infrastructure.Vault
 
             return items;
         }
-
-
-        public async Task SeedTestDataAsync(int userId)
-        {
-            if (await _db.LoginData.AnyAsync(x => x.UserId == userId))
-                return;
-
-            var folder = new Folder
-            {
-                UserId = userId,
-                Name = "Default",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _db.Folders.Add(folder);
-
-            _db.LoginData.Add(new LoginData
-            {
-                UserId = userId,
-                Title = "Google",
-                Folder = folder,
-                Login = "user@gmail.com",
-                PasswordEncrypted = "pass123",
-                NoteEncrypted = "This is my Google account",
-                CreatedAt = DateTime.UtcNow
-            });
-
-            _db.CardData.Add(new CardData
-            {
-                UserId = userId,
-                Title = "Visa",
-                Folder = folder,
-                CardNumberEncrypted = "1234567812345678",
-                ExpireMonthEncrypted = "12",
-                ExpireYearEncrypted = "28",
-                NoteEncrypted = "My primary credit card",
-                CreatedAt = DateTime.UtcNow
-            });
-
-            _db.NoteData.Add(new NoteData
-            {
-                UserId = userId,
-                Folder = folder,
-                Title = "Private note",
-                NoteEncrypted = "Hello\nThis is a test note",
-                CreatedAt = DateTime.UtcNow
-            });
-
-            await _db.SaveChangesAsync();
-        }
-
     }
 }

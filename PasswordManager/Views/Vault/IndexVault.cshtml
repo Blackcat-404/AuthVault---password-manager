@@ -253,7 +253,7 @@
                                                     @if (note.Content != null && note.Content.Any())
                                                     {
                                                         var firstLine = note.Content.First();
-                                                        var preview = firstLine.Length > 50 ? firstLine.Substring(0, 50) + "..." : firstLine;
+                                                        var preview = "";
                                                         @preview
                                                     }
                                                     else
@@ -293,7 +293,7 @@
                                             {
                                                 <div class="item-detail">
                                                     <div class="item-detail-label">Notes</div>
-                                                    <div class="item-detail-value">@login.Note.Count line(s)</div>
+                                                    <div class="item-detail-value">@login.Note line(s)</div>
                                                 </div>
                                             }
                                             break;
@@ -310,7 +310,7 @@
                                             {
                                                 <div class="item-detail">
                                                     <div class="item-detail-label">Notes</div>
-                                                    <div class="item-detail-value">@card.Note.Count line(s)</div>
+                                                    <div class="item-detail-value">@card.Note line(s)</div>
                                                 </div>
                                             }
                                             break;
@@ -320,7 +320,7 @@
                                             {
                                                 <div class="item-detail">
                                                     <div class="item-detail-label">Lines</div>
-                                                    <div class="item-detail-value">@note.Content.Count</div>
+                                                    <div class="item-detail-value">@note.Content</div>
                                                 </div>
                                             }
                                             break;

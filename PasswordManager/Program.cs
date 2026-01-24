@@ -44,6 +44,10 @@ namespace PasswordManager
             builder.Services.AddScoped<IVaultHomeService, VaultService>();
             builder.Services.AddScoped<IVaultSidebarService, VaultService>();
             builder.Services.AddScoped<IResetPasswordService, PasswordResetService>();
+            builder.Services.AddScoped<IVaultSettingsService, VaultService>();
+            builder.Services.AddScoped<IGetItemService, GetItemService>();
+            builder.Services.AddScoped<IUpdateItemFieldService, UpdateItemFieldService>();
+            builder.Services.AddScoped<IDeleteItemService, DeleteItemService>();
             builder.Services.AddScoped<IAddItemService, AddItemService>();
 
             builder.Services

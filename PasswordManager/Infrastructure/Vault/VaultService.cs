@@ -6,7 +6,7 @@ using PasswordManager.ViewModels.Vault.VaultItems;
 
 namespace PasswordManager.Infrastructure.Vault
 {
-    public class VaultService : IVaultHomeService, IVaultSidebarService
+    public class VaultService : IVaultHomeService, IVaultSidebarService, IVaultSettingsService
     {
         private readonly AppDbContext _db;
 
@@ -46,6 +46,23 @@ namespace PasswordManager.Infrastructure.Vault
             };
         }
 
+        public async Task<VaultSettingsViewModel> GetSettingsDataAsync(int userId)
+        {
+            var email = await _db.Users
+                .Where(u => userId == u.Id)
+                .Select(u => u.Email)
+                .FirstOrDefaultAsync();
+            var accountCreatedAt = (await _db.Users.FindAsync(userId))!.CreatedAt;
+
+            var model = new VaultSettingsViewModel
+            {
+                Sidebar = await GetSidebarDataAsync(userId),
+                Email = email!,
+                accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy")
+            };
+            return model;
+        }
+
         public async Task<List<VaultItemViewModel>> GetItemsFromDBAsync(int userId)
         {
             var items = new List<VaultItemViewModel>();
@@ -59,6 +76,7 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
+                    WebURL = "google.com",
                     Login = x.LoginEncrypted,
                     Password = x.PasswordEncrypted,
                     Note = x.NoteEncrypted

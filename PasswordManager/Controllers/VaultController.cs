@@ -15,13 +15,26 @@ namespace PasswordManager.Controllers
     {
         private readonly IVaultHomeService _vaultHomeService;
         private readonly IVaultSidebarService _vaultSidebarService;
+        private readonly IVaultSettingsService _vaultSettingsService;
+        private readonly IGetItemService _vaultGetItemService;
+        private readonly IUpdateItemFieldService _updateItemFieldService;
+        private readonly IDeleteItemService _deleteItemService;
         private readonly IAddItemService _addItemService;
 
-
-        public VaultController(IVaultHomeService vaultHomeService, IVaultSidebarService vaultSidebarService, IAddItemService addItemService)
+        public VaultController(IVaultHomeService vaultHomeService,
+                                IVaultSidebarService vaultSidebarService,
+                                IVaultSettingsService vaultSettingsService,
+                                IGetItemService vaultGetItemService,
+                                IUpdateItemFieldService updateItemFieldService,
+                                IDeleteItemService deleteItemService,
+                                IAddItemService addItemService)
         {
             _vaultHomeService = vaultHomeService;
             _vaultSidebarService = vaultSidebarService;
+            _vaultSettingsService = vaultSettingsService;
+            _vaultGetItemService = vaultGetItemService;
+            _updateItemFieldService = updateItemFieldService;
+            _deleteItemService = deleteItemService;
             _addItemService = addItemService;
         }
 
@@ -46,6 +59,8 @@ namespace PasswordManager.Controllers
         public async Task<IActionResult> Settings()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
             var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
 
             return View(model);
@@ -156,26 +171,89 @@ namespace PasswordManager.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EditItem(int id)
+        public async Task<IActionResult> ViewItem(int id, string type)
         {
-            return View();
-        }
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+            VaultItemViewModel? item = null;
+
+            switch (type?.ToLower())
+            {
+                case "login":
+                    
+                    item = await _vaultGetItemService.GetLoginItemAsync(userId, id);
+                    break;
+                case "card":
+                    
+                    item = await _vaultGetItemService.GetCardItemAsync(userId, id);
+                    break;
+                case "note":
+                    
+                    item = await _vaultGetItemService.GetNoteItemAsync(userId, id);
+                    break;
+            }
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ViewItemViewModel
+            {
+                Sidebar = await _vaultSidebarService.GetSidebarDataAsync(userId),
+                Item = item
+            };
+
+            return View(model);
+        }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditItem(int id, VaultItemViewModel model)
+        public async Task<IActionResult> UpdateField(int id, string itemType, string fieldName, string fieldValue)
         {
-            return RedirectToAction("Home");
-        }
 
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            switch (itemType?.ToLower())
+            {
+                case "login":
+                    await _updateItemFieldService.UpdateLoginFieldAsync(userId, id, fieldName, fieldValue);
+                    break;
+                case "card":
+                    await _updateItemFieldService.UpdateCardFieldAsync(userId, id, fieldName, fieldValue);
+                    break;
+                case "note":
+                    await _updateItemFieldService.UpdateNoteFieldAsync(userId, id, fieldName, fieldValue);
+                    break;
+                default:
+                    return Json(new { success = false, message = "Invalid item type" });
+            }
+            
+            return Json(new { success = true, message = "Field updated successfully" });
+        }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteItem(int id)
+        public async Task<IActionResult> DeleteItem(int id, string type)
         {
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            switch (type?.ToLower())
+            {
+                case "login":
+                    await _deleteItemService.DeleteLoginItemAsync(userId, id);
+                    break;
+                case "card":
+                    await _deleteItemService.DeleteCardItemAsync(userId, id);
+                    break;
+                case "note":
+                    await _deleteItemService.DeleteNoteItemAsync(userId, id);
+                    break;
+            }
+
             return RedirectToAction("Home");
         }
 
@@ -191,14 +269,6 @@ namespace PasswordManager.Controllers
 
 
 
-        [HttpGet]
-        public async Task<IActionResult> Favorites()
-        {
-            return View("Home");
-        }
-
-
-
 
         [HttpGet]
         public async Task<IActionResult> Folder(int folderId)
@@ -206,13 +276,5 @@ namespace PasswordManager.Controllers
             return View("Home");
         }
 
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleFavorite(int id)
-        {
-            return Json(new { success = false });
-        }
     }
 }

@@ -3,6 +3,7 @@
 .form-container {
     max-width: 800px;
     margin: 0 auto;
+    user-select: none;
 }
 
 /* Type Selector */
@@ -36,7 +37,6 @@
     .type-btn.active {
         border-color: #3498db;
         background: rgba(52, 152, 219, 0.1);
-        color: #3498db;
     }
 
 .type-icon {
@@ -192,6 +192,12 @@
         background: #3d4252;
         color: #3498db;
         border-color: #3498db;
+    }
+
+    .password-toggle-btn svg,
+    .generate-password-btn svg {
+        width: 24px;
+        height: 24px;
     }
 
 /* Type Fields */

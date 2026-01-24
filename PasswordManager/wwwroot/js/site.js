@@ -46,10 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ========================================
-   AUTH PAGE SCRIPTS (Login/Register)
+   TOGGLE PASSWORD VISIBILITY
    ======================================== */
-
-// Toggle password visibility
+   
 function togglePassword(inputId, button) {
     const input = document.getElementById(inputId);
 
@@ -67,6 +66,8 @@ function togglePassword(inputId, button) {
 function getEyeIcon() {
     return `
     <svg xmlns="http://www.w3.org/2000/svg"
+    	width="24"
+	    height="24"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -107,20 +108,6 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
     localStorage.setItem('sidebar', sidebar.classList.contains('collapsed'));
 }
-
-// Copy to clipboard function (for future use)
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        // Show success notification
-        console.log('Copied to clipboard!');
-        // TODO: Add visual feedback
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-    });
-}
-
-
-
 
 // Password Generator Functions
 
@@ -194,10 +181,10 @@ function generatePassword() {
     }
 
     // Update strength indicator
-    updatePasswordStrength(password, useUppercase, useLowercase, useNumbers, useSymbols);
+    //updatePasswordStrength(password, useUppercase, useLowercase, useNumbers, useSymbols);
 }
 
-function updatePasswordStrength(password, hasUpper, hasLower, hasNumber, hasSymbol) {
+/*function updatePasswordStrength(password, hasUpper, hasLower, hasNumber, hasSymbol) {
     const length = password.length;
     let score = 0;
     let strengthText = '';
@@ -259,7 +246,7 @@ function updatePasswordStrength(password, hasUpper, hasLower, hasNumber, hasSymb
         }
     });
 }
-
+*/
 function copyGeneratedPassword() {
     const passwordDisplay = document.getElementById('generated-password');
     if (!passwordDisplay) return;

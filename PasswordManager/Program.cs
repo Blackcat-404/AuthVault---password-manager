@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Account.Register;
@@ -13,7 +11,6 @@ using PasswordManager.Infrastructure.ForgotPassword;
 using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using PasswordManager.Infrastructure.Register;
 using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.Application.Account.Email;
@@ -45,6 +42,10 @@ namespace PasswordManager
             builder.Services.AddScoped<IVaultHomeService, VaultService>();
             builder.Services.AddScoped<IVaultSidebarService, VaultService>();
             builder.Services.AddScoped<IResetPasswordService, PasswordResetService>();
+            builder.Services.AddScoped<IVaultSettingsService, VaultService>();
+            builder.Services.AddScoped<IGetItemService, GetItemService>();
+            builder.Services.AddScoped<IUpdateItemFieldService, UpdateItemFieldService>();
+            builder.Services.AddScoped<IDeleteItemService, DeleteItemService>();
 
 
             builder.Services

@@ -11,7 +11,6 @@
 <div class="vault-page">
     <div class="app-container">
 
-        
         <!-- Main content -->
         <main class="main-content">
             <header class="header">
@@ -90,13 +89,21 @@
                                 <rect x="3" y="10" width="18" height="12" rx="2" />
                                 <path d="M7 10V7a5 5 0 0 1 10 0v3" />
                             </svg>
-                            <p><h>The vault is empty</p>
+                            <p>The vault is empty</p>
                         </div>
                     }
                     else
                     {
                         @foreach (var item in Model.Items)
                         {
+                            var itemType = item switch
+                            {
+                                LoginItemViewModel => "Login",
+                                CardItemViewModel => "Card",
+                                NoteItemViewModel => "Note",
+                                _ => "Unknown"
+                            };
+
                             <div class="item-card">
                                 <div class="item-header">
                                     <!-- Icon and colour according to type -->
@@ -122,12 +129,31 @@
                                                 <div class="item-username">@(login.Login ?? "No username")</div>
                                             </div>
                                             <div class="item-actions">
+                                                <a href="@Url.Action("ViewItem", "Vault", new { id = item.Id, type = itemType })"
+                                                   class="item-action-btn"
+                                                   title="All information">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                         width="24"
+                                                         height="24"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none"
+                                                         stroke="currentColor"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round"
+                                                         class="lucide lucide-form-icon lucide-form">
+                                                        <path d="M4 14h6" />
+                                                        <path d="M4 2h10" />
+                                                        <rect x="4" y="18" width="16" height="4" rx="1" />
+                                                        <rect x="4" y="6" width="16" height="4" rx="1" />
+                                                    </svg>
+                                                </a>
                                                 @if (!string.IsNullOrEmpty(login.Password))
                                                 {
                                                     <button class="item-action-btn"
                                                             title="Copy password"
                                                             data-copy="@login.Password"
-                                                            onclick="copyFromData(this)">
+                                                            onclick="copyFromData(this, 'Password')">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                              width="24"
                                                              height="24"
@@ -142,22 +168,6 @@
                                                         </svg>
                                                     </button>
                                                 }
-                                                <a href="@Url.Action("EditItem", "Vault", new { id = login.Id })"
-                                                   class="item-action-btn"
-                                                   title="Edit">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                         width="24"
-                                                         height="24"
-                                                         viewBox="0 0 24 24"
-                                                         fill="none"
-                                                         stroke="currentColor"
-                                                         stroke-width="2"
-                                                         stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                                        <path d="m15 5 4 4" />
-                                                    </svg>
-                                                </a>
                                             </div>
                                             break;
 
@@ -190,12 +200,31 @@
                                                 </div>
                                             </div>
                                             <div class="item-actions">
+                                                <a href="@Url.Action("ViewItem", "Vault", new { id = item.Id, type = itemType })"
+                                                   class="item-action-btn"
+                                                   title="All information">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                         width="24"
+                                                         height="24"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none"
+                                                         stroke="currentColor"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round"
+                                                         class="lucide lucide-form-icon lucide-form">
+                                                        <path d="M4 14h6" />
+                                                        <path d="M4 2h10" />
+                                                        <rect x="4" y="18" width="16" height="4" rx="1" />
+                                                        <rect x="4" y="6" width="16" height="4" rx="1" />
+                                                    </svg>
+                                                </a>
                                                 @if (!string.IsNullOrEmpty(card.CardNumber))
                                                 {
                                                     <button class="item-action-btn"
                                                             title="Copy card number"
                                                             data-copy="@card.CardNumber"
-                                                            onclick="copyFromData(this)">
+                                                            onclick="copyFromData(this, 'Card number')">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                              width="24"
                                                              height="24"
@@ -210,22 +239,6 @@
                                                         </svg>
                                                     </button>
                                                 }
-                                                <a href="@Url.Action("EditItem", "Vault", new { id = card.Id })"
-                                                   class="item-action-btn"
-                                                   title="Edit">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                         width="24"
-                                                         height="24"
-                                                         viewBox="0 0 24 24"
-                                                         fill="none"
-                                                         stroke="currentColor"
-                                                         stroke-width="2"
-                                                         stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                                        <path d="m15 5 4 4" />
-                                                    </svg>
-                                                </a>
                                             </div>
                                             break;
 
@@ -252,8 +265,11 @@
                                                 <div class="item-username">
                                                     @if (note.Content != null && note.Content.Any())
                                                     {
-                                                        var firstLine = note.Content.First();
-                                                        var preview = firstLine.Length > 50 ? firstLine.Substring(0, 50) + "..." : firstLine;
+                                                        var noteSplitedByNewline = note.Content.Split('\n');
+                                                        var firstLine = noteSplitedByNewline.Length > 0 ? noteSplitedByNewline[0] : "";
+                                                        var preview = firstLine.Length > 50
+                                                            ? firstLine.Substring(0, 50) + "..."
+                                                            : firstLine;
                                                         @preview
                                                     }
                                                     else
@@ -263,9 +279,9 @@
                                                 </div>
                                             </div>
                                             <div class="item-actions">
-                                                <a href="@Url.Action("EditItem", "Vault", new { id = note.Id })"
+                                                <a href="@Url.Action("ViewItem", "Vault", new { id = item.Id, type = itemType })"
                                                    class="item-action-btn"
-                                                   title="Edit">
+                                                   title="All information">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                          width="24"
                                                          height="24"
@@ -274,9 +290,12 @@
                                                          stroke="currentColor"
                                                          stroke-width="2"
                                                          stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                                        <path d="m15 5 4 4" />
+                                                         stroke-linejoin="round"
+                                                         class="lucide lucide-form-icon lucide-form">
+                                                        <path d="M4 14h6" />
+                                                        <path d="M4 2h10" />
+                                                        <rect x="4" y="18" width="16" height="4" rx="1" />
+                                                        <rect x="4" y="6" width="16" height="4" rx="1" />
                                                     </svg>
                                                 </a>
                                             </div>
@@ -289,11 +308,33 @@
                                     @switch (item)
                                     {
                                         case LoginItemViewModel login:
-                                            @if (login.Note != null && login.Note.Any())
+                                            @if (login.WebURL != null && login.WebURL.Any())
                                             {
                                                 <div class="item-detail">
-                                                    <div class="item-detail-label">Notes</div>
-                                                    <div class="item-detail-value">@login.Note.Count line(s)</div>
+                                                    <div class="URL">
+                                                        <div class="item-detail-label">URL</div>
+                                                        <div class="item-detail-value item-detail-inline">
+                                                            <span class="item-url">@login.WebURL</span>
+
+                                                            <button class="item-action-btn item-action-btn--inline"
+                                                                    title="Copy URL"
+                                                                    data-copy="@login.WebURL"
+                                                                    onclick="copyFromData(this, 'URL')">
+                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                     width="16"
+                                                                     height="16"
+                                                                     viewBox="0 0 24 24"
+                                                                     fill="none"
+                                                                     stroke="currentColor"
+                                                                     stroke-width="2"
+                                                                     stroke-linecap="round"
+                                                                     stroke-linejoin="round">
+                                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             }
                                             break;
@@ -306,13 +347,7 @@
                                                     <div class="item-detail-value">@card.ExpireMonth/@card.ExpireYear</div>
                                                 </div>
                                             }
-                                            @if (card.Note != null && card.Note.Any())
-                                            {
-                                                <div class="item-detail">
-                                                    <div class="item-detail-label">Notes</div>
-                                                    <div class="item-detail-value">@card.Note.Count line(s)</div>
-                                                </div>
-                                            }
+
                                             break;
 
                                         case NoteItemViewModel note:
@@ -320,24 +355,22 @@
                                             {
                                                 <div class="item-detail">
                                                     <div class="item-detail-label">Lines</div>
-                                                    <div class="item-detail-value">@note.Content.Count</div>
+                                                    <div class="item-detail-value">
+                                                        @{
+                                                            var total = note.Content.Length;
+                                                            var meaningful = note.Content.Count(char.IsLetterOrDigit);
+                                                        }
+                                                        @total characters • @meaningful meaningful
+                                                    </div>
                                                 </div>
                                             }
                                             break;
                                     }
 
-                                <!-- Common details for all items -->
-                                <div class="item-detail">
-                                    <div class="item-detail-label">Type</div>
-                                    <div class="item-detail-value">
-                                        @(item switch
-                                        {
-                                            LoginItemViewModel => "Login",
-                                            CardItemViewModel => "Card",
-                                            NoteItemViewModel => "Note",
-                                            _ => "Unknown"
-                                        })
-                                        </div>
+                                    <!-- Common details for all items -->
+                                    <div class="item-detail">
+                                        <div class="item-detail-label">Type</div>
+                                        <div class="item-detail-value">@itemType</div>
                                     </div>
 
                                     <div class="item-detail">
@@ -358,25 +391,29 @@
 
 @section Scripts {
     <script>
-        function copyFromData(btn) {
+        // Copy data from button's data attribute
+        function copyFromData(btn, type) {
             const value = btn.dataset.copy;
+            const typeLabel = type || 'Value';
             if (!value) return;
 
             navigator.clipboard.writeText(value).then(() => {
-                showNotification('Password copied to clipboard!');
+                showNotification(`${typeLabel} copied to clipboard!`);
             }).catch(err => {
                 console.error('Copy failed:', err);
+                showNotification('Failed to copy', 'error');
             });
         }
 
-        function showNotification(message) {
+        // Show notification message
+        function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
             notification.textContent = message;
             notification.style.cssText = `
                 position: fixed;
                 bottom: 24px;
                 right: 24px;
-                background: #27ae60;
+                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
                 color: white;
                 padding: 16px 24px;
                 border-radius: 8px;

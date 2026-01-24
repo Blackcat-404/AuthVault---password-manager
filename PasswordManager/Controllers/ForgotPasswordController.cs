@@ -30,7 +30,7 @@ namespace PasswordManager.Controllers
             });
 
             ModelState.AddModelError(nameof(model.Email), "If your email address has been confirmed and entered correctly, " +
-                "and you have not sent the link within 24 hours, then this link has been sent to you.");
+                "and you have not sent the link within 30 minutes, then this link has been sent to you.");
             return View("IndexForgotPassword",model);
         }
     }

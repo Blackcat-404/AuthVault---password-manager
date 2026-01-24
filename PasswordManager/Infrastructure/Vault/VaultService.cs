@@ -7,7 +7,7 @@ using PasswordManager.ViewModels.Vault.VaultItems;
 
 namespace PasswordManager.Infrastructure.Vault
 {
-    public class VaultService : IVaultHomeService, IVaultSidebarService
+    public class VaultService : IVaultHomeService, IVaultSidebarService, IVaultSettingsService
     {
         private readonly AppDbContext _db;
 
@@ -34,12 +34,34 @@ namespace PasswordManager.Infrastructure.Vault
               + await _db.CardData.CountAsync(x => x.UserId == userId)
               + await _db.NoteData.CountAsync(x => x.UserId == userId);
 
+            var name = await _db.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.Login)
+                .FirstOrDefaultAsync();
+
             return new VaultSidebarViewModel
             {
                 UserId = userId,
-                UserName = "AuthVault",
+                UserName = name,
                 CountAllItems = countItems
             };
+        }
+
+        public async Task<VaultSettingsViewModel> GetSettingsDataAsync(int userId)
+        {
+            var email = await _db.Users
+                .Where(u => userId == u.Id)
+                .Select(u => u.Email)
+                .FirstOrDefaultAsync();
+            var accountCreatedAt = (await _db.Users.FindAsync(userId))!.CreatedAt;
+
+            var model = new VaultSettingsViewModel
+            {
+                Sidebar = await GetSidebarDataAsync(userId),
+                Email = email!,
+                accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy")
+            };
+            return model;
         }
 
         public async Task<List<VaultItemViewModel>> GetItemsFromDBAsync(int userId)
@@ -55,11 +77,10 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
+                    WebURL = "google.com",
                     Login = x.Login,
                     Password = x.PasswordEncrypted,
-                    Note = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Note = x.NoteEncrypted,
 
                 })
                 .ToListAsync();
@@ -76,9 +97,7 @@ namespace PasswordManager.Infrastructure.Vault
                     CardNumber = x.CardNumberEncrypted,
                     ExpireMonth = x.ExpireMonthEncrypted,
                     ExpireYear = x.ExpireYearEncrypted,
-                    Note = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Note = x.NoteEncrypted,
                 })
                 .ToListAsync();
 
@@ -91,9 +110,7 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
-                    Content = x.NoteEncrypted != null
-                        ? x.NoteEncrypted.Split('\n', StringSplitOptions.None).ToList()
-                        : new List<string>()
+                    Content = x.NoteEncrypted,
                 })
                 .ToListAsync();
 
@@ -153,6 +170,24 @@ namespace PasswordManager.Infrastructure.Vault
 
             await _db.SaveChangesAsync();
         }
+
+        #region Update Field Methods
+
+        /// <summary>
+        /// Update a specific field of a login item
+        /// </summary>
+        
+
+        #endregion
+
+        #region Delete Methods
+
+        /// <summary>
+        /// Delete a login item
+        /// </summary>
+        
+
+        #endregion
 
     }
 }

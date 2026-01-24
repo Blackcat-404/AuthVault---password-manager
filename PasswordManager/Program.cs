@@ -12,8 +12,10 @@ using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
 using PasswordManager.Infrastructure.Register;
-using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Infrastructure.Security;
+using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Account.ForgotPassword;
 
 namespace PasswordManager
 {
@@ -46,7 +48,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IGetItemService, GetItemService>();
             builder.Services.AddScoped<IUpdateItemFieldService, UpdateItemFieldService>();
             builder.Services.AddScoped<IDeleteItemService, DeleteItemService>();
-
+            builder.Services.AddScoped<IAddItemService, AddItemService>();
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -69,17 +71,24 @@ namespace PasswordManager
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
-            if (!app.Environment.IsDevelopment())
+            /*if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+            }*/
+            app.UseExceptionHandler("/Error");
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            app.UseHsts();
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 

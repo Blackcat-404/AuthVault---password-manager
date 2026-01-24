@@ -15,8 +15,8 @@ namespace PasswordManager.Infrastructure.Email
 
         public EmailVerificationService(AppDbContext db, EmailService emailService)
         {
-            _db = db;
             _emailService = emailService;
+            _db = db;
         }
 
         public async Task<Result<User>> VerifyAsync(EmailVerificationDto dto)

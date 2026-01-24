@@ -6,5 +6,6 @@
         public string? Password { get; set; }
         public string? Note { get; set; }
         public string? WebURL { get; set; }
+        public string? Note { get; set; }
     }
 }

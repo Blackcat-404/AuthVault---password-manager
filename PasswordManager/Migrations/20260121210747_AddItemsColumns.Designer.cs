@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PasswordManager.Data;
 
@@ -11,9 +12,11 @@ using PasswordManager.Data;
 namespace PasswordManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260121210747_AddItemsColumns")]
+    partial class AddItemsColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace PasswordManager.Migrations
                     b.Property<string>("ExpireYearEncrypted")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FolderId")
+                    b.Property<int>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("NoteEncrypted")
@@ -110,7 +113,7 @@ namespace PasswordManager.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FolderId")
+                    b.Property<int>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("LoginEncrypted")
@@ -152,7 +155,7 @@ namespace PasswordManager.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FolderId")
+                    b.Property<int>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("NoteEncrypted")
@@ -245,7 +248,9 @@ namespace PasswordManager.Migrations
                 {
                     b.HasOne("PasswordManager.Domain.Entities.Folder", "Folder")
                         .WithMany("CardItems")
-                        .HasForeignKey("FolderId");
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PasswordManager.Domain.Entities.User", "User")
                         .WithMany()
@@ -273,7 +278,9 @@ namespace PasswordManager.Migrations
                 {
                     b.HasOne("PasswordManager.Domain.Entities.Folder", "Folder")
                         .WithMany("LoginItems")
-                        .HasForeignKey("FolderId");
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PasswordManager.Domain.Entities.User", "User")
                         .WithMany()
@@ -290,7 +297,9 @@ namespace PasswordManager.Migrations
                 {
                     b.HasOne("PasswordManager.Domain.Entities.Folder", "Folder")
                         .WithMany("NoteItems")
-                        .HasForeignKey("FolderId");
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PasswordManager.Domain.Entities.User", "User")
                         .WithMany()

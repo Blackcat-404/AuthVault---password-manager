@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.ViewModels;
 using PasswordManager.Application.Vault;
 using System.Security.Claims;
 using PasswordManager.ViewModels.Vault;
@@ -20,22 +19,23 @@ namespace PasswordManager.Controllers
         private readonly IGetItemService _vaultGetItemService;
         private readonly IUpdateItemFieldService _updateItemFieldService;
         private readonly IDeleteItemService _deleteItemService;
-
+        private readonly IAddItemService _addItemService;
 
         public VaultController(IVaultHomeService vaultHomeService,
                                 IVaultSidebarService vaultSidebarService,
                                 IVaultSettingsService vaultSettingsService,
                                 IGetItemService vaultGetItemService,
                                 IUpdateItemFieldService updateItemFieldService,
-                                IDeleteItemService deleteItemService)
+                                IDeleteItemService deleteItemService,
+                                IAddItemService addItemService)
         {
-            
             _vaultHomeService = vaultHomeService;
             _vaultSidebarService = vaultSidebarService;
             _vaultSettingsService = vaultSettingsService;
             _vaultGetItemService = vaultGetItemService;
             _updateItemFieldService = updateItemFieldService;
             _deleteItemService = deleteItemService;
+            _addItemService = addItemService;
         }
 
 
@@ -49,9 +49,6 @@ namespace PasswordManager.Controllers
             }
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            //await _vaultHomeService.SeedTestDataAsync(userId);
-
             var model = await _vaultHomeService.GetHomeDataAsync(userId);
 
             return View("IndexVault", model);
@@ -63,9 +60,8 @@ namespace PasswordManager.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            await _vaultHomeService.SeedTestDataAsync(userId);
-
             var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
+            var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
 
             return View(model);
         }
@@ -76,9 +72,6 @@ namespace PasswordManager.Controllers
         public async Task<IActionResult> AddFolder()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            await _vaultHomeService.SeedTestDataAsync(userId);
-
             var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
 
             return View(model);
@@ -106,8 +99,6 @@ namespace PasswordManager.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            await _vaultHomeService.SeedTestDataAsync(userId);
-
             var model = new AddItemViewModel
             {
                 ItemType = type,
@@ -123,8 +114,57 @@ namespace PasswordManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddItem()
+        public async Task<IActionResult> AddItem(AddItemViewModel model)
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            if (model.ItemType == "login")
+            {
+                var dto = new LoginItemDto
+                {
+                    Title = model.Title,
+                    Password = model.LoginItem!.Password,
+                    Note = model.LoginItem.Note,
+                    UserId = userId,
+                    FolderId = model.FolderId,
+                    CreatedAt = DateTime.UtcNow,
+                    Login = model.LoginItem.Login!,
+                    WebURL = model.LoginItem.WebURL,
+                };
+
+                await _addItemService.AddLoginAsync(dto);
+            }
+            else if (model.ItemType == "card")
+            {
+                var dto = new CardItemDto
+                {
+                    Title = model.Title,
+                    CardNumber = model.CardItem!.CardNumber,
+                    CardholderName = model.CardItem!.CardholderName,
+                    ExpireMonth = model.CardItem.ExpireMonth,
+                    ExpireYear = model.CardItem.ExpireYear,
+                    Note = model.CardItem.Note,
+                    UserId = userId,
+                    FolderId = model.FolderId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _addItemService.AddCardAsync(dto);
+            }
+            else
+            {
+                var dto = new NoteItemDto
+                {
+                    Title = model.Title,
+                    Note = model.CardItem!.Note,
+                    UserId = userId,
+                    FolderId = model.FolderId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _addItemService.AddNoteAsync(dto);
+            }
+            
             return RedirectToAction("Home");
         }
 

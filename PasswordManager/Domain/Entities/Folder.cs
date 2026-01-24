@@ -4,6 +4,10 @@ namespace PasswordManager.Domain.Entities
     {
         public string Name { get; set; } = null!;
 
+        public string? Description { get; set; }
+
+        public string Color { get; set; } = null!;
+
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 

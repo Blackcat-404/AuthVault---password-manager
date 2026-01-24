@@ -2,6 +2,6 @@
 {
     public class NoteItemViewModel : VaultItemViewModel
     {
-        public string? Content { get; set; }
+        public string? Content { get; set; } 
     }
 }

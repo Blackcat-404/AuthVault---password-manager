@@ -1,4 +1,5 @@
 ﻿using PasswordManager.ViewModels.Vault;
+using PasswordManager.ViewModels.Vault.VaultItems;
 
 namespace PasswordManager.Application.Vault
 {

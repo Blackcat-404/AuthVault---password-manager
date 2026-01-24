@@ -27,7 +27,7 @@ namespace PasswordManager.Infrastructure.Vault
                     loginItem!.Title = fieldValue ??= string.Empty;
                     break;
                 case "Login":
-                    loginItem!.Login = fieldValue ??= string.Empty;
+                    loginItem!.LoginEncrypted = fieldValue ??= string.Empty;
                     break;
                 case "Password":
                     loginItem!.PasswordEncrypted = fieldValue ??= string.Empty;

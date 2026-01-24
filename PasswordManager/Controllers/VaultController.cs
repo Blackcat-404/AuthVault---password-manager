@@ -61,7 +61,6 @@ namespace PasswordManager.Controllers
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
-            var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
 
             return View(model);
         }

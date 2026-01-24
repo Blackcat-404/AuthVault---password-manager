@@ -24,7 +24,7 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = l.FolderId,
                     Title = l.Title,
                     CreatedAt = l.CreatedAt,
-                    Login = l.Login,
+                    Login = l.LoginEncrypted,
                     Password = l.PasswordEncrypted,
                     Note = l.NoteEncrypted,
                     WebURL = "google.com"

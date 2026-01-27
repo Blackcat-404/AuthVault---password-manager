@@ -10,7 +10,7 @@ namespace PasswordManager.ViewModels.Vault
         [StringLength(100, ErrorMessage = "Folder name cannot exceed 100 characters")]
         public string Name { get; set; } = null!;
 
-        [StringLength(500)]
+        [StringLength(200)]
         public string? Description { get; set; }
 
         public string Color { get; set; } = "blue";

@@ -5,7 +5,7 @@
     ViewData["EnablePasswordGenerator"] = true;
     Layout = "_VaultLayout";
     var selectedType = Model.ItemType;
-    
+    var folders = Model.Folders;
 }
 
 <!-- Header -->
@@ -122,6 +122,10 @@
                     <label for="folder">Folder</label>
                     <select id="folder" name="FolderId" class="form-input">
                         <option value="">No Folder</option>
+                        @foreach (var folder in folders)
+                        {
+                            <option value="@folder.Key">@folder.Value</option>
+                        }
                     </select>
                 </div>
             </div>
@@ -237,7 +241,7 @@
                     <div class="form-group">
                         <label for="card-holder">Cardholder Name</label>
                         <input type="text" id="card-holder" name="CardItem.CardholderName" class="form-input" placeholder="JOHN DOE">
-                    </div>
+                    </div> 
 
 
                     <div class="form-group">

@@ -11,5 +11,6 @@ namespace PasswordManager.ViewModels.Vault
         public LoginItemViewModel? LoginItem { get; set; }
         public CardItemViewModel? CardItem { get; set; }
         public NoteItemViewModel? NoteItem { get; set; }
+        public IReadOnlyDictionary<int, string> Folders { get; set; } = new Dictionary<int, string>();
     }
 }

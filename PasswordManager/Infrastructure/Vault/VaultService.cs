@@ -38,11 +38,25 @@ namespace PasswordManager.Infrastructure.Vault
                 .Select(u => u.Login)
                 .FirstOrDefaultAsync();
 
+            var folders = await _db.Folders
+                .Where(f => f.UserId == userId)
+                .Select(f => new FolderViewModel
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    Description = f.Description,
+                    Color = f.Color,
+                    CreatedAt = f.CreatedAt
+                })
+                .OrderBy(f => f.Name)
+                .ToListAsync();
+
             return new VaultSidebarViewModel
             {
                 UserId = userId,
                 UserName = name,
-                CountAllItems = countItems
+                CountAllItems = countItems,
+                Folders = folders
             };
         }
 
@@ -108,7 +122,7 @@ namespace PasswordManager.Infrastructure.Vault
                     FolderId = x.FolderId,
                     Title = x.Title,
                     CreatedAt = x.CreatedAt,
-                    WebURL = "google.com",
+                    WebURL = x.WebURL,
                     Login = x.LoginEncrypted,
                     Password = x.PasswordEncrypted,
                     Note = x.NoteEncrypted

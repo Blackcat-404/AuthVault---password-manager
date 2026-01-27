@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /* ========================================
    TOGGLE PASSWORD VISIBILITY
    ======================================== */
-   
+
 function togglePassword(inputId, button) {
     const input = document.getElementById(inputId);
 
@@ -102,14 +102,208 @@ function getEyeOffIcon() {
    VAULT PAGE SCRIPTS (Dashboard)
    ======================================== */
 
-// Toggle sidebar collapse
+// Toggle Sidebar Function
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed');
-    localStorage.setItem('sidebar', sidebar.classList.contains('collapsed'));
+
+    // Save state to localStorage
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
 }
 
-// Password Generator Functions
+// Delete Folder Function
+function deleteFolder(event, folderId, folderName) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!confirm(`Are you sure you want to delete the folder "${folderName}"?\n\nAll items in this folder will be moved to "No Folder".`)) {
+        return;
+    }
+
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Vault/DeleteFolder';
+
+    // Add anti-forgery token
+    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+    if (tokenInput) {
+        const token = document.createElement('input');
+        token.type = 'hidden';
+        token.name = '__RequestVerificationToken';
+        token.value = tokenInput.value;
+        form.appendChild(token);
+    }
+
+    // Add folder ID
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'folderId';
+    idInput.value = folderId;
+    form.appendChild(idInput);
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+/* ========================================
+   SIDEBAR STATE RESTORATION
+   ======================================== */
+// Restore Sidebar State IMMEDIATELY (before DOMContentLoaded)
+(function () {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+
+    if (savedState === 'true') {
+        
+        const style = document.createElement('style');
+        style.id = 'sidebar-preload';
+        style.textContent = '.sidebar { width: 95px; }';
+        document.head.appendChild(style);
+    }
+})();
+
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const savedState = localStorage.getItem('sidebarCollapsed');
+
+    const preloadStyle = document.getElementById('sidebar-preload');
+    if (preloadStyle) {
+        preloadStyle.remove();
+    }
+
+    if (savedState === 'true' && sidebar) {
+        sidebar.classList.add('collapsed');
+    }
+
+    initializeFoldersScroll();
+    initializeTooltipPositioning();
+    checkFoldersOverflow();
+});
+
+/* ========================================
+   FOLDERS SCROLL MANAGEMENT
+   ======================================== */
+function initializeFoldersScroll() {
+    const foldersScrollable = document.querySelector('.folders-scrollable');
+
+    if (foldersScrollable) {
+        const scrollEl = document.getElementById('foldersScroll') || foldersScrollable;
+        const key = 'foldersScrollTop';
+
+        const saved = localStorage.getItem(key);
+        if (saved !== null) {
+            scrollEl.scrollTop = parseInt(saved, 10);
+        }
+
+        scrollEl.addEventListener('scroll', () => {
+            localStorage.setItem(key, scrollEl.scrollTop);
+        });
+
+        // Highlight active folder on scroll
+        const activeFolderItem = foldersScrollable.querySelector('.folder-item.active');
+        if (activeFolderItem && saved === null) {
+            const scrollTop = activeFolderItem.offsetTop - foldersScrollable.offsetTop - 20;
+            foldersScrollable.scrollTop = scrollTop;
+        }
+    }
+}
+
+/* ========================================
+   FOLDERS OVERFLOW DETECTION
+   ======================================== */
+function checkFoldersOverflow() {
+    const foldersScrollable = document.querySelector('.folders-scrollable');
+
+    if (!foldersScrollable) return;
+
+    const hasOverflow = foldersScrollable.scrollHeight > foldersScrollable.clientHeight;
+
+    if (hasOverflow) {
+        foldersScrollable.classList.add('has-overflow');
+    } else {
+        foldersScrollable.classList.remove('has-overflow');
+    }
+}
+
+window.addEventListener('resize', checkFoldersOverflow);
+
+/* ========================================
+   TOOLTIP POSITIONING
+   ======================================== */
+function initializeTooltipPositioning() {
+    const folderWrappers = document.querySelectorAll('.folder-item-wrapper');
+
+    folderWrappers.forEach(wrapper => {
+        const tooltip = wrapper.querySelector('.folder-tooltip');
+
+        if (!tooltip) return;
+
+        wrapper.addEventListener('mouseenter', function () {
+            updateTooltipPosition(wrapper, tooltip);
+        });
+    });
+}
+
+function updateTooltipPosition(wrapper, tooltip) {
+    const rect = wrapper.getBoundingClientRect();
+    const sidebar = document.getElementById('sidebar');
+    const sidebarRect = sidebar.getBoundingClientRect();
+
+
+    const left = sidebarRect.right + 12;
+    const top = rect.top;
+
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+
+    setTimeout(() => {
+        const tooltipRect = tooltip.getBoundingClientRect();
+
+        if (tooltipRect.bottom > window.innerHeight) {
+            const newTop = window.innerHeight - tooltipRect.height - 12;
+            tooltip.style.top = Math.max(12, newTop) + 'px';
+        }
+
+        if (tooltipRect.right > window.innerWidth) {
+            tooltip.style.left = (sidebarRect.left - tooltipRect.width - 12) + 'px';
+
+            tooltip.style.setProperty('--arrow-side', 'right');
+        }
+    }, 10);
+}
+
+// Update folder count in real-time (optional enhancement)
+function updateFolderItemCount(folderId, count) {
+    const folderLink = document.querySelector(`a[href*="folderId=${folderId}"]`);
+    if (folderLink) {
+        const countSpan = folderLink.querySelector('.nav-item-count');
+        if (countSpan) {
+            countSpan.textContent = count;
+        }
+    }
+}
+
+/* ========================================
+   KEYBOARD SHORTCUTS
+   ======================================== */
+/*document.addEventListener('keydown', function (event) {
+    // Shift + S = Toggle Sidebar
+    if (event.shiftKey && event.key === 'S') {
+        event.preventDefault();
+        toggleSidebar();
+    }
+
+    // Shift + G = Open Password Generator
+    if (event.shiftKey && event.key === 'G') {
+        event.preventDefault();
+        openGenerator(event);
+    }
+});*/
+
+/* ========================================
+   PASSWORD GENERATOR FUNCTIONS
+   ======================================== */
 
 function openGenerator(event) {
     if (event) event.preventDefault();
@@ -179,74 +373,8 @@ function generatePassword() {
             passwordDisplay.style.transform = 'scale(1)';
         }, 100);
     }
-
-    // Update strength indicator
-    //updatePasswordStrength(password, useUppercase, useLowercase, useNumbers, useSymbols);
 }
 
-/*function updatePasswordStrength(password, hasUpper, hasLower, hasNumber, hasSymbol) {
-    const length = password.length;
-    let score = 0;
-    let strengthText = '';
-    let strengthClass = '';
-
-    // Calculate password strength
-    if (length >= 8) score++;
-    if (length >= 12) score++;
-    if (length >= 16) score++;
-
-    let charTypesCount = 0;
-    if (hasUpper) charTypesCount++;
-    if (hasLower) charTypesCount++;
-    if (hasNumber) charTypesCount++;
-    if (hasSymbol) charTypesCount++;
-
-    if (charTypesCount >= 2) score++;
-    if (charTypesCount >= 3) score++;
-    if (charTypesCount >= 4) score++;
-
-    // Determine strength level
-    if (score <= 2) {
-        strengthText = 'Weak';
-        strengthClass = 'weak';
-    } else if (score <= 4) {
-        strengthText = 'Medium';
-        strengthClass = 'medium';
-    } else {
-        strengthText = 'Strong';
-        strengthClass = 'strong';
-    }
-
-    // Update indicators
-    const strengthTextEl = document.getElementById('strength-text');
-    if (strengthTextEl) {
-        strengthTextEl.textContent = strengthText;
-        strengthTextEl.className = `strength-text ${strengthClass}`;
-    }
-
-    // Update bars
-    const bars = [
-        document.getElementById('strength-bar-1'),
-        document.getElementById('strength-bar-2'),
-        document.getElementById('strength-bar-3'),
-        document.getElementById('strength-bar-4')
-    ];
-
-    bars.forEach((bar, index) => {
-        if (bar) {
-            bar.className = 'strength-bar';
-
-            if (strengthClass === 'weak' && index === 0) {
-                bar.classList.add('active');
-            } else if (strengthClass === 'medium' && index <= 1) {
-                bar.classList.add('active', 'medium');
-            } else if (strengthClass === 'strong' && index <= 3) {
-                bar.classList.add('active', 'strong');
-            }
-        }
-    });
-}
-*/
 function copyGeneratedPassword() {
     const passwordDisplay = document.getElementById('generated-password');
     if (!passwordDisplay) return;

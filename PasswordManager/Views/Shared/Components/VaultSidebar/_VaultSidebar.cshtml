@@ -3,6 +3,7 @@
 @{
     var userName = Model.UserName;
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var currentFolderId = ViewContext.RouteData.Values["folderId"]?.ToString();
     var itemCount = Model.CountAllItems;
 }
 
@@ -48,7 +49,7 @@
         <div class="nav-section">
             <div class="nav-section-title">Vault</div>
             <a href="@Url.Action("Home", "Vault")"
-               class="nav-item @(currentAction == "Home" ? "active" : "")">
+               class="nav-item @(currentAction == "Home" && string.IsNullOrEmpty(currentFolderId) ? "active" : "")">
                 <span class="nav-item-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          width="24"
@@ -67,6 +68,117 @@
                 <span class="nav-item-text">All Items</span>
                 <span class="nav-item-count">@itemCount</span>
             </a>
+        </div>
+
+        <!-- Folders Section (Scrollable) -->
+        <div class="nav-section folders-section">
+            <div class="nav-section-header">
+                <div class="nav-section-title">Folders</div>
+                <a href="@Url.Action("AddFolder", "Vault")"
+                   class="add-folder-btn"
+                   title="Add new folder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14" />
+                        <path d="M5 12h14" />
+                    </svg>
+                </a>
+            </div>
+
+            @if (Model.Folders.Any())
+            {
+                <div id="foldersScroll" class="folders-scrollable">
+                    @foreach (var folder in Model.Folders)
+                    {
+                        var currentFolderIdStr = ViewContext.RouteData.Values["folderId"]
+                        ?? Context.Request.Query["folderId"].FirstOrDefault();
+
+                        var isActive = int.TryParse(currentFolderIdStr?.ToString(), out var folderId) && folderId == folder.Id;
+
+                        var colorMap = new Dictionary<string, string>
+                                {
+                                { "blue", "linear-gradient(135deg, #3498db 0%, #2980b9 100%)" },
+                                { "green", "linear-gradient(135deg, #27ae60 0%, #229954 100%)" },
+                                { "purple", "linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)" },
+                                { "orange", "linear-gradient(135deg, #f39c12 0%, #e67e22 100%)" },
+                                { "red", "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)" },
+                                { "teal", "linear-gradient(135deg, #1abc9c 0%, #16a085 100%)" }
+                                };
+
+                        var folderColor = colorMap.ContainsKey(folder.Color) ? colorMap[folder.Color] : colorMap["blue"];
+
+                        <div class="folder-item-wrapper @(isActive ? "active" : "")">
+                            <a href="@Url.Action("Folder", "Vault", new { folderId = folder.Id })"
+                               class="nav-item folder-item @(isActive ? "active" : "")"
+                               data-folder-name="@folder.Name"
+                               data-folder-description="@folder.Description">
+                                <span class="folder-color-indicator" style="background: @folderColor"></span>
+                                <span class="nav-folder-icon" style="background: @folderColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         width="24"
+                                         height="24"
+                                         viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="2"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round">
+                                        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                                    </svg>
+                                </span>
+                                <span class="nav-item-text">@folder.Name</span>
+                            </a>
+
+                            @* Rich Tooltip *@
+                            <div class="folder-tooltip">
+                                <div class="folder-tooltip-header">
+                                    <span class="folder-tooltip-icon" style="background: @folderColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                                        </svg>
+                                    </span>
+                                    <strong class="folder-tooltip-name">@folder.Name</strong>
+                                </div>
+                                @if (!string.IsNullOrEmpty(folder.Description))
+                                {
+                                    <div class="folder-tooltip-description">
+                                        @foreach (var line in folder.Description.Split("\n"))
+                                        {
+                                            @line<br />
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="folder-tooltip-description">No Description</div>
+                                }
+                                <div class="folder-tooltip-meta">
+                                    Created @folder.CreatedAt.ToString("MMM dd, yyyy")
+                                </div>
+                            </div>
+
+                            <button class="folder-delete-btn"
+                                    onclick="deleteFolder(event, @folder.Id, '@folder.Name')"
+                                    title="Delete folder">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="16"
+                                     height="16"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="M3 6h18" />
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                    <line x1="10" x2="10" y1="11" y2="17" />
+                                    <line x1="14" x2="14" y1="11" y2="17" />
+                                </svg>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         <!-- Tools Section -->
@@ -147,3 +259,25 @@
         </div>
     </div>
 </aside>
+
+@* Anti-forgery token for delete operations *@
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <!-- Saving scroll position -->
+    <script>
+        const scrollEl = document.getElementById('foldersScroll');
+        const key = 'foldersScrollTop';
+
+        if (scrollEl) {
+            const saved = localStorage.getItem(key);
+            if (saved !== null) {
+                scrollEl.scrollTop = parseInt(saved, 10);
+            }
+
+            scrollEl.addEventListener('scroll', () => {
+                localStorage.setItem(key, scrollEl.scrollTop);
+            });
+        }
+    </script>
+}

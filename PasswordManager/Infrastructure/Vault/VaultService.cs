@@ -53,17 +53,15 @@ namespace PasswordManager.Infrastructure.Vault
                 .Select(u => u.Email)
                 .FirstOrDefaultAsync();
             var accountCreatedAt = (await _db.Users.FindAsync(userId))!.CreatedAt;
-
-            var FAemail = await _db.TwoFactorAuthentications
-                .Where(u => userId == u.UserId)
-                .Select(u => u.Email)
-                .FirstOrDefaultAsync();
+            var user = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(u => userId == u.UserId);
 
             var model = new VaultSettingsViewModel
             {
                 Sidebar = await GetSidebarDataAsync(userId),
                 Email = email!,
-                FAEmail = FAemail,
+                FAEmail = user!.Email,
+                Is2FAEnabled = user!.IsEnabled,
                 accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy")
             };
             return model;

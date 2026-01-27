@@ -38,7 +38,7 @@ namespace PasswordManager.Controllers
             var id = Convert.ToInt32(TempData["userId"]);
             if (!await _loginService.Verify2FACode(id,model.Code))
             {
-                return RedirectToAction("GetLogin");
+                return RedirectToAction();
             }
 
             await _authService.SignInAsync(HttpContext, id);

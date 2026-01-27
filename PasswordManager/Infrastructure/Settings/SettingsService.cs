@@ -53,9 +53,7 @@ namespace PasswordManager.Infrastructure.Settings
         public async Task<bool> Verify2FACodeAsync(int userId, string code, string email)
         {
             var record = await _db.TwoFactorAuthentications
-            .Where(x =>
-                x.UserId == userId &&
-                !x.IsEnabled)
+            .Where(x => x.UserId == userId)
             .FirstOrDefaultAsync();
 
             if (record == null)
@@ -80,6 +78,21 @@ namespace PasswordManager.Infrastructure.Settings
 
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task Set2FAStatement(int userId, bool statement)
+        {
+            var record = await _db.TwoFactorAuthentications
+            .Where(x => x.UserId == userId)
+            .FirstOrDefaultAsync();
+
+            if (record == null)
+            {
+                return;
+            }
+            
+            record.IsEnabled = statement;
+            await _db.SaveChangesAsync();
         }
     }
 }

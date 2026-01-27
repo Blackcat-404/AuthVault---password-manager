@@ -9,6 +9,7 @@
     var userEmail = Model.Email;
     var accountCreatedOn = Model.accountCreatedOn;
     var FAEmail = Model.FAEmail;
+    var Is2FAEnabled = Model.Is2FAEnabled;
 }
 
 <!-- Header -->
@@ -92,6 +93,7 @@
             </div>
 
             <div class="settings-card">
+                @Html.AntiForgeryToken()
                 <div class="setting-item">
                     <div class="setting-info">
                         <div class="setting-label">Master Password</div>
@@ -100,18 +102,23 @@
                     <button class="btn btn-secondary btn-sm">Change</button>
                 </div>
 
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">Two-Factor Authentication</div>
-                        <div class="setting-hint">Add an extra layer of security</div>
-                    </div>
+                @{
+                    if (FAEmail != null)
+                    {
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">Two-Factor Authentication</div>
+                                <div class="setting-hint">Add an extra layer of security</div>
+                            </div>
 
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
+                            <label class="toggle-switch">   
+                                <input type="checkbox" id="Toggle" @(Is2FAEnabled ? "checked" : "")>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    }
+                }
+                
                 <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
                     <div class="setting-item">
                         <div class="setting-info">
@@ -208,3 +215,20 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
 }
+
+<script>
+    const toggle = document.getElementById("Toggle");
+    toggle.addEventListener("change", async function () {
+        const isEnabled = this.checked;
+        await fetch('/Vault/Settings/Toggle2FA', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({ isEnabled: isEnabled })
+        });
+
+        const result = await response.json();
+    });
+</script>

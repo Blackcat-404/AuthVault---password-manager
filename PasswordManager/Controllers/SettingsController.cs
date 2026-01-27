@@ -3,6 +3,7 @@ using PasswordManager.Application.Vault;
 using PasswordManager.Infrastructure.Settings;
 using PasswordManager.ViewModels.Vault;
 using System.Security.Claims;
+using PasswordManager.Application.Settings;
 
 namespace PasswordManager.Controllers
 {
@@ -78,6 +79,17 @@ namespace PasswordManager.Controllers
             {
                 return RedirectToAction("Get2FACode");
             }
+
+            return RedirectToAction("GetSettings");
+        }
+
+        [HttpPost("Settings/Toggle2FA")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Toggle2FA([FromBody] Toggle2FADto dto)
+        {
+            Console.WriteLine("Here");
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _settingsService.Set2FAStatement(userId, dto.IsEnabled);
 
             return RedirectToAction("GetSettings");
         }

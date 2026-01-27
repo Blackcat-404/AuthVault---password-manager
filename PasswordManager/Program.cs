@@ -14,6 +14,7 @@ using PasswordManager.Models.Email;
 using PasswordManager.Infrastructure.Register;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Infrastructure.Settings;
 
 namespace PasswordManager
 {
@@ -52,6 +53,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IGetAllFoldersService, GetFolderService>();
             builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
 
+            builder.Services.AddScoped<SettingsService>();
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

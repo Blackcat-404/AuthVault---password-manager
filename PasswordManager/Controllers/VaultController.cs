@@ -56,18 +56,6 @@ namespace PasswordManager.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Settings()
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
-
-            return View(model);
-        }
-
-
-
-        [HttpGet]
         public async Task<IActionResult> AddFolder()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

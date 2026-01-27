@@ -16,6 +16,7 @@ using PasswordManager.Infrastructure.Security;
 using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Infrastructure.Settings;
 
 namespace PasswordManager
 {
@@ -49,6 +50,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IUpdateItemFieldService, UpdateItemFieldService>();
             builder.Services.AddScoped<IDeleteItemService, DeleteItemService>();
             builder.Services.AddScoped<IAddItemService, AddItemService>();
+            builder.Services.AddScoped<SettingsService>();
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

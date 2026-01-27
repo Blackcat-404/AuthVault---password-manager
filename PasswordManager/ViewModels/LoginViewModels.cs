@@ -12,4 +12,9 @@ namespace PasswordManager.ViewModels
         public string? Password { get; set; }
 
     }
+
+    public class Login2FAViewModel
+    {
+        public string Code { get; set; } = null!;
+    }
 }

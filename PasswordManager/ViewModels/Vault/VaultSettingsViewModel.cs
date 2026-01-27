@@ -4,6 +4,7 @@
     {
         public VaultSidebarViewModel Sidebar { get; set; } = null!;
         public string Email { get; set; } = null!;
+        public string? FAEmail { get; set; }
         public string accountCreatedOn { get; set; } = null!;
     }
 }

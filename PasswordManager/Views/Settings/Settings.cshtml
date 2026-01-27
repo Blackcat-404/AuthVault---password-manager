@@ -8,6 +8,7 @@
     var userName = Model.Sidebar.UserName;
     var userEmail = Model.Email;
     var accountCreatedOn = Model.accountCreatedOn;
+    var FAEmail = Model.FAEmail;
 }
 
 <!-- Header -->
@@ -57,26 +58,13 @@
                 </div>
 
                 <div class="setting-item">
-                    <div class="setting-label">Account Created</div>
-                    <div class="setting-value">@accountCreatedOn</div>
+                    <div class="setting-label">Two factor authentication email</div>
+                    <div class="setting-value">@(FAEmail == null?"None":FAEmail)</div>
                 </div>
 
-                <div class="edit-btn">
-                    <button class="btn btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="20"
-                             height="20"
-                             viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             stroke-linecap="round"
-                             stroke-linejoin="round">
-                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                            <path d="m15 5 4 4" />
-                        </svg>
-                        Edit Profile
-                    </button>
+                <div class="setting-item">
+                    <div class="setting-label">Account Created</div>
+                    <div class="setting-value">@accountCreatedOn</div>
                 </div>
             </div>
         </div>
@@ -117,11 +105,22 @@
                         <div class="setting-label">Two-Factor Authentication</div>
                         <div class="setting-hint">Add an extra layer of security</div>
                     </div>
+
                     <label class="toggle-switch">
                         <input type="checkbox">
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+
+                <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">Two-Factor Authentication Email</div>
+                            <div class="setting-hint">Your secondary email for better security</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm">@((FAEmail == null)?"Add":"Change")</button>
+                    </div>
+                </form>
 
                 <div class="setting-item">
                     <div class="setting-info">
@@ -201,7 +200,7 @@
                     </svg>
                     Logout
                 </button>
-            </form>
+            </form> 
         </div>
     </div>
 </div>

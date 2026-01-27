@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Application.Security;
-using PasswordManager.Data;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.ViewModels;
-using PasswordManager.Application.Security;
 
 namespace PasswordManager.Controllers
 {

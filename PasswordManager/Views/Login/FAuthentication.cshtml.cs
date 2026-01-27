@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace PasswordManager.Views.Vault
+namespace PasswordManager.Views.Login
 {
-    public class SettingsModel : PageModel
+    public class FAuthenticationModel : PageModel
     {
         public void OnGet()
         {

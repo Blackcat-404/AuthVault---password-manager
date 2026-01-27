@@ -1,0 +1,39 @@
+﻿@using PasswordManager.ViewModels.Vault
+@model FAuthenticationCodeViewModel
+@{
+    ViewData["Title"] = "Settings";
+    ViewData["EnablePasswordGenerator"] = true;
+    Layout = "_VaultLayout";
+}
+<!-- Header -->
+<header class="header">
+    <div class="header-title-section">
+        <h1 class="page-title">Two-Factor Authentication</h1>
+        <p class="page-subtitle">Manage your 2FA to be safe</p>
+    </div>
+</header>
+<!-- Settings Content -->
+<div class="content-area">
+    <div class="form-container">
+        <!-- Form for sending code -->
+        <form asp-action="PostVerifyCode" asp-controller="Settings" method="post" class="vault-form" id="sendCodeForm">
+            @Html.AntiForgeryToken()
+            <div class="form-section">
+                <h3 class="form-section-title">Code</h3>
+                <div class="form-group">
+                    <label for="email">Check your email and enter code here*</label>
+                    <input id="code" name="Code" class="form-input" placeholder="123456" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    Verify
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/vault-forms.css" asp-append-version="true" />
+}

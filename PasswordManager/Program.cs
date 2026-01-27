@@ -12,8 +12,6 @@ using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Infrastructure.Security;
 using PasswordManager.Models.Email;
 using PasswordManager.Infrastructure.Register;
-using PasswordManager.Infrastructure.Security;
-using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Application.Account.ForgotPassword;
 
@@ -49,6 +47,11 @@ namespace PasswordManager
             builder.Services.AddScoped<IUpdateItemFieldService, UpdateItemFieldService>();
             builder.Services.AddScoped<IDeleteItemService, DeleteItemService>();
             builder.Services.AddScoped<IAddItemService, AddItemService>();
+            builder.Services.AddScoped<IAddFolderService, AddFolderService>();
+            builder.Services.AddScoped<IGetFolderService, GetFolderService>();
+            builder.Services.AddScoped<IGetAllFoldersService, GetFolderService>();
+            builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
+
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

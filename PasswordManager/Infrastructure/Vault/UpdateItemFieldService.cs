@@ -26,6 +26,9 @@ namespace PasswordManager.Infrastructure.Vault
                 case "Title":
                     loginItem!.Title = fieldValue ??= string.Empty;
                     break;
+                case "FolderId":
+                    loginItem!.FolderId = string.IsNullOrEmpty(fieldValue) ? (int?)null : Convert.ToInt32(fieldValue);
+                    break;
                 case "Login":
                     loginItem!.LoginEncrypted = fieldValue ??= string.Empty;
                     break;
@@ -33,7 +36,7 @@ namespace PasswordManager.Infrastructure.Vault
                     loginItem!.PasswordEncrypted = fieldValue ??= string.Empty;
                     break;
                 case "WebURL":
-                    // loginItem.WebURL = fieldValue;
+                    loginItem!.WebURL = fieldValue ??= string.Empty;
                     break;
                 case "Note":
                     loginItem!.NoteEncrypted = fieldValue ??= string.Empty;
@@ -56,9 +59,14 @@ namespace PasswordManager.Infrastructure.Vault
                 case "Title":
                     cardItem!.Title = fieldValue ??= string.Empty;
                     break;
+                case "FolderId":
+                    cardItem!.FolderId = string.IsNullOrEmpty(fieldValue) ? (int?)null : Convert.ToInt32(fieldValue);
+                    break;
                 case "CardNumber":
-
                     cardItem!.CardNumberEncrypted = fieldValue ??= string.Empty;
+                    break;
+                case "CardholderName":
+                    cardItem!.CardholderName = fieldValue ??= string.Empty;
                     break;
                 case "ExpireMonth":
                     cardItem!.ExpireMonthEncrypted = fieldValue;
@@ -85,6 +93,9 @@ namespace PasswordManager.Infrastructure.Vault
             {
                 case "Title":
                     noteItem!.Title = fieldValue ??= string.Empty;
+                    break;
+                case "FolderId":
+                    noteItem!.FolderId = string.IsNullOrEmpty(fieldValue) ? (int?)null : Convert.ToInt32(fieldValue);
                     break;
                 case "Content":
                     noteItem!.NoteEncrypted = fieldValue ??= string.Empty;

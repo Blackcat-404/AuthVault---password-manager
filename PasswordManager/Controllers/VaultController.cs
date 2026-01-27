@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.X509;
 using PasswordManager.Application.Vault;
-using System.Security.Claims;
+using PasswordManager.Domain.Entities;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
+using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
@@ -20,6 +22,10 @@ namespace PasswordManager.Controllers
         private readonly IUpdateItemFieldService _updateItemFieldService;
         private readonly IDeleteItemService _deleteItemService;
         private readonly IAddItemService _addItemService;
+        private readonly IAddFolderService _addFolderService;
+        private readonly IGetFolderService _getFolderService;
+        private readonly IGetAllFoldersService _getAllFoldersService;
+        private readonly IDeleteFolderService _deleteFolderService;
 
         public VaultController(IVaultHomeService vaultHomeService,
                                 IVaultSidebarService vaultSidebarService,
@@ -27,7 +33,11 @@ namespace PasswordManager.Controllers
                                 IGetItemService vaultGetItemService,
                                 IUpdateItemFieldService updateItemFieldService,
                                 IDeleteItemService deleteItemService,
-                                IAddItemService addItemService)
+                                IAddItemService addItemService,
+                                IAddFolderService addFolderService,
+                                IGetFolderService getFolderService,
+                                IGetAllFoldersService getAllFoldersService,
+                                IDeleteFolderService deleteFolderService)
         {
             _vaultHomeService = vaultHomeService;
             _vaultSidebarService = vaultSidebarService;
@@ -36,6 +46,10 @@ namespace PasswordManager.Controllers
             _updateItemFieldService = updateItemFieldService;
             _deleteItemService = deleteItemService;
             _addItemService = addItemService;
+            _addFolderService = addFolderService;
+            _getFolderService = getFolderService;
+            _getAllFoldersService = getAllFoldersService;
+            _deleteFolderService = deleteFolderService;
         }
 
 
@@ -66,33 +80,6 @@ namespace PasswordManager.Controllers
         }
 
 
-
-        [HttpGet]
-        public async Task<IActionResult> AddFolder()
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
-
-            return View(model);
-        }
-
-
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddFolder(FolderViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            return RedirectToAction(nameof(Home));
-        }
-
-
-
         [HttpGet]
         public async Task<IActionResult> AddItem(string type = "login")
         {
@@ -101,14 +88,13 @@ namespace PasswordManager.Controllers
             var model = new AddItemViewModel
             {
                 ItemType = type,
-                Sidebar = await _vaultSidebarService.GetSidebarDataAsync(userId)
+                Sidebar = await _vaultSidebarService.GetSidebarDataAsync(userId),
+                Folders = await _getAllFoldersService.GetAllFoldersAsync(userId)
             };
             // Pass item type to view to show appropriate form
 
             return View(model);
         }
-
-
 
 
         [HttpPost]
@@ -155,7 +141,7 @@ namespace PasswordManager.Controllers
                 var dto = new NoteItemDto
                 {
                     Title = model.Title,
-                    Note = model.CardItem!.Note,
+                    Content = model.NoteItem!.Content,
                     UserId = userId,
                     FolderId = model.FolderId,
                     CreatedAt = DateTime.UtcNow,
@@ -175,6 +161,7 @@ namespace PasswordManager.Controllers
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             VaultItemViewModel? item = null;
+            IReadOnlyDictionary<int, string> folders = await _getAllFoldersService.GetAllFoldersAsync(userId);
 
             switch (type?.ToLower())
             {
@@ -200,7 +187,8 @@ namespace PasswordManager.Controllers
             var model = new ViewItemViewModel
             {
                 Sidebar = await _vaultSidebarService.GetSidebarDataAsync(userId),
-                Item = item
+                Item = item,
+                Folders = folders
             };
 
             return View(model);
@@ -232,7 +220,7 @@ namespace PasswordManager.Controllers
             return Json(new { success = true, message = "Field updated successfully" });
         }
 
-
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteItem(int id, string type)
@@ -257,6 +245,68 @@ namespace PasswordManager.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> Folder(int folderId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var model = await _getFolderService.GetFolderAsync(userId, folderId);
+
+            return View("IndexVault", model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddFolder()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
+
+            return View(model);
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFolder(FolderViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var dto = new FolderDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Color = model.Color,
+                UserId = userId
+            };
+
+            await _addFolderService.AddFolderAsync(dto);
+
+            return RedirectToAction(nameof(Home));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFolder(int folderId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            try
+            {
+                await _deleteFolderService.DeleteFolderAsync(userId, folderId);
+                return RedirectToAction(nameof(Home));
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Folder not found or access denied");
+                return NotFound();
+            }
+        }
+
 
 
         [HttpGet]
@@ -264,16 +314,5 @@ namespace PasswordManager.Controllers
         {
             return View("Home");
         }
-
-
-
-
-
-        [HttpGet]
-        public async Task<IActionResult> Folder(int folderId)
-        {
-            return View("Home");
-        }
-
     }
 }

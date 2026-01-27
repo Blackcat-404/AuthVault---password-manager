@@ -13,6 +13,8 @@
         NoteItemViewModel => "Note",
         _ => "Unknown"
     };
+
+    var folders = Model.Folders;
 }
 
 <div class="vault-page">
@@ -145,12 +147,46 @@
                         @switch (Model.Item)
                         {
                             case LoginItemViewModel login:
+
+                                <!-- Folder -->
+                                <div class="field-group">
+                                    <label class="field-label">Folder</label>
+                                    <div class="editable-field" data-field="FolderId" data-id="@login.Id" data-type="Login">
+                                        <div class="field-value-container">
+                                            <span class="field-value">@(login.FolderName ?? "No Folder")</span>
+                                            <button class="edit-btn" onclick="enableEdit(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <select class="edit-input edit-select" style="display:none" value="@login.FolderId">
+                                            <option value="">No Folder</option>
+                                            @foreach (var folder in folders)
+                                            {
+                                                <option value="@folder.Key">@folder.Value</option>
+                                            }
+                                        </select>
+                                        <div class="edit-actions" style="display: none;">
+                                            <button class="btn-save" onclick="saveEdit(this)">✓</button>
+                                            <button class="btn-cancel" onclick="cancelEdit(this)">✕</button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Username/Email -->
                                 <div class="field-group">
                                     <label class="field-label">Username / Email</label>
                                     <div class="editable-field" data-field="Login" data-id="@login.Id" data-type="Login">
                                         <div class="field-value-container">
-                                            <span class="field-value">@(login.Login ?? "Not set")</span>
+                                            <span class="field-value">@(string.IsNullOrEmpty(login.Login) ? "Not set" : @login.Login)</span>
                                             @if (!string.IsNullOrEmpty(login.Login))
                                             {
                                                 <button class="copy-btn" onclick="copyToClipboard('@login.Login', 'Username')">
@@ -257,49 +293,47 @@
                                 </div>
 
                                 <!-- URL -->
-                                @if (!string.IsNullOrEmpty(login.WebURL))
-                                {
-                                    <div class="field-group">
-                                        <label class="field-label">Website URL</label>
-                                        <div class="editable-field" data-field="WebURL" data-id="@login.Id" data-type="Login">
-                                            <div class="field-value-container">
-                                                <a href="@(login.WebURL.StartsWith("http://") || login.WebURL.StartsWith("https://") ? login.WebURL : "https://" + login.WebURL)"
-                                                   target="_blank"
-                                                   class="field-value link"
-                                                   rel="noopener noreferrer">@login.WebURL</a>
-                                                <button class="copy-btn" onclick="copyToClipboard('@login.WebURL', 'URL')">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        width="16"
-                                                        height="16"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        stroke-width="2">
-                                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                                    </svg>
-                                                </button>
-                                                <button class="edit-btn" onclick="enableEdit(this)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        width="16"
-                                                        height="16"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        stroke-width="2">
-                                                        <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                                        <path d="m15 5 4 4" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                            <input type="url" class="edit-input" value="@login.WebURL" style="display: none;" />
-                                            <div class="edit-actions" style="display: none;">
-                                                <button class="btn-save" onclick="saveEdit(this)">✓ Save</button>
-                                                <button class="btn-cancel" onclick="cancelEdit(this)">✕ Cancel</button>
-                                            </div>
+                                @if (login.WebURL == null) login.WebURL = "";
+                                <div class="field-group">
+                                    <label class="field-label">Website URL</label>
+                                    <div class="editable-field" data-field="WebURL" data-id="@login.Id" data-type="Login">
+                                        <div class="field-value-container">
+                                            <a href="@(login.WebURL.StartsWith("http://") || login.WebURL.StartsWith("https://") ? login.WebURL : "https://" + login.WebURL)"
+                                               target="_blank"
+                                               class="field-value link"
+                                               rel="noopener noreferrer">@login.WebURL</a>
+                                            <button class="copy-btn" onclick="copyToClipboard('@login.WebURL', 'URL')">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                </svg>
+                                            </button>
+                                            <button class="edit-btn" onclick="enableEdit(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <input type="url" class="edit-input" value="@login.WebURL" style="display: none;" />
+                                        <div class="edit-actions" style="display: none;">
+                                            <button class="btn-save" onclick="saveEdit(this)">✓ Save</button>
+                                            <button class="btn-cancel" onclick="cancelEdit(this)">✕ Cancel</button>
                                         </div>
                                     </div>
-                                }
+                                </div>
 
                                 <!-- Notes -->
                                 <div class="field-group">
@@ -339,6 +373,40 @@
                                 break;
 
                             case CardItemViewModel card:
+
+                                <!-- Folder -->
+                                <div class="field-group">
+                                    <label class="field-label">Folder</label>
+                                    <div class="editable-field" data-field="FolderId" data-id="@card.Id" data-type="Card">
+                                        <div class="field-value-container">
+                                            <span class="field-value">@(card.FolderName ?? "No Folder")</span>
+                                            <button class="edit-btn" onclick="enableEdit(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <select class="edit-input edit-select" style="display:none" value="@card.FolderId">
+                                            <option value="">No Folder</option>
+                                            @foreach (var folder in folders)
+                                            {
+                                                <option value="@folder.Key">@folder.Value</option>
+                                            }
+                                        </select>
+                                        <div class="edit-actions" style="display: none;">
+                                            <button class="btn-save" onclick="saveEdit(this)">✓</button>
+                                            <button class="btn-cancel" onclick="cancelEdit(this)">✕</button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Card Number -->
                                 <div class="field-group">
                                     <label class="field-label">Card Number</label>
@@ -449,6 +517,49 @@
                                     </div>
                                 </div>
 
+                                <!-- CardholderName -->
+                                @if (card.CardholderName == null) card.CardholderName = "";
+                                <div class="field-group">
+                                    <label class="field-label">Cardholder Name</label>
+                                    <div class="editable-field" id="cardholder-name" data-field="CardholderName" data-id="@card.Id" data-type="Card">
+                                        <div class="field-value-container">
+                                            <span class="field-value">@card.CardholderName</span>
+                                            @if (!string.IsNullOrEmpty(card.CardholderName))
+                                            {
+                                                <button class="copy-btn" onclick="copyToClipboard('@card.CardholderName', 'Cardholder Name')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                         width="16"
+                                                         height="16"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none"
+                                                         stroke="currentColor"
+                                                         stroke-width="2">
+                                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                    </svg>
+                                                </button>
+                                            }
+                                            <button class="edit-btn" onclick="enableEdit(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="edit-input" value="@card.CardholderName" style="display: none;" maxlength="19" oninput="formatCardholderName(this)" />
+                                        <div class="edit-actions" style="display: none;">
+                                            <button class="btn-save" onclick="saveEdit(this)">✓ Save</button>
+                                            <button class="btn-cancel" onclick="cancelEdit(this)">✕ Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Notes -->
                                 <div class="field-group">
                                     <label class="field-label">Notes</label>
@@ -487,6 +598,40 @@
                                 break;
 
                             case NoteItemViewModel note:
+
+                                <!-- Folder -->
+                                <div class="field-group">
+                                    <label class="field-label">Folder</label>
+                                    <div class="editable-field" data-field="FolderId" data-id="@note.Id" data-type="Note">
+                                        <div class="field-value-container">
+                                            <span class="field-value">@(note.FolderName ?? "No Folder")</span>
+                                            <button class="edit-btn" onclick="enableEdit(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2">
+                                                    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <select class="edit-input edit-select" style="display:none" value="@note.FolderId">
+                                            <option value="">No Folder</option>
+                                            @foreach (var folder in folders)
+                                            {
+                                                <option value="@folder.Key">@folder.Value</option>
+                                            }
+                                        </select>
+                                        <div class="edit-actions" style="display: none;">
+                                            <button class="btn-save" onclick="saveEdit(this)">✓</button>
+                                            <button class="btn-cancel" onclick="cancelEdit(this)">✕</button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Note Content -->
                                 <div class="field-group">
                                     <label class="field-label">Content</label>
@@ -546,15 +691,41 @@
             const editInput = editableField.querySelector('.edit-input');
             const editActions = editableField.querySelector('.edit-actions');
 
+
+            if (editInput.tagName === 'SELECT') {
+                editInput.setAttribute('data-original-value', editInput.value);
+            } else {
+                editInput.setAttribute('data-original-value', editInput.value);
+            }
+
             valueContainer.style.display = 'none';
             editInput.style.display = 'block';
             editActions.style.display = 'flex';
+
+            if (valueContainer) {
+                valueContainer.style.display = 'none';
+            }
+
+            if (editableField.classList.contains('editable-field-title')) {
+                const titleElement = editableField.querySelector('.item-view-title');
+                if (titleElement) {
+                    editInput.value = titleElement.textContent;
+                    titleElement.style.display = 'none';
+                }
+            }
+
             editInput.focus();
 
             // For textareas, auto-adjust height
             if (editInput.tagName === 'TEXTAREA') {
                 editInput.style.height = 'auto';
                 editInput.style.height = editInput.scrollHeight + 'px';
+            }
+
+            // For select - set current value
+            if (editInput.tagName === 'SELECT') {
+                const currentValue = editableField.dataset.value || '';
+                editInput.value = currentValue;
             }
         }
 
@@ -571,6 +742,14 @@
                 editInput.value = originalValue;
             }
 
+
+            if (editableField.classList.contains('editable-field-title')) {
+                const titleElement = editableField.querySelector('.item-view-title');
+                if (titleElement) {
+                    titleElement.style.display = 'block';
+                }
+            }
+
             valueContainer.style.display = 'flex';
             editInput.style.display = 'none';
             editActions.style.display = 'none';
@@ -581,54 +760,84 @@
             const editableField = btn.closest('.editable-field');
             const editInput = editableField.querySelector('.edit-input');
             const fieldValue = editableField.querySelector('.field-value');
-            const newValue = editInput.value;
 
             const fieldName = editableField.dataset.field;
             const itemId = editableField.dataset.id;
             const itemType = editableField.dataset.type;
 
+            let newValue = editInput.value;
+            let displayValue = newValue;
+
+
+            if (editInput.tagName === 'SELECT') {
+                const selectedOption = editInput.options[editInput.selectedIndex];
+                displayValue = selectedOption ? selectedOption.text : 'No Folder';
+            }
+
+
+            if (editInput.tagName === 'TEXTAREA') {
+                displayValue = newValue || 'No notes';
+            }
+
+
+
             // Show loading state
             btn.disabled = true;
+            const originalText = btn.textContent;
             btn.textContent = 'Saving...';
 
             try {
-                const response = await fetch('@Url.Action("UpdateField", "Vault")', {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const response = await fetch('/Vault/UpdateField', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        'RequestVerificationToken': token
                     },
                     body: new URLSearchParams({
                         id: itemId,
                         itemType: itemType,
                         fieldName: fieldName,
                         fieldValue: newValue,
-                        __RequestVerificationToken: document.querySelector('input[name="__RequestVerificationToken"]').value
+                        __RequestVerificationToken: token
                     })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    // Update the display value
-                    if (editInput.tagName === 'TEXTAREA') {
-                        fieldValue.textContent = newValue || 'No notes';
-                    } else {
-                        fieldValue.textContent = newValue;
+
+                    if (fieldValue) {
+                        fieldValue.textContent = displayValue;
                     }
 
-                    // Update title in header if that's what was edited
+
                     if (fieldName === 'Title') {
-                        document.querySelector('.item-view-title').textContent = newValue;
+                        const titleElement = editableField.querySelector('.item-view-title');
+                        if (titleElement) {
+                            titleElement.textContent = newValue;
+                            titleElement.style.display = 'block';
+                        }
                     }
 
-                    // Update stored password value for toggle functionality
+
                     if (fieldName === 'Password') {
                         const toggleBtn = editableField.querySelector('.toggle-password-btn');
                         if (toggleBtn) {
                             toggleBtn.dataset.password = newValue;
                         }
                         editInput.setAttribute('data-actual-value', newValue);
+
+
+                        const valueSpan = editableField.querySelector('.field-value');
+                        if (valueSpan && !valueSpan.classList.contains('password-hidden')) {
+                            valueSpan.textContent = newValue;
+                        }
+                    }
+
+
+                    if (fieldName === 'FolderId') {
+                        editableField.dataset.value = newValue;
                     }
 
                     cancelEdit(btn);
@@ -641,7 +850,7 @@
                 showNotification('An error occurred while updating', 'error');
             } finally {
                 btn.disabled = false;
-                btn.textContent = '✓ Save';
+                btn.textContent = originalText;
             }
         }
 
@@ -667,13 +876,17 @@
             }
         }
 
-        
-        // Only digits in card number
+        // Format card number (only digits)
         function formatCardNumber(input) {
             let value = input.value.replace(/\D/g, '');
             input.value = value;
         }
 
+        // Format cardholder name (only letters and spaces)
+        function formatCardholderName(input) {
+            let value = input.value.replace(/[^a-zA-Z\s]/g, '');
+            input.value = value;
+        }
 
         // Copy text to clipboard
         function copyToClipboard(text, label) {
@@ -719,8 +932,19 @@
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
+
+        // Auto-resize textarea on input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-input-textarea').forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        });
     </script>
 }
+
 
 
 @section Styles {

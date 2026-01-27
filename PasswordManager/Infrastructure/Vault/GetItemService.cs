@@ -22,12 +22,13 @@ namespace PasswordManager.Infrastructure.Vault
                 {
                     Id = l!.Id,
                     FolderId = l.FolderId,
+                    FolderName = l.Folder!.Name,
                     Title = l.Title,
                     CreatedAt = l.CreatedAt,
                     Login = l.LoginEncrypted,
                     Password = l.PasswordEncrypted,
                     Note = l.NoteEncrypted,
-                    WebURL = "google.com"
+                    WebURL = l.WebURL,
                 })
                 .FirstOrDefaultAsync();
 
@@ -43,12 +44,13 @@ namespace PasswordManager.Infrastructure.Vault
                 {
                     Id = c.Id,
                     FolderId = c.FolderId,
+                    FolderName = c.Folder!.Name,
                     Title = c.Title,
                     CreatedAt = c.CreatedAt,
                     CardNumber = c.CardNumberEncrypted,
                     ExpireMonth = c.ExpireMonthEncrypted,
                     ExpireYear = c.ExpireYearEncrypted,
-                    CardholderName = "James",
+                    CardholderName = c.CardholderName,
                     Note = c.NoteEncrypted
                 })
                 .FirstOrDefaultAsync();
@@ -65,6 +67,7 @@ namespace PasswordManager.Infrastructure.Vault
                 {
                     Id = n!.Id,
                     FolderId = n.FolderId,
+                    FolderName = n.Folder!.Name,
                     Title = n.Title,
                     CreatedAt = n.CreatedAt,
                     Content = n.NoteEncrypted,

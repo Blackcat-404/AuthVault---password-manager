@@ -28,6 +28,6 @@
 
     public class NoteItemDto : VaultItemDto
     {
-        public string? Note { get; set; }
+        public string? Content { get; set; }
     }
 }

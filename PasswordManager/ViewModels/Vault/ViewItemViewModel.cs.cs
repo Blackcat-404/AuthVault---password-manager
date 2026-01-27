@@ -6,5 +6,6 @@ namespace PasswordManager.ViewModels.Vault
     {
         public VaultSidebarViewModel Sidebar { get; set; } = null!;
         public VaultItemViewModel Item { get; set; } = null!;
+        public IReadOnlyDictionary<int, string> Folders { get; set; } = new Dictionary<int, string>();
     }
 }

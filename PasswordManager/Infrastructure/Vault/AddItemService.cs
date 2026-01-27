@@ -14,7 +14,7 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task AddLoginAsync(LoginItemDto dto)
         {
-            _db.LoginData.Add(new LoginData
+            await _db.LoginData.AddAsync(new LoginData
             {
                 Title = dto.Title!,
                 PasswordEncrypted = dto.Password, //TODO:Encrypt password
@@ -31,7 +31,7 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task AddCardAsync(CardItemDto dto)
         {
-            _db.CardData.Add(new CardData
+            await _db.CardData.AddAsync(new CardData
             {
                 Title = dto.Title!,
                 CardNumberEncrypted = dto.CardNumber, //TODO:Encrypt
@@ -49,10 +49,10 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task AddNoteAsync(NoteItemDto dto)
         {
-            _db.NoteData.Add(new NoteData
+            await _db.NoteData.AddAsync(new NoteData
             {
                 Title = dto.Title!,
-                NoteEncrypted = dto.Note, //TODO:Encrypt
+                NoteEncrypted = dto.Content, //TODO:Encrypt
                 UserId = dto.UserId,
                 FolderId = dto.FolderId,
                 CreatedAt = DateTime.UtcNow,

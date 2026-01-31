@@ -22,7 +22,8 @@
                 <h3 class="form-section-title">Code</h3>
                 <div class="form-group">
                     <label for="email">Check your email and enter code here*</label>
-                    <input id="code" name="Code" class="form-input" placeholder="123456" required>
+                    <input id="code" name="Code" class="form-input" placeholder="123456">
+                    <span asp-validation-for="Code" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-actions">

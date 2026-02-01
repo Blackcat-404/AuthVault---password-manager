@@ -1,0 +1,212 @@
+﻿/* Delete Account Modal Specific Styles */
+.delete-account-modal {
+    max-width: 600px;
+}
+
+/* Warning Content Styles */
+.warning-content {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.warning-icon {
+    margin: 0 auto 24px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.2) 0%, rgba(192, 57, 43, 0.2) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+    .warning-icon svg {
+        color: #e74c3c;
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(231, 76, 60, 0);
+    }
+}
+
+.warning-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(231, 76, 60, 0.2);
+}
+
+.warning-message {
+    background: #1a1d29;
+    border: 2px solid #e74c3c;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+    .warning-message p {
+        font-size: 16px;
+        color: #c4c9d4;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .warning-message strong {
+        color: #e74c3c;
+        font-weight: 700;
+    }
+
+.warning-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.warning-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #8b92a7;
+    padding: 12px;
+    background: #23273a;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+    .warning-item:hover {
+        background: #2d3142;
+        color: #c4c9d4;
+    }
+
+    .warning-item svg {
+        color: #e74c3c;
+        flex-shrink: 0;
+    }
+
+.countdown-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 10px;
+    color: #e74c3c;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+    .countdown-notice svg {
+        animation: rotate 2s linear infinite;
+    }
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.countdown-notice #countdown {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    background: #e74c3c;
+    padding: 2px 8px;
+    border-radius: 6px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.countdown-notice.hidden {
+    display: none;
+}
+
+/* Danger Button Styles */
+.btn-danger {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: #c4c9d4;
+    cursor: not-allowed;
+    opacity: 0.6;
+    width: 100%;
+}
+
+    .btn-danger:not(:disabled) {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: #ffffff;
+        cursor: pointer;
+        opacity: 1;
+    }
+
+        .btn-danger:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-danger:not(:disabled):active {
+            transform: translateY(0);
+        }
+
+/* Override modal actions for this specific modal */
+.delete-account-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+    .delete-account-modal .modal-actions form {
+        flex: 1;
+    }
+
+    .delete-account-modal .modal-actions .btn {
+        flex: 1;
+    }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .warning-title {
+        font-size: 22px;
+    }
+
+    .warning-message {
+        padding: 16px;
+    }
+
+        .warning-message p {
+            font-size: 14px;
+        }
+
+    .warning-item {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .countdown-notice {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .delete-account-modal .modal-actions {
+        flex-direction: column;
+    }
+
+        .delete-account-modal .modal-actions .btn {
+            width: 100%;
+        }
+}

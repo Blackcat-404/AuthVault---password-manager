@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Vault;
 using PasswordManager.Data;
+using PasswordManager.Domain.Entities;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
 
@@ -74,8 +75,8 @@ namespace PasswordManager.Infrastructure.Vault
             {
                 Sidebar = await GetSidebarDataAsync(userId),
                 Email = email!,
-                FAEmail = user!.Email,
-                Is2FAEnabled = user!.IsEnabled,
+                FAEmail = (user == null)?null:user.Email,
+                Is2FAEnabled = (user == null)?false:user.IsEnabled,
                 accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy")
             };
             return model;
@@ -83,11 +84,6 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task<FAuthenticationEmailViewModel> Get2FAEmailAsync(int userId)
         {
-            var email = await _db.Users
-                .Where(u => userId == u.Id)
-                .Select(u => u.Email)
-                .FirstOrDefaultAsync();
-
             var model = new FAuthenticationEmailViewModel
             {
                 Sidebar = await GetSidebarDataAsync(userId),
@@ -97,12 +93,34 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task<FAuthenticationCodeViewModel> Get2FACodeAsync(int userId)
         {
-            var email = await _db.Users
-                .Where(u => userId == u.Id)
-                .Select(u => u.Email)
-                .FirstOrDefaultAsync();
-
             var model = new FAuthenticationCodeViewModel
+            {
+                Sidebar = await GetSidebarDataAsync(userId),
+            };
+            return model;
+        }
+
+        public async Task<ChangeMasterPasswordViewModel> GetChangeMasterPasswordAsync(int userId)
+        {
+            var model = new ChangeMasterPasswordViewModel
+            {
+                Sidebar = await GetSidebarDataAsync(userId),
+            };
+            return model;
+        }
+
+        public async Task<DeleteAccountViewModel> GetDeleteAccountPassword(int userId)
+        {
+            var model = new DeleteAccountViewModel
+            {
+                Sidebar = await GetSidebarDataAsync(userId),
+            };
+            return model;
+        }
+
+        public async Task<DeleteAccountConfirmationViewModel> GetDeleteAccountConfirmationAsync(int userId)
+        {
+            var model = new DeleteAccountConfirmationViewModel
             {
                 Sidebar = await GetSidebarDataAsync(userId),
             };

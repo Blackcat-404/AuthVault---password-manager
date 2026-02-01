@@ -53,12 +53,6 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            if (!dto.AcceptTerms)
-            {
-                result.AddError(nameof(dto.AcceptTerms), "You must accept the terms of use");
-                return result;
-            }
-
             if (user == null)
             {
                 var userNew = new User

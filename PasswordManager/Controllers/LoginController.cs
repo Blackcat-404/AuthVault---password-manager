@@ -80,7 +80,7 @@ namespace PasswordManager.Controllers
             if (await _loginService.Has2FAAsync(model.Email!))
             {
                 var u = result.Value!;
-                await _loginService.Send2FACode(u.Id,model.Email!);
+                await _loginService.Send2FACode(u.Id);
 
                 TempData["userId"] = u.Id;
                 return RedirectToAction("Get2FA");

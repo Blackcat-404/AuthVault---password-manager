@@ -89,7 +89,7 @@ namespace PasswordManager.Infrastructure.Login
                 .FirstOrDefaultAsync();
         }
     
-        public async Task Send2FACode(int userId,string email)
+        public async Task Send2FACode(int userId)
         {
             int code = VerificationCodeGenerator.Generate();
             var user = await _db.TwoFactorAuthentications
@@ -107,7 +107,7 @@ namespace PasswordManager.Infrastructure.Login
 
             await _db.SaveChangesAsync();
             await _emailService.SendAsync(
-                email,
+                user.Email!,
                 "Two-Factor Authentication",
                 $"This is your 2FA code:{code}\n\nThis code expires in 5 minutes"
             );

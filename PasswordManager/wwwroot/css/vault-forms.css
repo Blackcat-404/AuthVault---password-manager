@@ -316,3 +316,10 @@
         width: 100%;
     }
 }
+
+.text-danger {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}

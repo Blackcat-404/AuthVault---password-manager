@@ -48,12 +48,17 @@ namespace PasswordManager.Controllers
                 return View("IndexRegister", model);
             }
 
+            if (!model.AcceptTerms)
+            {
+                ModelState.AddModelError("AcceptTerms","You must accept our terms");
+                return View("IndexRegister", model);
+            }
+
             var result = await _registerService.RegisterUserAsync(new RegisterUserDto
                 {
                     Name = model.Name!,
                     Email = model.Email!,
-                    Password = model.Password!,
-                    AcceptTerms = model.AcceptTerms
+                    Password = model.Password!
                 }
             );
 

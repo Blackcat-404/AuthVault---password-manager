@@ -93,14 +93,20 @@
             </div>
 
             <div class="settings-card">
+
                 @Html.AntiForgeryToken()
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <div class="setting-label">Master Password</div>
-                        <div class="setting-hint">Last changed 30 days ago</div>
+                
+                    <div class="setting-item">
+                        
+                        <div class="setting-info">
+                            <div class="setting-label">Master Password</div>
+                            <div class="setting-hint">Last changed 30 days ago</div>
+                        </div>
+                        <form asp-controller="Settings" asp-action="GetChangeMasterPassword" method="get">
+                            <button class="btn btn-secondary btn-sm">Change</button>
+                        </form>
                     </div>
-                    <button class="btn btn-secondary btn-sm">Change</button>
-                </div>
+                
 
                 @{
                     if (FAEmail != null)
@@ -119,15 +125,16 @@
                     }
                 }
                 
-                <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
+                
                     <div class="setting-item">
                         <div class="setting-info">
                             <div class="setting-label">Two-Factor Authentication Email</div>
                             <div class="setting-hint">Your secondary email for better security</div>
                         </div>
-                        <button class="btn btn-secondary btn-sm">@((FAEmail == null)?"Add":"Change")</button>
+                        <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
+                            <button class="btn btn-secondary btn-sm">@((FAEmail == null)?"Add":"Change")</button>
+                        </form>
                     </div>
-                </form>
 
                 <div class="setting-item">
                     <div class="setting-info">
@@ -174,7 +181,19 @@
                         <div class="setting-label">Export Data</div>
                         <div class="setting-hint">Download all your vault data</div>
                     </div>
-                    <button class="btn btn-secondary btn-sm">Export</button>
+
+                    <div class="export-controls">
+                        <select class="setting-select setting-export-type" id="exportFormat">
+                            <option value="txt" selected>TXT Format</option>
+                            <option value="md">Markdown Format</option>
+                        </select>
+
+                        <form asp-controller="Settings" asp-action="PostExportData" method="post" id="exportForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="format" id="formatInput" value="txt" />
+                            <button type="submit" class="btn btn-secondary btn-sm">Export</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="setting-item">
@@ -182,7 +201,10 @@
                         <div class="setting-label">Delete Account</div>
                         <div class="setting-hint">Permanently delete your account and all data</div>
                     </div>
-                    <button class="btn btn-danger btn-sm">Delete</button>
+                    <form asp-controller="Settings" asp-action="GetDeleteAccountPassword" method="get">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -230,5 +252,17 @@
         });
 
         const result = await response.json();
+    });
+
+    const exportFormat = document.getElementById('exportFormat');
+    const formatInput = document.getElementById('formatInput');
+    const exportForm = document.getElementById('exportForm');
+
+    exportFormat.addEventListener('change', function() {
+        formatInput.value = this.value;
+    });
+
+    exportForm.addEventListener('submit', function(e) {
+        formatInput.value = exportFormat.value;
     });
 </script>

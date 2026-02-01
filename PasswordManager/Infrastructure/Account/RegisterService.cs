@@ -56,15 +56,6 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            if (!dto.AcceptTerms)
-            {
-                result.AddError(nameof(dto.AcceptTerms), "You must accept the terms of use");
-                return result;
-            }
-
-            int verificationCode = VerificationCodeGenerator.Generate();
-            DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
-
             if (user == null)
             {
                 byte[] authSalt = _encryptionService.GenerateSalt();

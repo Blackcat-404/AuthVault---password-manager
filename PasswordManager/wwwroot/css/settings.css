@@ -249,3 +249,33 @@
         width: 100%;
     }
 }
+
+.export-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.setting-export-type {
+    min-width: 150px;
+}
+
+@media (max-width: 768px) {
+    .export-controls {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .setting-export-type {
+        width: 100%;
+    }
+
+    .export-controls form {
+        width: 100%;
+    }
+
+    .export-controls .btn {
+        width: 100%;
+    }
+}

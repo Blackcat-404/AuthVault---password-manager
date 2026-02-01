@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using PasswordManager.Application.Settings;
 using PasswordManager.Application.Vault;
 using PasswordManager.Infrastructure.Settings;
 using PasswordManager.ViewModels.Vault;
 using System.Security.Claims;
-using PasswordManager.Application.Settings;
+using System.Text;
 
 namespace PasswordManager.Controllers
 {
@@ -18,20 +21,20 @@ namespace PasswordManager.Controllers
             _settingsService = settingsService;
         }
 
-        #region 2FA
         [HttpGet("Settings")]
         public async Task<IActionResult> GetSettings()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
             var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
 
             return View("Settings", model);
         }
 
+        #region 2FA
         [HttpGet("Settings/2FA/Email")]
         public async Task<IActionResult> Get2FAEmail()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
             var model = await _vaultSettingsService.Get2FAEmailAsync(userId);
 
             return View("FAEmail", model);
@@ -40,13 +43,13 @@ namespace PasswordManager.Controllers
         [HttpGet("Settings/2FA/Code")]
         public async Task<IActionResult> Get2FACode()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
             var model = await _vaultSettingsService.Get2FACodeAsync(userId);
 
             return View("FACode", model);
         }
 
-        [HttpPost("Settings")]
+        [HttpPost("Settings/EmailChange")]
         public async Task<IActionResult> PostFAEmailChange()
         {
             return RedirectToAction("Get2FAEmail");
@@ -55,7 +58,12 @@ namespace PasswordManager.Controllers
         [HttpPost("Settings/2FA/Email")]
         public async Task<IActionResult> PostSendCode(FAuthenticationEmailViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (!ModelState.IsValid)
+            {
+                return View("FAEmail", model);
+            }
+
+            var userId = GetUserID();
 
             await _settingsService.Add2FAAsync(userId,model.Email);
 
@@ -66,7 +74,12 @@ namespace PasswordManager.Controllers
         [HttpPost("Settings/2FA/Code")]
         public async Task<IActionResult> PostVerifyCode(FAuthenticationCodeViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (!ModelState.IsValid)
+            {
+                return View("FACode", model);
+            }
+
+            var userId = GetUserID();
             var email = TempData["2FA_Email"] as string;
 
             if (email == null)
@@ -77,7 +90,8 @@ namespace PasswordManager.Controllers
             var isValid = await _settingsService.Verify2FACodeAsync(userId, model.Code, email);
             if (!isValid)
             {
-                return RedirectToAction("Get2FACode");
+                ModelState.AddModelError("Code","Code is wrong");
+                return View("FACode", model);
             }
 
             return RedirectToAction("GetSettings");
@@ -87,7 +101,6 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Toggle2FA([FromBody] Toggle2FADto dto)
         {
-            Console.WriteLine("Here");
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _settingsService.Set2FAStatement(userId, dto.IsEnabled);
 
@@ -95,6 +108,106 @@ namespace PasswordManager.Controllers
         }
         #endregion
 
+        #region Change master password get/post methods
+        [HttpGet("Settings/ChangeMasterPassword")]
+        public async Task<IActionResult> GetChangeMasterPassword()
+        {
+            var userId = GetUserID();
+            var model = await _vaultSettingsService.GetChangeMasterPasswordAsync(userId);
 
+            return View("ChangeMasterPassword", model);
+        }
+
+
+        [HttpPost("Settings/ChangeMasterPassword")]
+        public async Task<IActionResult> PostChangeMasterPassword(ChangeMasterPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ChangeMasterPassword",model);
+            }
+
+            int userId = GetUserID();
+            await _settingsService.ChangeMasterPassword(userId,model.NewPassword);
+
+            return RedirectToAction("GetSettings");
+        }
+        #endregion
+
+        #region Delete account get/post methods
+        [HttpGet("Settings/DeleteAccount/Password")]
+        public async Task<IActionResult> GetDeleteAccountPassword()
+        {
+            var userId = GetUserID();
+            var model = await _vaultSettingsService.GetDeleteAccountPassword(userId);
+
+            return View("DeleteAccountPassword", model);
+        }
+
+        [HttpPost("Settings/DeleteAccount/Password")]
+        public async Task<IActionResult> PostDeleteAccountPassword(DeleteAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("DeleteAccountPassword", model);
+            }
+
+            int userId = GetUserID();
+            if (!await _settingsService.PasswordVerifyAsync(userId,model.Password))
+            {
+                ModelState.AddModelError("Password","Password is incorrect");
+                return View("DeleteAccountPassword", model);
+            }
+
+            //TODO: implement "OK" page
+            return RedirectToAction("GetDeleteAccountConfirmation");
+        }
+
+        [HttpGet("Settings/DeleteAccount/Confirm")]
+        public async Task<IActionResult> GetDeleteAccountConfirmation()
+        {
+            var userId = GetUserID();
+            var model = await _vaultSettingsService.GetDeleteAccountConfirmationAsync(userId);
+            return View("DeleteAccountConfirmation", model);
+        }
+
+        [HttpPost("Settings/DeleteAccount")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userId = GetUserID();
+
+            if (await _settingsService.DeleteAccountAsync(userId))
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction("Register", "Account");
+            }
+            return View("Vault","Home");
+        }
+        #endregion
+
+        [HttpPost("Settings/ExportData")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PostExportData(string format)
+        {
+            int userId = GetUserID();
+            if (format == "txt")
+            {
+                string content = await _settingsService.ExportUserDataAsTextAsync(userId);
+                var bytes = Encoding.UTF8.GetBytes(content);
+                return File(bytes, "text/plain", "Data.txt");
+            }
+            else
+            {
+                string content = await _settingsService.ExportUserDataAsMarkdownAsync(userId);
+                var bytes = Encoding.UTF8.GetBytes(content);
+                return File(bytes, "text/plain", "Data.md");
+            }
+        }
+
+        private int GetUserID()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        }
     }
 }

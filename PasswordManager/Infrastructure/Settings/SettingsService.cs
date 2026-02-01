@@ -116,6 +116,8 @@ namespace PasswordManager.Infrastructure.Settings
             user.AuthHash = authHash;
             user.AuthSalt = authSalt;
             user.EncryptionSalt = encryptionSalt;
+            user.PasswordLastChangedAt = DateTime.UtcNow;
+
             await _db.SaveChangesAsync();
         }
 

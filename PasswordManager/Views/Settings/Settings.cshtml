@@ -10,6 +10,7 @@
     var accountCreatedOn = Model.accountCreatedOn;
     var FAEmail = Model.FAEmail;
     var Is2FAEnabled = Model.Is2FAEnabled;
+    var PasswordLastChangedAt = Model.PasswordLastChangeAt;
 }
 
 <!-- Header -->
@@ -100,7 +101,7 @@
 
                     <div class="setting-info">
                         <div class="setting-label">Master Password</div>
-                        <div class="setting-hint">Last changed 30 days ago</div>
+                        <div class="setting-hint">@(PasswordLastChangedAt == null ? "You have not changed your password yet" : $"Last changed {PasswordLastChangedAt:yyyy-MM-dd HH:mm}")</div>
                     </div>
                     <form asp-controller="Settings" asp-action="GetChangeMasterPassword" method="get">
                         <button class="btn btn-secondary btn-sm">Change</button>

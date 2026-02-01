@@ -256,6 +256,12 @@
     gap: 20px;
 }
 
+    .export-controls form {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
 .setting-export-type {
     min-width: 150px;
 }
@@ -267,11 +273,12 @@
         gap: 12px;
     }
 
-    .setting-export-type {
-        width: 100%;
-    }
+        .export-controls form {
+            width: 100%;
+            flex-direction: column;
+        }
 
-    .export-controls form {
+    .setting-export-type {
         width: 100%;
     }
 

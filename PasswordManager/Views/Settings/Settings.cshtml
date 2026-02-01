@@ -60,7 +60,7 @@
 
                 <div class="setting-item">
                     <div class="setting-label">Two factor authentication email</div>
-                    <div class="setting-value">@(FAEmail == null?"None":FAEmail)</div>
+                    <div class="setting-value">@(FAEmail == null ? "None" : FAEmail)</div>
                 </div>
 
                 <div class="setting-item">
@@ -95,18 +95,18 @@
             <div class="settings-card">
 
                 @Html.AntiForgeryToken()
-                
-                    <div class="setting-item">
-                        
-                        <div class="setting-info">
-                            <div class="setting-label">Master Password</div>
-                            <div class="setting-hint">Last changed 30 days ago</div>
-                        </div>
-                        <form asp-controller="Settings" asp-action="GetChangeMasterPassword" method="get">
-                            <button class="btn btn-secondary btn-sm">Change</button>
-                        </form>
+
+                <div class="setting-item">
+
+                    <div class="setting-info">
+                        <div class="setting-label">Master Password</div>
+                        <div class="setting-hint">Last changed 30 days ago</div>
                     </div>
-                
+                    <form asp-controller="Settings" asp-action="GetChangeMasterPassword" method="get">
+                        <button class="btn btn-secondary btn-sm">Change</button>
+                    </form>
+                </div>
+
 
                 @{
                     if (FAEmail != null)
@@ -117,24 +117,24 @@
                                 <div class="setting-hint">Add an extra layer of security</div>
                             </div>
 
-                            <label class="toggle-switch">   
+                            <label class="toggle-switch">
                                 <input type="checkbox" id="Toggle" @(Is2FAEnabled ? "checked" : "")>
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
                     }
                 }
-                
-                
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <div class="setting-label">Two-Factor Authentication Email</div>
-                            <div class="setting-hint">Your secondary email for better security</div>
-                        </div>
-                        <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
-                            <button class="btn btn-secondary btn-sm">@((FAEmail == null)?"Add":"Change")</button>
-                        </form>
+
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Two-Factor Authentication Email</div>
+                        <div class="setting-hint">Your secondary email for better security</div>
                     </div>
+                    <form asp-controller="Settings" asp-action="PostFAEmailChange" method="post">
+                        <button class="btn btn-secondary btn-sm">@((FAEmail == null) ? "Add" : "Change")</button>
+                    </form>
+                </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
@@ -183,14 +183,12 @@
                     </div>
 
                     <div class="export-controls">
-                        <select class="setting-select setting-export-type" id="exportFormat">
-                            <option value="txt" selected>TXT Format</option>
-                            <option value="md">Markdown Format</option>
-                        </select>
-
                         <form asp-controller="Settings" asp-action="PostExportData" method="post" id="exportForm">
                             @Html.AntiForgeryToken()
-                            <input type="hidden" name="format" id="formatInput" value="txt" />
+                            <select class="setting-select setting-export-type" name="format" id="exportFormat">
+                                <option value="txt" selected>TXT Format</option>
+                                <option value="md">Markdown Format</option>
+                            </select>
                             <button type="submit" class="btn btn-secondary btn-sm">Export</button>
                         </form>
                     </div>
@@ -229,7 +227,7 @@
                     </svg>
                     Logout
                 </button>
-            </form> 
+            </form>
         </div>
     </div>
 </div>
@@ -242,7 +240,7 @@
     const toggle = document.getElementById("Toggle");
     toggle.addEventListener("change", async function () {
         const isEnabled = this.checked;
-        await fetch('/Vault/Settings/Toggle2FA', {
+        const response = await fetch('/Vault/Settings/Toggle2FA', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -252,17 +250,5 @@
         });
 
         const result = await response.json();
-    });
-
-    const exportFormat = document.getElementById('exportFormat');
-    const formatInput = document.getElementById('formatInput');
-    const exportForm = document.getElementById('exportForm');
-
-    exportFormat.addEventListener('change', function() {
-        formatInput.value = this.value;
-    });
-
-    exportForm.addEventListener('submit', function(e) {
-        formatInput.value = exportFormat.value;
     });
 </script>

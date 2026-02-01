@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PasswordManager.Data;
-using PasswordManager.Domain.Enums;
-using PasswordManager.Domain.Entities;
-using PasswordManager.Infrastructure.Security;
 using PasswordManager.Application;
 using PasswordManager.Application.Account.Email;
+using PasswordManager.Data;
+using PasswordManager.Domain.Entities;
+using PasswordManager.Domain.Enums;
+using PasswordManager.Infrastructure.Security;
+using PasswordManager.Application.Security;
 
 namespace PasswordManager.Infrastructure.Email
 {
@@ -15,8 +16,8 @@ namespace PasswordManager.Infrastructure.Email
 
         public EmailVerificationService(AppDbContext db, EmailService emailService)
         {
-            _emailService = emailService;
             _db = db;
+            _emailService = emailService;
         }
 
         public async Task<Result<User>> VerifyAsync(EmailVerificationDto dto)
@@ -24,9 +25,7 @@ namespace PasswordManager.Infrastructure.Email
             var result = new Result<User>();
 
             var user = await _db.Users
-                .FirstOrDefaultAsync(u =>
-                    u.Email == dto.Email ||
-                    u.Login == dto.Email);
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null)
             {
@@ -49,9 +48,6 @@ namespace PasswordManager.Infrastructure.Email
             user.EmailVerificationStatus = EmailVerificationStatus.Verified;
             user.EmailVerificationCode = null;
             user.EmailVerificationExpiresAt = null;
-
-            user!.LastLoginAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
 
             return Result<User>.Ok(user);
         }

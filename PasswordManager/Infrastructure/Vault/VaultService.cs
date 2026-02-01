@@ -1,18 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Vault;
 using PasswordManager.Data;
+using PasswordManager.Infrastructure.Security;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
+using PasswordManager.Application.Security;
 
 namespace PasswordManager.Infrastructure.Vault
 {
+
     public class VaultService : IVaultHomeService, IVaultSidebarService, IVaultSettingsService
     {
         private readonly AppDbContext _db;
+        private readonly IEncryptionService _encryptionService;
+        private readonly ISessionEncryptionService _sessionEncryptionService;
 
-        public VaultService(AppDbContext db)
+        public VaultService(
+            AppDbContext db,
+            IEncryptionService encryptionService,
+            ISessionEncryptionService sessionEncryptionService)
         {
             _db = db;
+            _encryptionService = encryptionService;
+            _sessionEncryptionService = sessionEncryptionService;
         }
 
         public async Task<VaultHomeViewModel> GetHomeDataAsync(int userId)
@@ -77,59 +87,139 @@ namespace PasswordManager.Infrastructure.Vault
             return model;
         }
 
+
         public async Task<List<VaultItemViewModel>> GetItemsFromDBAsync(int userId)
         {
+            byte[]? encryptionKey = _sessionEncryptionService.GetEncryptionKey(userId);
+
+            if (encryptionKey == null)
+            {
+                throw new InvalidOperationException("Encryption key doesn't found");
+            }
+
             var items = new List<VaultItemViewModel>();
 
-            // LOGIN ITEMS
+            // ============ LOGIN ITEMS ============
             var loginItems = await _db.LoginData
                 .Where(x => x.UserId == userId)
-                .Select(x => new LoginItemViewModel
-                {
-                    Id = x.Id,
-                    FolderId = x.FolderId,
-                    Title = x.Title,
-                    CreatedAt = x.CreatedAt,
-                    WebURL = x.WebURL,
-                    Login = x.LoginEncrypted,
-                    Password = x.PasswordEncrypted,
-                    Note = x.NoteEncrypted
-
-                })
                 .ToListAsync();
 
-            // CARD ITEMS
+            foreach (var item in loginItems)
+            {
+                try
+                {
+                    string decryptedLogin = _encryptionService.Decrypt(
+                        item.LoginEncrypted!,
+                        item.LoginIV!,
+                        encryptionKey);
+
+                    string decryptedPassword = _encryptionService.Decrypt(
+                        item.PasswordEncrypted!,
+                        item.PasswordIV!,
+                        encryptionKey);
+
+                    string? decryptedNote = string.IsNullOrEmpty(item.NoteEncrypted)
+                        ? null
+                        : _encryptionService.Decrypt(
+                            item.NoteEncrypted,
+                            item.NoteIV!,
+                            encryptionKey);
+
+                    items.Add(new LoginItemViewModel
+                    {
+                        Id = item.Id,
+                        FolderId = item.FolderId,
+                        Title = item.Title,
+                        CreatedAt = item.CreatedAt,
+                        WebURL = item.WebURL,
+                        Login = decryptedLogin,
+                        Password = decryptedPassword,
+                        Note = decryptedNote
+                    });
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+
+            // ============ CARD ITEMS ============
             var cardItems = await _db.CardData
                 .Where(x => x.UserId == userId)
-                .Select(x => new CardItemViewModel
-                {
-                    Id = x.Id,
-                    FolderId = x.FolderId,
-                    Title = x.Title,
-                    CreatedAt = x.CreatedAt,
-                    CardNumber = x.CardNumberEncrypted,
-                    ExpireMonth = x.ExpireMonthEncrypted,
-                    ExpireYear = x.ExpireYearEncrypted,
-                    Note = x.NoteEncrypted
-                })
                 .ToListAsync();
 
-            // NOTE ITEMS
+            foreach (var item in cardItems)
+            {
+                try
+                {
+                    string decryptedCardNumber = _encryptionService.Decrypt(
+                        item.CardNumberEncrypted!,
+                        item.CardNumberIV!,
+                        encryptionKey);
+
+                    string decryptedExpireMonth = _encryptionService.Decrypt(
+                        item.ExpireMonthEncrypted!,
+                        item.ExpireMonthIV!,
+                        encryptionKey);
+
+                    string decryptedExpireYear = _encryptionService.Decrypt(
+                        item.ExpireYearEncrypted!,
+                        item.ExpireYearIV!,
+                        encryptionKey);
+
+                    string? decryptedNote = string.IsNullOrEmpty(item.NoteEncrypted)
+                        ? null
+                        : _encryptionService.Decrypt(
+                            item.NoteEncrypted,
+                            item.NoteIV!,
+                            encryptionKey);
+
+                    items.Add(new CardItemViewModel
+                    {
+                        Id = item.Id,
+                        FolderId = item.FolderId,
+                        Title = item.Title,
+                        CreatedAt = item.CreatedAt,
+                        CardNumber = decryptedCardNumber,
+                        ExpireMonth = decryptedExpireMonth,
+                        ExpireYear = decryptedExpireYear,
+                        Note = decryptedNote
+                    });
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+
+            // ============ NOTE ITEMS ============
             var noteItems = await _db.NoteData
                 .Where(x => x.UserId == userId)
-                .Select(x => new NoteItemViewModel
-                {
-                    Id = x.Id,
-                    FolderId = x.FolderId,
-                    Title = x.Title,
-                    CreatedAt = x.CreatedAt,
-                    Content = x.NoteEncrypted
-                })
                 .ToListAsync();
 
-            items.AddRange(loginItems);
-            items.AddRange(cardItems);
-            items.AddRange(noteItems);
+            foreach (var item in noteItems)
+            {
+                try
+                {
+                    string decryptedContent = _encryptionService.Decrypt(
+                        item.NoteEncrypted!,
+                        item.NoteIV!,
+                        encryptionKey);
+
+                    items.Add(new NoteItemViewModel
+                    {
+                        Id = item.Id,
+                        FolderId = item.FolderId,
+                        Title = item.Title,
+                        CreatedAt = item.CreatedAt,
+                        Content = decryptedContent
+                    });
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
 
             return items;
         }

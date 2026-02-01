@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.X509;
 using PasswordManager.Application.Vault;
 using PasswordManager.Domain.Entities;
+using PasswordManager.Infrastructure.Security;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
 using System.Security.Claims;

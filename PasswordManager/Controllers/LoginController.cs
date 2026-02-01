@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Security;
 using PasswordManager.ViewModels;
+using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
@@ -27,13 +28,6 @@ namespace PasswordManager.Controllers
             return View("IndexLogin");
         }
 
-        /// <summary>
-        /// POST: /Account/Login
-        /// Processes user login
-        /// </summary>
-        /// <param name="email">User's email address</param>
-        /// <param name="password">User's master password</param>
-        /// <returns>Redirects to vault on success, returns view with error on failure</returns>
 
         [HttpPost("Login")]
         [ValidateAntiForgeryToken]
@@ -68,6 +62,8 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _loginService.DeleteEncryptionKey(userId);
             await _authService.SignOutAsync(HttpContext);
             return RedirectToAction("Login", "Account");
         }

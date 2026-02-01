@@ -66,7 +66,6 @@ namespace PasswordManager.Controllers
             }
 
             TempData["Email"] = model.Email;
-            //return RedirectToAction("EmailVerification", "Register");
             return RedirectToAction(
                 nameof(EmailVerificationController.GetEmailVerification),
                 "EmailVerification"

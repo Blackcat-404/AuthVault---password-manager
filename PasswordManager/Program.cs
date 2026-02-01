@@ -15,6 +15,10 @@ using PasswordManager.Infrastructure.Security;
 using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Middleware;
 using PasswordManager.Models.Email;
+using PasswordManager.Infrastructure.Register;
+using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Infrastructure.Settings;
 
 namespace PasswordManager
 {
@@ -52,6 +56,8 @@ namespace PasswordManager
             builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
             builder.Services.AddScoped<IEncryptionService, EncryptionService>();
             builder.Services.AddScoped<ISessionEncryptionService, SessionEncryptionService>();
+
+            builder.Services.AddScoped<SettingsService>();
 
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

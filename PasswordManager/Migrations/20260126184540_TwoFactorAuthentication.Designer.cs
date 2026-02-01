@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PasswordManager.Data;
 
@@ -11,9 +12,11 @@ using PasswordManager.Data;
 namespace PasswordManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260126184540_TwoFactorAuthentication")]
+    partial class TwoFactorAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +36,6 @@ namespace PasswordManager.Migrations
                     b.Property<string>("CardNumberEncrypted")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CardNumberIV")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CardholderName")
                         .HasColumnType("nvarchar(max)");
 
@@ -45,22 +45,13 @@ namespace PasswordManager.Migrations
                     b.Property<string>("ExpireMonthEncrypted")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExpireMonthIV")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ExpireYearEncrypted")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExpireYearIV")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("NoteEncrypted")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NoteIV")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -128,19 +119,10 @@ namespace PasswordManager.Migrations
                     b.Property<string>("LoginEncrypted")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LoginIV")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NoteEncrypted")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NoteIV")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordEncrypted")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordIV")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -177,9 +159,6 @@ namespace PasswordManager.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("NoteEncrypted")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NoteIV")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -266,14 +245,6 @@ namespace PasswordManager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("AuthHash")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("AuthSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -290,10 +261,6 @@ namespace PasswordManager.Migrations
                     b.Property<int>("EmailVerificationStatus")
                         .HasColumnType("int");
 
-                    b.Property<byte[]>("EncryptionSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
 
@@ -301,8 +268,9 @@ namespace PasswordManager.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("PasswordLastChangedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

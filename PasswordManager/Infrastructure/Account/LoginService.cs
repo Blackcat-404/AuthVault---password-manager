@@ -5,6 +5,7 @@ using PasswordManager.Application.Security;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
+using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
 
 
@@ -15,10 +16,12 @@ namespace PasswordManager.Infrastructure.Login
         private readonly AppDbContext _db;
         private readonly IEncryptionService _encryptionService;
         private readonly ISessionEncryptionService _sessionEncryptionService;
+        private readonly EmailService _emailService;
 
-        public LoginService(AppDbContext db, IEncryptionService encryptionService, ISessionEncryptionService sessionEncryptionService)
+        public LoginService(AppDbContext db, IEncryptionService encryptionService, ISessionEncryptionService sessionEncryptionService, EmailService emailService)
         {
             _db = db;
+            _emailService = emailService;
             _encryptionService = encryptionService;
             _sessionEncryptionService = sessionEncryptionService;
         }
@@ -33,7 +36,8 @@ namespace PasswordManager.Infrastructure.Login
         {
             var result = new Result<User>();
 
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var user = await _db.Users.FirstOrDefaultAsync(u =>
+                u.Email == dto.Email);
 
             if (user == null)
             {
@@ -68,6 +72,66 @@ namespace PasswordManager.Infrastructure.Login
             await _db.SaveChangesAsync();
 
             return Result<User>.Ok(user);
+        }
+
+        public async Task<bool> Has2FAAsync(string email)
+        {
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Email == email);
+
+            if (user == null)
+                return false;
+
+            return await _db.TwoFactorAuthentications
+                .Where(t => t.UserId == user.Id)
+                .Select(t => t.IsEnabled)
+                .FirstOrDefaultAsync();
+        }
+    
+        public async Task Send2FACode(int userId,string email)
+        {
+            int code = VerificationCodeGenerator.Generate();
+            var user = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(u =>
+                    u.UserId == userId
+                );
+
+            if (user == null)
+            {
+                return;
+            }
+
+            user.Code = code.ToString();
+            user.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
+
+            await _db.SaveChangesAsync();
+            await _emailService.SendAsync(
+                email,
+                "Two-Factor Authentication",
+                $"This is your 2FA code:{code}\n\nThis code expires in 5 minutes"
+            );
+        }
+
+        public async Task<bool> Verify2FACode(int userId, string code)
+        {
+            var twoFactor = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (twoFactor == null)
+                return false;
+
+            if (twoFactor.ExpiresAt < DateTime.UtcNow)
+                return false;
+
+            if (twoFactor.Code != code)
+                return false;
+
+            twoFactor.Code = null;
+            twoFactor.ExpiresAt = null;
+
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -6,7 +6,6 @@ using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
 using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
-using PasswordManager.Application.Security;
 
 namespace PasswordManager.Infrastructure.Register
 {
@@ -56,6 +55,9 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
+            int verificationCode = VerificationCodeGenerator.Generate();
+            DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
+
             if (user == null)
             {
                 byte[] authSalt = _encryptionService.GenerateSalt();
@@ -96,12 +98,12 @@ namespace PasswordManager.Infrastructure.Register
             }
 
             await _db.SaveChangesAsync();
-            await SendVerificationEmailAsync(dto.Name, dto.Email, verificationCode, expiresAt);
+            await SendVerificationEmailAsync(dto.Name, dto.Email, verificationCode);
 
             return result;
         }
 
-        public async Task SendVerificationEmailAsync(string Name, string Email, int verificationCode, DateTime expiresAt)
+        public async Task SendVerificationEmailAsync(string Name, string Email, int verificationCode)
         {
             string bodystr = "Hello, " + Name + "\nYour verification code is: " + verificationCode +
                 "\n\nThis code expires in 5 minutes\n" +

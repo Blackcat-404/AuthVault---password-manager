@@ -5,7 +5,6 @@ using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
 using PasswordManager.Infrastructure.Security;
-using PasswordManager.Application.Security;
 
 namespace PasswordManager.Infrastructure.Email
 {
@@ -48,6 +47,8 @@ namespace PasswordManager.Infrastructure.Email
             user.EmailVerificationStatus = EmailVerificationStatus.Verified;
             user.EmailVerificationCode = null;
             user.EmailVerificationExpiresAt = null;
+
+            await _db.SaveChangesAsync();
 
             return Result<User>.Ok(user);
         }

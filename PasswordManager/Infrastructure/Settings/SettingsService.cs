@@ -12,10 +12,12 @@ namespace PasswordManager.Infrastructure.Settings
     {
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
-        public SettingsService(AppDbContext db,EmailService emailService) 
+        private readonly IEncryptionService _encryptionService;
+        public SettingsService(AppDbContext db,EmailService emailService, IEncryptionService encryptionService) 
         {
             _db = db;
             _emailService = emailService;
+            _encryptionService = encryptionService;
         }
 
         public async Task Add2FAAsync(int userId,string email)
@@ -107,7 +109,13 @@ namespace PasswordManager.Infrastructure.Settings
                 return;
             }
 
-            user.PasswordHash = PasswordHasher.Hash(password);
+            byte[] authSalt = _encryptionService.GenerateSalt();
+            byte[] encryptionSalt = _encryptionService.GenerateSalt();
+            byte[] authHash = _encryptionService.DeriveAuthHash(password, authSalt);
+
+            user.AuthHash = authHash;
+            user.AuthSalt = authSalt;
+            user.EncryptionSalt = encryptionSalt;
             await _db.SaveChangesAsync();
         }
 
@@ -121,7 +129,7 @@ namespace PasswordManager.Infrastructure.Settings
             {
                 return false;
             }
-            return PasswordHasher.Verify(password, user.PasswordHash);
+            return PasswordHasher.VerifyPassword(password, user.AuthHash, user.AuthSalt);
         }
 
         public async Task<bool> DeleteAccountAsync(int userId)

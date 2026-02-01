@@ -15,9 +15,6 @@ using PasswordManager.Infrastructure.Security;
 using PasswordManager.Infrastructure.Vault;
 using PasswordManager.Middleware;
 using PasswordManager.Models.Email;
-using PasswordManager.Infrastructure.Register;
-using PasswordManager.Application.Account.Email;
-using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.Infrastructure.Settings;
 
 namespace PasswordManager

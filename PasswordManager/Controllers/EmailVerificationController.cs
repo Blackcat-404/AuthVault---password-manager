@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Email;
-using PasswordManager.Application.Security;
 using PasswordManager.ViewModels;
 
 namespace PasswordManager.Controllers
@@ -11,23 +10,21 @@ namespace PasswordManager.Controllers
     public class EmailVerificationController : Controller
     {
         private readonly IEmailVerificationService _emailVerificationService;
-        private readonly IAuthService _authService;
 
-        public EmailVerificationController(IEmailVerificationService emailVerificationService, IAuthService authService)
+        public EmailVerificationController(IEmailVerificationService emailVerificationService)
         {
             _emailVerificationService = emailVerificationService;
-            _authService = authService;
         }
-         
+
         [HttpGet("EmailVerification")]
         public IActionResult GetEmailVerification()
         {
             var email = TempData["Email"] as string;
 
             if (string.IsNullOrEmpty(email))
-            {
-                return RedirectToAction("Account", "Register");
-            }
+                return RedirectToAction("GetRegister", "Register");
+
+            TempData.Keep("Email");
 
             return View("IndexEmailVerification", new EmailVerificationViewModel
             {
@@ -35,12 +32,7 @@ namespace PasswordManager.Controllers
             });
         }
 
-        /// <summary>
-        /// POST: /Account/EmailVerification
-        /// Processes email verification
-        /// </summary>
-        /// <param name="codeVerification">Verification code</param>
-        /// <returns>Redirects to vault on success, returns view with error on failure</returns>
+
         [HttpPost("EmailVerification")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostEmailVerification(EmailVerificationViewModel model)
@@ -49,11 +41,10 @@ namespace PasswordManager.Controllers
                 return View("IndexEmailVerification", model);
 
             var result = await _emailVerificationService.VerifyAsync(new EmailVerificationDto
-                {
-                    Email = model.Email,
-                    VerificationCode = model.VerificationCode
-                }
-            );
+            {
+                Email = model.Email,
+                VerificationCode = model.VerificationCode
+            });
 
             if (!result.Success)
             {
@@ -62,40 +53,30 @@ namespace PasswordManager.Controllers
                 return View("IndexEmailVerification", model);
             }
 
-            var user = result.Value;
-
-            await _authService.SignInAsync(HttpContext, user!.Id);
-
-            return RedirectToAction("Home", "Vault");
+            return RedirectToAction("GetLogin", "Login");
         }
 
 
-        /// <summary>
-        /// POST: /Account/ResendVerificationCode
-        /// Send new verification code
-        /// </summary>
-        /// <param name="codeVerification">Verification code</param>
-        /// <returns>Redirects to vault on success, returns view with error on failure</returns>
         [HttpPost("ResendVerificationCode")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResendVerificationCode([Bind("Email")] EmailVerificationViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View("IndexEmailVerification", model);
+            if (string.IsNullOrEmpty(model.Email))
+                return RedirectToAction("GetRegister", "Register");
 
             var result = await _emailVerificationService.ResendAsync(new EmailVerificationDto
-                {
-                    Email = model.Email,
-                    VerificationCode = model.VerificationCode
-                }
-            );
+            {
+                Email = model.Email
+            });
 
-            if(!result.Success)
+            if (!result.Success)
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(error.Key, error.Value);
                 return View("IndexEmailVerification", model);
             }
+
+            TempData.Keep("Email");
 
             return View("IndexEmailVerification", model);
         }

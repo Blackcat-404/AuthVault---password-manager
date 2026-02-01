@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PasswordManager.Application;
 using PasswordManager.Application.Account.Register;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
+using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
-using PasswordManager.Application;
+using PasswordManager.Application.Security;
 
 namespace PasswordManager.Infrastructure.Register
 {
@@ -13,11 +14,15 @@ namespace PasswordManager.Infrastructure.Register
     {
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
+        private readonly IEncryptionService _encryptionService;
 
-        public RegisterService(AppDbContext db, EmailService emailService)
+        public RegisterService(AppDbContext db,
+                                EmailService emailService,
+                                IEncryptionService encryptionService)
         {
             _db = db;
             _emailService = emailService;
+            _encryptionService = encryptionService;
         }
 
 
@@ -31,7 +36,7 @@ namespace PasswordManager.Infrastructure.Register
                 result.AddError(nameof(dto.Name), "Are you serious, dude?");
                 return result;
             }*/
-
+            
             var loginExists = await _db.Users.AnyAsync(
                 u => u.Login == dto.Name &&
                 u.EmailVerificationStatus == EmailVerificationStatus.Verified
@@ -44,8 +49,6 @@ namespace PasswordManager.Infrastructure.Register
             }
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            int verificationCode = VerificationCodeGenerator.Generate();
-            DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             if (user != null && user.EmailVerificationStatus == EmailVerificationStatus.Verified)
             {
@@ -55,11 +58,19 @@ namespace PasswordManager.Infrastructure.Register
 
             if (user == null)
             {
+                byte[] authSalt = _encryptionService.GenerateSalt();
+                byte[] encryptionSalt = _encryptionService.GenerateSalt();
+                byte[] authHash = _encryptionService.DeriveAuthHash(dto.Password!, authSalt);
+
                 var userNew = new User
                 {
                     Login = dto.Name!,
                     Email = dto.Email!,
-                    PasswordHash = PasswordHasher.Hash(dto.Password!),
+
+                    AuthHash = authHash,
+                    AuthSalt = authSalt,
+                    EncryptionSalt = encryptionSalt,
+
                     EmailVerificationStatus = EmailVerificationStatus.NotVerified,
                     EmailVerificationCode = verificationCode,
                     EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5),
@@ -67,18 +78,24 @@ namespace PasswordManager.Infrastructure.Register
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _db.Users.Add(userNew);
+                await _db.Users.AddAsync(userNew);
             }
             else
             {
+                byte[] authSalt = _encryptionService.GenerateSalt();
+                byte[] encryptionSalt = _encryptionService.GenerateSalt();
+                byte[] authHash = _encryptionService.DeriveAuthHash(dto.Password, authSalt);
+
+                user.AuthHash = authHash;
+                user.AuthSalt = authSalt;
+                user.EncryptionSalt = encryptionSalt;
+
                 user.Login = dto.Name!;
-                user.PasswordHash = PasswordHasher.Hash(dto.Password!);
                 user.EmailVerificationCode = verificationCode;
                 user.EmailVerificationExpiresAt = expiresAt;
             }
 
             await _db.SaveChangesAsync();
-
             await SendVerificationEmailAsync(dto.Name, dto.Email, verificationCode, expiresAt);
 
             return result;

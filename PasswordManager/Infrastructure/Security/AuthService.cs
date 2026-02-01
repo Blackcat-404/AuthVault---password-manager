@@ -5,7 +5,6 @@ using System.Security.Claims;
 
 namespace PasswordManager.Infrastructure.Security
 {
-
     public class AuthService : IAuthService
     {
         public async Task SignInAsync(HttpContext context, int userId)

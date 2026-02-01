@@ -1,19 +1,20 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using PasswordManager.Application.Account.Email;
+using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Account.Register;
 using PasswordManager.Application.Security;
 using PasswordManager.Application.Vault;
 using PasswordManager.Data;
 using PasswordManager.Infrastructure.Email;
-using PasswordManager.Infrastructure.Login;
 using PasswordManager.Infrastructure.ForgotPassword;
-using PasswordManager.Infrastructure.Vault;
-using PasswordManager.Infrastructure.Security;
-using PasswordManager.Models.Email;
+using PasswordManager.Infrastructure.Login;
 using PasswordManager.Infrastructure.Register;
-using PasswordManager.Application.Account.Email;
-using PasswordManager.Application.Account.ForgotPassword;
+using PasswordManager.Infrastructure.Security;
+using PasswordManager.Infrastructure.Vault;
+using PasswordManager.Middleware;
+using PasswordManager.Models.Email;
 using PasswordManager.Infrastructure.Settings;
 
 namespace PasswordManager
@@ -23,8 +24,6 @@ namespace PasswordManager
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container
 
             builder.Services.AddControllersWithViews();
 
@@ -52,6 +51,8 @@ namespace PasswordManager
             builder.Services.AddScoped<IGetFolderService, GetFolderService>();
             builder.Services.AddScoped<IGetAllFoldersService, GetFolderService>();
             builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
+            builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+            builder.Services.AddScoped<ISessionEncryptionService, SessionEncryptionService>();
 
             builder.Services.AddScoped<SettingsService>();
 
@@ -72,6 +73,15 @@ namespace PasswordManager
                 });
 
 
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            builder.Services.AddHttpContextAccessor();
+
 
             var app = builder.Build();
 
@@ -85,17 +95,19 @@ namespace PasswordManager
             {
                 app.UseDeveloperExceptionPage();
             }*/
+            app.UseSession();
+
             app.UseExceptionHandler("/Error");
             app.UseStatusCodePagesWithReExecute("/Error/{0}");
             app.UseHsts();
-
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<EncryptionKeyValidationMiddleware>();
 
             app.MapGet("/", context =>
             {

@@ -12,14 +12,16 @@ namespace PasswordManager.Infrastructure.ForgotPassword
     {
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
+        private readonly IEncryptionService _encryptionService;
 
-        public PasswordResetService(AppDbContext db, EmailService emailService)
+        public PasswordResetService(AppDbContext db, EmailService emailService, IEncryptionService encryptionService)
         {
             _db = db;
             _emailService = emailService;
+            _encryptionService = encryptionService;
         }
 
-            public async Task CreateResetTokenAsync(ForgotPasswordDto dto)
+        public async Task CreateResetTokenAsync(ForgotPasswordDto dto)
             {
                 var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
                 if (user == null)
@@ -116,7 +118,15 @@ namespace PasswordManager.Infrastructure.ForgotPassword
 
             resetToken.Token = null;
             resetToken.UsedAt = DateTime.UtcNow;
-            resetToken.User.PasswordHash = PasswordHasher.Hash(newPassword);
+
+            byte[] authSalt = _encryptionService.GenerateSalt();
+            byte[] encryptionSalt = _encryptionService.GenerateSalt();
+            byte[] authHash = _encryptionService.DeriveAuthHash(newPassword, authSalt);
+
+            resetToken.User.AuthSalt = authSalt;
+            resetToken.User.EncryptionSalt = encryptionSalt;
+            resetToken.User.AuthHash = authHash;
+
             await _db.SaveChangesAsync();
 
             return result;

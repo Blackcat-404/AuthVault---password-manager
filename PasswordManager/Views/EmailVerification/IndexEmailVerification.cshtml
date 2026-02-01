@@ -74,11 +74,10 @@
 
     <!-- Resend code -->
     <div class="verify-password">
-        <form asp-action="ResendVerificationCode"
-              asp-controller="EmailVerification"
-              method="post">
+        <form asp-action="ResendVerificationCode" asp-controller="EmailVerification" method="post">
             @Html.AntiForgeryToken()
-            <input asp-for="Email" type="hidden"/>
+
+            <input type="hidden" asp-for="Email" />
             <button type="submit" class="resend-btn">
                 Resend verification code
             </button>

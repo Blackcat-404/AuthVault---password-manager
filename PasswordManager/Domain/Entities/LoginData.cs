@@ -3,10 +3,15 @@ namespace PasswordManager.Domain.Entities
     public class LoginData : BaseEntity
     {
         public string Title { get; set; } = null!;
+
         public string? LoginEncrypted { get; set; }
+        public string? LoginIV { get; set; }
 
         public string? PasswordEncrypted { get; set; }
+        public string? PasswordIV { get; set; }
+
         public string? NoteEncrypted { get; set; }
+        public string? NoteIV { get; set; }
 
         public string? WebURL { get; set; }
 

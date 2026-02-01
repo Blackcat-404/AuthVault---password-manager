@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Security;
 using PasswordManager.ViewModels;
+using System.Security.Claims;
 
 namespace PasswordManager.Controllers
 {
@@ -99,6 +100,8 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _loginService.DeleteEncryptionKey(userId);
             await _authService.SignOutAsync(HttpContext);
             return RedirectToAction("Login", "Account");
         }

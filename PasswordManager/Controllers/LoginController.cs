@@ -29,13 +29,13 @@ namespace PasswordManager.Controllers
         [HttpGet("Login/2FA")]
         public IActionResult Get2FA()
         {
-            return View("FAuthentication");
+            
+            return View("~/Views/Token/TokenSent.cshtml");
         }
 
         [HttpPost("Login/2FA")]
         public async Task<IActionResult> PostVerifyCodeAsync(Login2FAViewModel model)
         {
-            Console.WriteLine(model.Code);
             var id = Convert.ToInt32(TempData["userId"]);
             if (!await _loginService.Verify2FAToken(id,model.Code)) //TODO: TOKEN instead code
             {
@@ -84,10 +84,8 @@ namespace PasswordManager.Controllers
                 await _loginService.Send2FACode(u.Id);
 
                 TempData["userId"] = u.Id;
-                return RedirectToAction("Get2FA");
+                return View("~/Views/Token/TokenSent.cshtml");
             }
-
-            Console.WriteLine("no 2FA");
 
             var user = result.Value!;
             await _authService.SignInAsync(HttpContext, user.Id);

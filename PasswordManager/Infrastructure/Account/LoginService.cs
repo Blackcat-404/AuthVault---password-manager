@@ -17,19 +17,19 @@ namespace PasswordManager.Infrastructure.Login
         private readonly IEncryptionService _encryptionService;
         private readonly ISessionEncryptionService _sessionEncryptionService;
         private readonly EmailService _emailService;
-        private readonly TokenService _generateTokenService;
+        private readonly TokenService _tokenService;
 
         public LoginService(AppDbContext db, 
             IEncryptionService encryptionService, 
             ISessionEncryptionService sessionEncryptionService, 
             EmailService emailService, 
-            TokenService generateTokenService)
+            TokenService tokenService)
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
             _sessionEncryptionService = sessionEncryptionService;
-            _generateTokenService = generateTokenService;
+            _tokenService = tokenService;
         }
 
         public Task DeleteEncryptionKey(int userId)
@@ -97,7 +97,6 @@ namespace PasswordManager.Infrastructure.Login
     
         public async Task Send2FACode(int userId)
         {
-            int code = VerificationCodeGenerator.Generate();
             var user = await _db.TwoFactorAuthentications
                 .FirstOrDefaultAsync(u =>
                     u.UserId == userId
@@ -108,15 +107,12 @@ namespace PasswordManager.Infrastructure.Login
                 return;
             }
 
-            user.Token = await _generateTokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
+            var token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
+            user.Token = token;
             user.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
 
             await _db.SaveChangesAsync();
-            await _emailService.SendAsync(
-                user.Email!,
-                "Two-Factor Authentication",
-                $"This is your 2FA token:{$"https://localhost/"}\n\nThis code expires in 5 minutes"
-            );
+            await _tokenService.SendTokenToEmailAsync(user.User.Login, user.Email!, 5, $"https://localhost:7108/Account/Login/2FA?token={token}");
         }
 
         public async Task<bool> Verify2FAToken(int userId, string token)

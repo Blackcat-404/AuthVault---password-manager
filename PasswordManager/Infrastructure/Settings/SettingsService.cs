@@ -13,50 +13,52 @@ namespace PasswordManager.Infrastructure.Settings
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
-        public SettingsService(AppDbContext db,EmailService emailService, IEncryptionService encryptionService) 
+        private readonly TokenService _tokenService;
+        public SettingsService(AppDbContext db,EmailService emailService, IEncryptionService encryptionService,TokenService tokenService) 
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
+            _tokenService = tokenService;
         }
 
         public async Task Add2FAAsync(int userId,string email)
         {
-            int code = VerificationCodeGenerator.Generate();
+            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.TwoFactorAuthentications, t => t.Token);
             var expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             var twoFa = await _db.TwoFactorAuthentications
                 .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            var user = await _db.Users
+                .FirstOrDefaultAsync(x => x.Id == userId);
 
             if (twoFa == null)
             {
                 twoFa = new TwoFactorAuthentication
                 {
                     UserId = userId,
-                    //Code = code.ToString(),
-                    //ExpiresAt = expiresAt
+                    Token = token,
+                    TokenExpiresAt = expiresAt
                 };
 
                 _db.TwoFactorAuthentications.Add(twoFa);
+                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"https://localhost:7108/Vault/Settings/2FA/EmailVerification?token={token}");
             }
             else
             {
-                //twoFa.Code = code.ToString();
-                //twoFa.ExpiresAt = expiresAt;
+                twoFa.Token = token;
+                twoFa.TokenExpiresAt = expiresAt;
+                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"https://localhost:7108/Vault/Settings/2FA/EmailVerification?token={token}");
             }
 
             await _db.SaveChangesAsync();
-            await _emailService.SendAsync(
-                email,
-                "Your verification code",
-                $"Your verification code for 2FA is: {code}\n\nIt expires in 5 minutes."
-            );
         }
 
-        public async Task<bool> Verify2FACodeAsync(int userId, string code, string email)
+        public async Task<bool> Verify2FAToken(string token)
         {
             var record = await _db.TwoFactorAuthentications
-            .Where(x => x.UserId == userId)
+            .Where(x => x.Token == token)
             .FirstOrDefaultAsync();
 
             if (record == null)
@@ -64,23 +66,33 @@ namespace PasswordManager.Infrastructure.Settings
                 return false;
             }
 
-            /*if (record.ExpiresAt < DateTime.UtcNow)
+            if (record.TokenExpiresAt < DateTime.UtcNow)
             {
                 return false;
             }
 
-            if (record.Code != code)
+            if (record.Token != token)
             {
                 return false;
             }
 
-            record.Email = email;
-            record.Code = null;
-            record.ExpiresAt = null;
-            record.LinkedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();*/
             return true;
+        }
+
+        public async Task Add2FAEmailAsync(string token, string email)
+        {
+            var twoFa = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(x => x.Token == token);
+
+            if (twoFa == null)
+                return;
+
+            twoFa.Token = null;
+            twoFa.TokenExpiresAt = null;
+            twoFa.Email = email;
+            twoFa.LinkedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
         }
 
         public async Task Set2FAStatement(int userId, bool statement)

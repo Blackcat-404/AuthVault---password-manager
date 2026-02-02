@@ -135,5 +135,24 @@ namespace PasswordManager.Infrastructure.Login
             await _db.SaveChangesAsync();
             return true;
         }
+
+        public async Task<int?> GetUserIdByToken(string token)
+        {
+            var twoFactor = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(x => x.Token == token && x.TokenExpiresAt > DateTime.UtcNow);
+
+            return twoFactor?.UserId;
+        }
+
+        public async Task<bool> IsTokenVerified(int userId)
+        {
+            var twoFactor = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+
+            if (twoFactor == null)
+                return false;
+
+            return twoFactor.Token == null;
+        }
     }
 }

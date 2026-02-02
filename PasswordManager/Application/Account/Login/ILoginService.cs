@@ -9,5 +9,7 @@ namespace PasswordManager.Application.Account.Login
         Task Send2FACode(int userId);
         Task<bool> Verify2FAToken(int userId, string token);
         Task DeleteEncryptionKey(int userId);
+        Task<int?> GetUserIdByToken(string token);
+        Task<bool> IsTokenVerified(int userId);
     }
 }

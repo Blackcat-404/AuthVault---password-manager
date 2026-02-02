@@ -2,6 +2,7 @@
     ViewData["Title"] = "Email Verification";
     ViewData["BodyClass"] = "auth-page";
     Layout = "_Layout";
+    var userId = TempData["userId"];
 }
 
 <div class="login-container">
@@ -21,30 +22,9 @@
             <polyline points="22,6 12,13 2,6"></polyline>
         </svg>
     </div>
-
-    <!-- Tagline -->
     <div class="tagline">
         <p>Check your email inbox</p>
     </div>
-
-    <!-- Success Message -->
-    <div class="success-message">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="20"
-             height="20"
-             viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"
-             stroke-linecap="round"
-             stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-        </svg>
-        <span>Verification email sent successfully!</span>
-    </div>
-
-    <!-- Email Verification Content -->
     <div class="invalid-token-content">
         <div class="forgot-password">
             <a asp-controller="Account" asp-action="Login">
@@ -66,6 +46,35 @@
         </div>
     </div>
 </div>
+
+<!--2FA FLOW -->
+<script>
+    const userId = @userId;
+    let pollInterval;
+
+    async function checkVerificationStatus() {
+        try {
+            const response = await fetch(`/Account/Login/2FA/CheckStatus?userId=${userId}`);
+            const data = await response.json();
+
+            if (data.success && data.verified) {
+                clearInterval(pollInterval);
+                window.location.href = '@Url.Action("Home", "Vault")';
+            }
+        } catch (error) {
+            console.error('Error checking verification status:', error);
+        }
+    }
+
+    pollInterval = setInterval(checkVerificationStatus, 2000);
+
+    setTimeout(() => {
+        clearInterval(pollInterval);
+        alert('Verification timeout. Please try logging in again.');
+        window.location.href = '@Url.Action("GetLogin", "Login")';
+    }, 5 * 60 * 1000);
+</script>
+
 
 @section Styles {
     <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />

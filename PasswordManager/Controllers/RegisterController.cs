@@ -54,19 +54,16 @@ namespace PasswordManager.Controllers
                 return View("IndexRegister", model);
             }
 
-            /*var result = await _registerService.RegisterUserAsync(new RegisterUserDto
+            var result = await _registerService.RegisterUserAsync(new RegisterUserDto
                 {
-                    Name = model.Name!,
+                    Login = model.Name!,
                     Email = model.Email!,
                     Password = model.Password!
                 }
-            );*/
-
-            TempData["Email"] = model.Email;
-            return RedirectToAction(
-                nameof(EmailVerificationController.GetEmailVerification),
-                "EmailVerification"
             );
+
+            return RedirectToAction(actionName: "GetEmailVerificationLinkSent",
+                                    controllerName: "EmailVerification");
         }
     }
 }

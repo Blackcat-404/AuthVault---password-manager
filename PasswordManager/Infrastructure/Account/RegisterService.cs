@@ -14,17 +14,17 @@ namespace PasswordManager.Infrastructure.Register
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
-        private readonly TokenService _generateTokenService;
+        private readonly TokenService _tokenService;
 
         public RegisterService(AppDbContext db,
                                 EmailService emailService,
                                 IEncryptionService encryptionService,
-                                TokenService generateTokenService)
+                                TokenService tokenService)
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
-            _generateTokenService = generateTokenService;
+            _tokenService = tokenService;
         }
 
 
@@ -40,13 +40,13 @@ namespace PasswordManager.Infrastructure.Register
             }*/
             
             var loginExists = await _db.Users.AnyAsync(
-                u => u.Login == dto.Name &&
+                u => u.Login == dto.Login &&
                 u.EmailVerificationStatus == EmailVerificationStatus.Verified
             );
 
             if (loginExists)
             {
-                result.AddError(nameof(dto.Name), "This login is already taken");
+                result.AddError(nameof(dto.Login), "This login is already taken");
                 return result;
             }
 
@@ -58,7 +58,7 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            string token = await _generateTokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
+            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
             DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             if (user == null)
@@ -71,7 +71,7 @@ namespace PasswordManager.Infrastructure.Register
 
                 var userNew = new User
                 {
-                    Login = dto.Name!,
+                    Login = dto.Login!,
                     Email = dto.Email!,
 
                     AuthHash = authHash,
@@ -97,23 +97,14 @@ namespace PasswordManager.Infrastructure.Register
                 user.AuthSalt = authSalt;
                 user.EncryptionSalt = encryptionSalt;
 
-                user.Login = dto.Name!;
+                user.Login = dto.Login!;
                 user.Token = token;
                 user.TokenExpiresAt = expiresAt;
             }
 
             await _db.SaveChangesAsync();
+            await _tokenService.SendTokenToEmailAsync(dto.Login, dto.Email, 5, $"https://localhost:7108/Account/Register/VerifyEmail?token={token}");
 
-            //Token sending to email
-            string bodystr = "Hello, " + dto.Name + "\nYour verification token is: " + $"https://localhost/EmailVerification&token={token}" +
-                "\n\nThis token expires in 5 minutes\n" +
-                "If you did not register, please ignore this email.";
-
-            await _emailService.SendAsync(
-                    to: dto.Email!,
-                    subject: "Email verification code",
-                    body: bodystr
-            );
             return result;
         }
 

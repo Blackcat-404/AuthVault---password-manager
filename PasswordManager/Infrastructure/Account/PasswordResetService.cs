@@ -54,8 +54,6 @@ namespace PasswordManager.Infrastructure.ForgotPassword
                 _db.PasswordResetTokens.Add(resetToken);
             }
 
-            Console.WriteLine("fkdfgjfpdgij");
-
             await _tokenService.SendTokenToEmailAsync(user.Login, dto.Email, 30, $"https://localhost:7108/Account/ForgotPassword/ResetPassword?token={token}");
             await _db.SaveChangesAsync();
         }

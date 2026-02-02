@@ -12,17 +12,14 @@ namespace PasswordManager.Infrastructure.Register
     public class RegisterService : IRegisterService
     {
         private readonly AppDbContext _db;
-        private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
         private readonly TokenService _tokenService;
 
         public RegisterService(AppDbContext db,
-                                EmailService emailService,
                                 IEncryptionService encryptionService,
                                 TokenService tokenService)
         {
             _db = db;
-            _emailService = emailService;
             _encryptionService = encryptionService;
             _tokenService = tokenService;
         }

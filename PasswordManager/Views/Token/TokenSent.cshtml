@@ -53,16 +53,12 @@
     let pollInterval;
 
     async function checkVerificationStatus() {
-        try {
-            const response = await fetch(`/Account/Login/2FA/CheckStatus?userId=${userId}`);
-            const data = await response.json();
+        const response = await fetch(`/Account/Login/2FA/CheckStatus?userId=${userId}`);
+        const data = await response.json();
 
-            if (data.success && data.verified) {
-                clearInterval(pollInterval);
-                window.location.href = '@Url.Action("Home", "Vault")';
-            }
-        } catch (error) {
-            console.error('Error checking verification status:', error);
+        if (data.success && data.verified) {
+            clearInterval(pollInterval);
+            window.location.href = '@Url.Action("Home", "Vault")';
         }
     }
 

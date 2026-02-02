@@ -54,21 +54,13 @@ namespace PasswordManager.Controllers
                 return View("IndexRegister", model);
             }
 
-            var result = await _registerService.RegisterUserAsync(new RegisterUserDto
+            /*var result = await _registerService.RegisterUserAsync(new RegisterUserDto
                 {
                     Name = model.Name!,
                     Email = model.Email!,
                     Password = model.Password!
                 }
-            );
-
-            if (!result.Success)
-            {
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError(error.Key, error.Value);
-
-                return View("IndexRegister", model);
-            }
+            );*/
 
             TempData["Email"] = model.Email;
             return RedirectToAction(

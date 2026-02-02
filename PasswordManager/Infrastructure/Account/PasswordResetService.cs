@@ -13,12 +13,14 @@ namespace PasswordManager.Infrastructure.ForgotPassword
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
+        private readonly TokenService _generateTokenService;
 
-        public PasswordResetService(AppDbContext db, EmailService emailService, IEncryptionService encryptionService)
+        public PasswordResetService(AppDbContext db, EmailService emailService, IEncryptionService encryptionService,TokenService generateTokenService)
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
+            _generateTokenService = generateTokenService;
         }
 
         public async Task CreateResetTokenAsync(ForgotPasswordDto dto)
@@ -29,7 +31,7 @@ namespace PasswordManager.Infrastructure.ForgotPassword
                     return;
                 }
 
-                var token = await GenerateUniqueResetTokenAsync();
+                var token = await _generateTokenService.GenerateUniqueResetTokenAsync(_db.PasswordResetTokens, t => t.Token);
                 var expiresAt = DateTime.UtcNow.AddMinutes(30);
 
                 var existingToken = await _db.PasswordResetTokens.FirstOrDefaultAsync(t => t.UserId == user.Id);
@@ -58,19 +60,6 @@ namespace PasswordManager.Infrastructure.ForgotPassword
                 }
 
                 await _db.SaveChangesAsync();
-
-                string bodystr = "Hello, " + user.Login + 
-                    "\n\nThis is your link to reset your password:\n" + 
-                    "https://localhost:7108/Account/ForgotPassword/ResetPassword?token=" + token +
-                    "\n\nWarning! This link can only be used once and resent after 30 minutes for security reasons!" +
-                    "\nThe link expires in 30 minutes." +
-                    "\nIf it's not you, please ignore this email.";
-
-                await _emailService.SendAsync(
-                        to: dto.Email,
-                        subject: "Reset password link",
-                        body: bodystr
-                );
             }
 
         public async Task<Result> ValidateTokenAsync(string token)
@@ -130,19 +119,6 @@ namespace PasswordManager.Infrastructure.ForgotPassword
             await _db.SaveChangesAsync();
 
             return result;
-        }
-
-        private async Task<string> GenerateUniqueResetTokenAsync()
-        {
-            string token;
-
-            do
-            {
-                token = Guid.NewGuid().ToString("N");
-            }
-            while (await _db.PasswordResetTokens.AnyAsync(t => t.Token == token));
-
-            return token;
         }
     }
 }

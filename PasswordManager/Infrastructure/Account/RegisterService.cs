@@ -14,14 +14,17 @@ namespace PasswordManager.Infrastructure.Register
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
+        private readonly TokenService _generateTokenService;
 
         public RegisterService(AppDbContext db,
                                 EmailService emailService,
-                                IEncryptionService encryptionService)
+                                IEncryptionService encryptionService,
+                                TokenService generateTokenService)
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
+            _generateTokenService = generateTokenService;
         }
 
 
@@ -55,7 +58,7 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            int verificationCode = VerificationCodeGenerator.Generate();
+            string token = await _generateTokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
             DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             if (user == null)
@@ -63,6 +66,8 @@ namespace PasswordManager.Infrastructure.Register
                 byte[] authSalt = _encryptionService.GenerateSalt();
                 byte[] encryptionSalt = _encryptionService.GenerateSalt();
                 byte[] authHash = _encryptionService.DeriveAuthHash(dto.Password!, authSalt);
+
+                
 
                 var userNew = new User
                 {
@@ -74,8 +79,8 @@ namespace PasswordManager.Infrastructure.Register
                     EncryptionSalt = encryptionSalt,
 
                     EmailVerificationStatus = EmailVerificationStatus.NotVerified,
-                    EmailVerificationCode = verificationCode,
-                    EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                    Token = token,
+                    TokenExpiresAt = DateTime.UtcNow.AddMinutes(5),
                     LastLoginAt = null,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -93,27 +98,24 @@ namespace PasswordManager.Infrastructure.Register
                 user.EncryptionSalt = encryptionSalt;
 
                 user.Login = dto.Name!;
-                user.EmailVerificationCode = verificationCode;
-                user.EmailVerificationExpiresAt = expiresAt;
+                user.Token = token;
+                user.TokenExpiresAt = expiresAt;
             }
 
             await _db.SaveChangesAsync();
-            await SendVerificationEmailAsync(dto.Name, dto.Email, verificationCode);
 
-            return result;
-        }
-
-        public async Task SendVerificationEmailAsync(string Name, string Email, int verificationCode)
-        {
-            string bodystr = "Hello, " + Name + "\nYour verification code is: " + verificationCode +
-                "\n\nThis code expires in 5 minutes\n" +
+            //Token sending to email
+            string bodystr = "Hello, " + dto.Name + "\nYour verification token is: " + $"https://localhost/EmailVerification&token={token}" +
+                "\n\nThis token expires in 5 minutes\n" +
                 "If you did not register, please ignore this email.";
 
             await _emailService.SendAsync(
-                    to: Email!,
+                    to: dto.Email!,
                     subject: "Email verification code",
                     body: bodystr
             );
+            return result;
         }
+
     }
 }   

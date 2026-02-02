@@ -17,13 +17,19 @@ namespace PasswordManager.Infrastructure.Login
         private readonly IEncryptionService _encryptionService;
         private readonly ISessionEncryptionService _sessionEncryptionService;
         private readonly EmailService _emailService;
+        private readonly TokenService _generateTokenService;
 
-        public LoginService(AppDbContext db, IEncryptionService encryptionService, ISessionEncryptionService sessionEncryptionService, EmailService emailService)
+        public LoginService(AppDbContext db, 
+            IEncryptionService encryptionService, 
+            ISessionEncryptionService sessionEncryptionService, 
+            EmailService emailService, 
+            TokenService generateTokenService)
         {
             _db = db;
             _emailService = emailService;
             _encryptionService = encryptionService;
             _sessionEncryptionService = sessionEncryptionService;
+            _generateTokenService = generateTokenService;
         }
 
         public Task DeleteEncryptionKey(int userId)
@@ -102,18 +108,18 @@ namespace PasswordManager.Infrastructure.Login
                 return;
             }
 
-            user.Code = code.ToString();
-            user.ExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            user.Token = await _generateTokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
+            user.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
 
             await _db.SaveChangesAsync();
             await _emailService.SendAsync(
                 user.Email!,
                 "Two-Factor Authentication",
-                $"This is your 2FA code:{code}\n\nThis code expires in 5 minutes"
+                $"This is your 2FA token:{$"https://localhost/"}\n\nThis code expires in 5 minutes"
             );
         }
 
-        public async Task<bool> Verify2FACode(int userId, string code)
+        public async Task<bool> Verify2FAToken(int userId, string token)
         {
             var twoFactor = await _db.TwoFactorAuthentications
                 .FirstOrDefaultAsync(x => x.UserId == userId);
@@ -121,14 +127,14 @@ namespace PasswordManager.Infrastructure.Login
             if (twoFactor == null)
                 return false;
 
-            if (twoFactor.ExpiresAt < DateTime.UtcNow)
+            if (twoFactor.TokenExpiresAt < DateTime.UtcNow)
                 return false;
 
-            if (twoFactor.Code != code)
+            if (twoFactor.Token != token)
                 return false;
 
-            twoFactor.Code = null;
-            twoFactor.ExpiresAt = null;
+            twoFactor.Token = null;
+            twoFactor.TokenExpiresAt = null;
 
             await _db.SaveChangesAsync();
             return true;

@@ -37,7 +37,7 @@ namespace PasswordManager.Controllers
         {
             Console.WriteLine(model.Code);
             var id = Convert.ToInt32(TempData["userId"]);
-            if (!await _loginService.Verify2FACode(id,model.Code))
+            if (!await _loginService.Verify2FAToken(id,model.Code)) //TODO: TOKEN instead code
             {
                 return RedirectToAction();
             }

@@ -33,16 +33,16 @@ namespace PasswordManager.Infrastructure.Settings
                 twoFa = new TwoFactorAuthentication
                 {
                     UserId = userId,
-                    Code = code.ToString(),
-                    ExpiresAt = expiresAt
+                    //Code = code.ToString(),
+                    //ExpiresAt = expiresAt
                 };
 
                 _db.TwoFactorAuthentications.Add(twoFa);
             }
             else
             {
-                twoFa.Code = code.ToString();
-                twoFa.ExpiresAt = expiresAt;
+                //twoFa.Code = code.ToString();
+                //twoFa.ExpiresAt = expiresAt;
             }
 
             await _db.SaveChangesAsync();
@@ -64,7 +64,7 @@ namespace PasswordManager.Infrastructure.Settings
                 return false;
             }
 
-            if (record.ExpiresAt < DateTime.UtcNow)
+            /*if (record.ExpiresAt < DateTime.UtcNow)
             {
                 return false;
             }
@@ -79,7 +79,7 @@ namespace PasswordManager.Infrastructure.Settings
             record.ExpiresAt = null;
             record.LinkedAt = DateTime.UtcNow;
 
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();*/
             return true;
         }
 

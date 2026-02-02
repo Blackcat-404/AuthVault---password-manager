@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using PasswordManager.Domain.Enums;
 
 namespace PasswordManager.Domain.Entities
@@ -13,8 +14,8 @@ namespace PasswordManager.Domain.Entities
 
 
         public EmailVerificationStatus EmailVerificationStatus { get; set; }
-        public int? EmailVerificationCode { get; set; }
-        public DateTime? EmailVerificationExpiresAt { get; set; }
+        public string? Token { get; set; }
+        public DateTime? TokenExpiresAt { get; set; }
 
         public DateTime? LastLoginAt { get; set; }
         public DateTime? PasswordLastChangedAt { get; set; } = null;

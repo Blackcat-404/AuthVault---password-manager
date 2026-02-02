@@ -43,7 +43,7 @@ namespace PasswordManager.Controllers
             var result = await _emailVerificationService.VerifyAsync(new EmailVerificationDto
             {
                 Email = model.Email,
-                VerificationCode = model.VerificationCode
+                //VerificationCode = model.VerificationCode
             });
 
             if (!result.Success)

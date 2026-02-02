@@ -12,11 +12,13 @@ namespace PasswordManager.Infrastructure.Email
     {
         private readonly AppDbContext _db;
         private readonly EmailService _emailService;
+        private readonly TokenService _tokenService;
 
-        public EmailVerificationService(AppDbContext db, EmailService emailService)
+        public EmailVerificationService(AppDbContext db, EmailService emailService, TokenService tokenService)
         {
             _db = db;
             _emailService = emailService;
+            _tokenService = tokenService;
         }
 
         public async Task<Result<User>> VerifyAsync(EmailVerificationDto dto)
@@ -32,21 +34,21 @@ namespace PasswordManager.Infrastructure.Email
                 return result;
             }
 
-            if (user.EmailVerificationExpiresAt < DateTime.UtcNow)
+            if (user.TokenExpiresAt < DateTime.UtcNow)
             {
-                result.AddError(nameof(dto.VerificationCode), "Verification code expired");
+                result.AddError(nameof(dto.Token), "Verification code expired");
                 return result;
             }
 
-            if (user.EmailVerificationCode != dto.VerificationCode)
+            if (user.Token != dto.Token)
             {
-                result.AddError(nameof(dto.VerificationCode), "Invalid verification code");
+                result.AddError(nameof(dto.Token), "Invalid token");
                 return result;
             }
 
             user.EmailVerificationStatus = EmailVerificationStatus.Verified;
-            user.EmailVerificationCode = null;
-            user.EmailVerificationExpiresAt = null;
+            user.Token = null;
+            user.TokenExpiresAt = null;
 
             await _db.SaveChangesAsync();
 
@@ -65,9 +67,9 @@ namespace PasswordManager.Infrastructure.Email
                 return result;
             }
 
-            if (user.EmailVerificationExpiresAt > DateTime.UtcNow.AddMinutes(4))
+            if (user.TokenExpiresAt > DateTime.UtcNow.AddMinutes(4))
             {
-                result.AddError(nameof(dto.VerificationCode), "The code can still be used");
+                result.AddError(nameof(dto.Token), "The code can still be used");
                 return result;
             }
 
@@ -77,22 +79,13 @@ namespace PasswordManager.Infrastructure.Email
                 return result;
             }
 
-            var code = VerificationCodeGenerator.Generate();
+            var token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
 
-            user.EmailVerificationCode = code;
-            user.EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            user.Token = token;
+            user.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
 
             await _db.SaveChangesAsync();
-
-            string bodystr = "Hello, " + user.Login + "\nYour verification code is: " + code +
-                "\n\nThis code expires in 5 minutes\n" +
-                "If you did not register, please ignore this email.";
-
-            await _emailService.SendAsync(
-                user.Email,
-                "Resending email verification code",
-                bodystr
-            );
+            //await _tokenService.SendTokenToEmailAsync(user.Login, dto.Email, "5", token);
 
             return result;
         }

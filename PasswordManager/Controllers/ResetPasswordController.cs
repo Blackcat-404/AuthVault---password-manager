@@ -16,10 +16,9 @@ namespace PasswordManager.Controllers
         [HttpGet("ResetPassword")]
         public async Task<IActionResult> GetResetPassword(string token)
         {
-            var result = await _resetPasswordService.ValidateTokenAsync(token);
-            if (!result.Success)
-                return View("InvalidToken");
-
+            bool IsValideToken = await _resetPasswordService.ValidateTokenAsync(token);
+            if (!IsValideToken)
+                return View("~/Views/Token/InvalidToken.cshtml");
 
             return View("IndexResetPassword", new ResetPasswordViewModel
             {
@@ -34,9 +33,9 @@ namespace PasswordManager.Controllers
             if (!ModelState.IsValid)
                 return View("IndexResetPassword", model);
 
-            var result = await _resetPasswordService.ResetPasswordAsync(model.Token,model.NewPassword);
-            if (!result.Success)
-                return View("InvalidToken");
+            bool result = await _resetPasswordService.ResetPasswordAsync(model.Token,model.NewPassword);
+            if (!result)
+                return View("~/Views/Token/InvalidToken.cshtml");
 
             return RedirectToAction("Login", "Account");
         }

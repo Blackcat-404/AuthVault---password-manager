@@ -4,7 +4,7 @@ namespace PasswordManager.Application.Account.Email
 {
     public interface IEmailVerificationService
     {
-        Task<Result<User>> VerifyAsync(EmailVerificationDto dto);
-        Task<Result> ResendAsync(EmailVerificationDto dto);
+        Task<bool> VerifyTokenAsync(string token);
+        Task<bool> VerifyEmailAsync(string token);
     }
 }

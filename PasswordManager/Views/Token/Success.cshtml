@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Token Verified";
+    ViewData["BodyClass"] = "auth-page";
+    Layout = "_Layout";
+}
+
+<div class="login-container">
+    <!-- Application logo -->
+    <div class="logo">
+        <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24"
+                 height="24"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+            </svg>
+        </div>
+        <div class="logo-title">
+            <svg viewBox="0 0 400 120" class="logo-svg">
+                <text x="50%" y="50%" text-anchor="middle"
+                      dominant-baseline="middle"
+                      class="logo-text-outline">
+                    AuthVault
+                </text>
+                <text x="50%" y="50%" text-anchor="middle"
+                      dominant-baseline="middle"
+                      class="logo-text-fill">
+                    AuthVault
+                </text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Tagline -->
+    <div class="tagline">
+        <p>This token is valid!</p>
+    </div>
+    <!-- Verification Success Content -->
+    <div class="invalid-token-content">
+        <div class="error-icon" style="background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3);">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="80"
+                 height="80"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 style="color: #2ecc71;">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+
+        <h2 class="error-title">Verification Complete!</h2>
+
+        <div class="tagline">
+            <p>Now you can close this page</p>
+        </div>
+
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+}

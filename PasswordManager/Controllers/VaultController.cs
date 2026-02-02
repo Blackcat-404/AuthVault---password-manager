@@ -303,7 +303,6 @@ namespace PasswordManager.Controllers
             }
             catch (InvalidOperationException)
             {
-                Console.WriteLine("Folder not found or access denied");
                 return NotFound();
             }
         }
@@ -311,7 +310,7 @@ namespace PasswordManager.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Search(string query)
+        public IActionResult Search(string query)
         {
             return View("Home");
         }

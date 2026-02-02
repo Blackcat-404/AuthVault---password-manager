@@ -3,7 +3,7 @@
     public interface IResetPasswordService
     {
         Task CreateResetTokenAsync(ForgotPasswordDto dto);
-        Task<Result> ValidateTokenAsync(string token);
-        Task<Result> ResetPasswordAsync(string token, string newPassword);
+        Task<bool> ValidateTokenAsync(string token);
+        Task<bool> ResetPasswordAsync(string token, string newPassword);
     }
 }

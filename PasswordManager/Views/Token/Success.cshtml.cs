@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace PasswordManager.Views.Settings
+namespace PasswordManager.Views.Token
 {
-    public class FACodeModel : PageModel
+    public class SuccessModel : PageModel
     {
         public void OnGet()
         {

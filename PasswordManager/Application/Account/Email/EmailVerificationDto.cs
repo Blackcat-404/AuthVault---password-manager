@@ -3,6 +3,6 @@
     public class EmailVerificationDto
     {
         public string Email { get; set; } = null!;
-        public int VerificationCode { get; set; }
+        public string? Token { get; set; }
     }
 }

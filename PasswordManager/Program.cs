@@ -53,6 +53,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
             builder.Services.AddScoped<IEncryptionService, EncryptionService>();
             builder.Services.AddScoped<ISessionEncryptionService, SessionEncryptionService>();
+            builder.Services.AddScoped<TokenService>();
 
             builder.Services.AddScoped<SettingsService>();
 

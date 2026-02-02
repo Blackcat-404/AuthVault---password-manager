@@ -1,100 +1,51 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PasswordManager.Application;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Data;
-using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
-using PasswordManager.Infrastructure.Security;
 
 namespace PasswordManager.Infrastructure.Email
 {
     public class EmailVerificationService : IEmailVerificationService
     {
         private readonly AppDbContext _db;
-        private readonly EmailService _emailService;
 
-        public EmailVerificationService(AppDbContext db, EmailService emailService)
+        public EmailVerificationService(AppDbContext db)
         {
             _db = db;
-            _emailService = emailService;
         }
 
-        public async Task<Result<User>> VerifyAsync(EmailVerificationDto dto)
+        public async Task<bool> VerifyTokenAsync(string token)
         {
-            var result = new Result<User>();
-
-            var user = await _db.Users
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
-
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Token == token);
+            
             if (user == null)
-            {
-                result.AddError(nameof(dto.Email), "User not found");
-                return result;
-            }
+                return false;
 
-            if (user.EmailVerificationExpiresAt < DateTime.UtcNow)
-            {
-                result.AddError(nameof(dto.VerificationCode), "Verification code expired");
-                return result;
-            }
+            if (user.Token != token)
+                return false;
 
-            if (user.EmailVerificationCode != dto.VerificationCode)
-            {
-                result.AddError(nameof(dto.VerificationCode), "Invalid verification code");
-                return result;
-            }
-
-            user.EmailVerificationStatus = EmailVerificationStatus.Verified;
-            user.EmailVerificationCode = null;
-            user.EmailVerificationExpiresAt = null;
-
-            await _db.SaveChangesAsync();
-
-            return Result<User>.Ok(user);
-        }
-
-        public async Task<Result> ResendAsync(EmailVerificationDto dto)
-        {
-            var result = new Result();
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-
-            if (user == null)
-            {
-                result.AddError(nameof(Email), "User not found");
-                return result;
-            }
-
-            if (user.EmailVerificationExpiresAt > DateTime.UtcNow.AddMinutes(4))
-            {
-                result.AddError(nameof(dto.VerificationCode), "The code can still be used");
-                return result;
-            }
+            if (user.TokenExpiresAt < DateTime.UtcNow)
+                return false;
 
             if (user.EmailVerificationStatus == EmailVerificationStatus.Verified)
-            {
-                result.AddError(nameof(Email), "Email is already confirmed");
-                return result;
-            }
+                return false;
 
-            var code = VerificationCodeGenerator.Generate();
+            return true;
+        }
 
-            user.EmailVerificationCode = code;
-            user.EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5);
+        public async Task<bool> VerifyEmailAsync(string token)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Token == token);
 
-            await _db.SaveChangesAsync();
+            if (user == null)
+                return false;
 
-            string bodystr = "Hello, " + user.Login + "\nYour verification code is: " + code +
-                "\n\nThis code expires in 5 minutes\n" +
-                "If you did not register, please ignore this email.";
+            user.EmailVerificationStatus = EmailVerificationStatus.Verified;
+            user.Token = null;
+            user.TokenExpiresAt = null;
 
-            await _emailService.SendAsync(
-                user.Email,
-                "Resending email verification code",
-                bodystr
-            );
-
-            return result;
+            await _db.SaveChangesAsync();    
+            return true;
         }
     }
 }

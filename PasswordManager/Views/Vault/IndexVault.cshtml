@@ -31,10 +31,6 @@
                             </svg>
                             @Model.CurrentFolderName
                         </h1>
-                        <!--@if (!string.IsNullOrEmpty(Model.CurrentFolderDescription))
-                        {
-                            <p class="page-description">@Model.CurrentFolderDescription</p>
-                        }-->
                         <p class="page-subtitle">@Model.Items.Count item(s) in this folder</p>
                     </div>
                 }
@@ -55,8 +51,17 @@
                                 <circle cx="11" cy="11" r="8" />
                             </svg>
                         </span>
-                        <input type="text" placeholder="Search...">
-                    </div>
+                        <input type="text"
+                               id="searchInput"
+                               placeholder="Search..."
+                               autocomplete="off">
+
+                        <span class="search-loading" id="searchLoading" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinning">
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                            </svg>
+                        </span>
+                    </div>  
                 }
 
                 <div class="header-actions">
@@ -341,10 +346,301 @@
             </div>
         </main>
     </div>
+    <script id="vaultItemsData" type="application/json">
+        @{
+            var itemsWithType = Model.Items.Select(item => new
+            {
+                id = item.Id,
+                folderId = item.FolderId,
+                folderName = item.FolderName,
+                title = item.Title,
+                createdAt = item.CreatedAt,
+                type = item switch
+                {
+                    LoginItemViewModel => "LoginItem",
+                    CardItemViewModel => "CardItem",
+                    NoteItemViewModel => "NoteItem",
+                    _ => "Unknown"
+                },
+                login = (item as LoginItemViewModel)?.Login,
+                password = (item as LoginItemViewModel)?.Password,
+                webURL = (item as LoginItemViewModel)?.WebURL,
+                loginNote = (item as LoginItemViewModel)?.Note,
+
+                cardNumber = (item as CardItemViewModel)?.CardNumber,
+                expireMonth = (item as CardItemViewModel)?.ExpireMonth,
+                expireYear = (item as CardItemViewModel)?.ExpireYear,
+                cardholderName = (item as CardItemViewModel)?.CardholderName,
+                cardNote = (item as CardItemViewModel)?.Note,
+
+                content = (item as NoteItemViewModel)?.Content
+            });
+        }
+        @Html.Raw(Json.Serialize(itemsWithType))
+    </script>
 </div>
 
 @section Scripts {
     <script>
+        let allVaultItems = [];
+        let isDataLoaded = false;
+
+        function loadVaultItems() {
+            if (isDataLoaded) return;
+
+            try {
+                const dataScript = document.getElementById('vaultItemsData');
+                if (dataScript) {
+                    allVaultItems = JSON.parse(dataScript.textContent);
+                    isDataLoaded = true;
+                    console.log(`Loaded ${allVaultItems.length} items for client-side search`);
+                }
+            } catch (error) {
+                console.error('Failed to load vault items:', error);
+            }
+        }
+
+        function createItemCard(item) {
+            const itemType = item.type || 'Unknown';
+
+            let iconSvg = '';
+            let itemInfo = '';
+            let itemDetails = '';
+            let copyButton = '';
+
+            if (itemType === 'LoginItem') {
+                iconSvg = `
+                    <div class="item-icon login">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                    </div>
+                `;
+                itemInfo = `
+                    <div class="item-info">
+                        <div class="item-name">${escapeHtml(item.title)}</div>
+                        <div class="item-username">${item.login ? escapeHtml(item.login) : 'No username'}</div>
+                    </div>
+                `;
+                if (item.password) {
+                    copyButton = `
+                        <button class="item-action-btn" title="Copy password" data-copy="${escapeHtml(item.password)}" onclick="copyFromData(this, 'Password')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                        </button>
+                    `;
+                }
+                if (item.webURL) {
+                    itemDetails = `
+                        <div class="item-detail">
+                            <div class="item-detail-label">URL</div>
+                            <div class="item-detail-value">${escapeHtml(item.webURL)}</div>
+                        </div>
+                    `;
+                }
+            } else if (itemType === 'CardItem') {
+                iconSvg = `
+                    <div class="item-icon card">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="14" x="2" y="5" rx="2" />
+                            <line x1="2" x2="22" y1="10" y2="10" />
+                        </svg>
+                    </div>
+                `;
+                let cardNumber = 'No card number';
+                if (item.cardNumber && item.cardNumber.length >= 8) {
+                    cardNumber = `${item.cardNumber.substring(0, 4)} •••• •••• ${item.cardNumber.substring(item.cardNumber.length - 4)}`;
+                }
+                itemInfo = `
+                    <div class="item-info">
+                        <div class="item-name">${escapeHtml(item.title)}</div>
+                        <div class="item-username">${cardNumber}</div>
+                    </div>
+                `;
+                if (item.cardNumber) {
+                    copyButton = `
+                        <button class="item-action-btn" title="Copy card number" data-copy="${escapeHtml(item.cardNumber)}" onclick="copyFromData(this, 'Card number')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                        </button>
+                    `;
+                }
+                if (item.expireMonth && item.expireYear) {
+                    itemDetails = `
+                        <div class="item-detail">
+                            <div class="item-detail-label">Expires</div>
+                            <div class="item-detail-value">${item.expireMonth}/${item.expireYear}</div>
+                        </div>
+                    `;
+                }
+            } else if (itemType === 'NoteItem') {
+                iconSvg = `
+                    <div class="item-icon note">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                            <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                            <path d="M10 9H8" />
+                            <path d="M16 13H8" />
+                            <path d="M16 17H8" />
+                        </svg>
+                    </div>
+                `;
+                let preview = 'No content';
+                if (item.content) {
+                    const lines = item.content.split('\n');
+                    const firstLine = lines.length > 0 ? lines[0] : '';
+                    preview = firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine;
+                }
+                itemInfo = `
+                    <div class="item-info">
+                        <div class="item-name">${escapeHtml(item.title)}</div>
+                        <div class="item-username">${escapeHtml(preview)}</div>
+                    </div>
+                `;
+                if (item.content) {
+                    const total = item.content.length;
+                    const meaningful = item.content.replace(/[^a-zA-Z0-9]/g, '').length;
+                    itemDetails = `
+                        <div class="item-detail">
+                            <div class="item-detail-label">Size</div>
+                            <div class="item-detail-value">${total} chars • ${meaningful} meaningful</div>
+                        </div>
+                    `;
+                }
+            }
+
+            const createdDate = new Date(item.createdAt);
+            const formattedDate = createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            return `
+                <div class="item-card">
+                    <div class="item-header">
+                        ${iconSvg}
+                        ${itemInfo}
+                        <div class="item-actions">
+                            <a href="/Vault/ViewItem?id=${item.id}&type=${itemType.replace('Item', '')}" class="item-action-btn" title="All information">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 14h6" />
+                                    <path d="M4 2h10" />
+                                    <rect x="4" y="18" width="16" height="4" rx="1" />
+                                    <rect x="4" y="6" width="16" height="4" rx="1" />
+                                </svg>
+                            </a>
+                            ${copyButton}
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        ${itemDetails}
+                        <div class="item-detail">
+                            <div class="item-detail-label">Type</div>
+                            <div class="item-detail-value">${itemType.replace('Item', '')}</div>
+                        </div>
+                        <div class="item-detail">
+                            <div class="item-detail-label">Created</div>
+                            <div class="item-detail-value">${formattedDate}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function performClientSideSearch(query) {
+            if (!isDataLoaded) {
+                loadVaultItems();
+            }
+
+            const itemsGrid = document.querySelector('.items-grid');
+            const resultsCount = document.getElementById('searchResultsCount');
+
+            if (!itemsGrid) return;
+
+            if (query === '') {
+                renderItems(allVaultItems);
+                if (resultsCount) resultsCount.style.display = 'none';
+                return;
+            }
+
+            const queryLower = query.toLowerCase();
+            const filtered = allVaultItems.filter(item => {
+                if (!item.title) return false;
+                return item.title.toLowerCase().includes(queryLower);
+            });
+
+            renderItems(filtered);
+
+            if (resultsCount) {
+                resultsCount.textContent = `${filtered.length} found`;
+                resultsCount.style.display = 'inline-block';
+            }
+        }
+
+        function renderItems(items) {
+            const itemsGrid = document.querySelector('.items-grid');
+            if (!itemsGrid) return;
+
+            if (items.length === 0) {
+                itemsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                        <p>No items found</p>
+                    </div>
+                `;
+            } else {
+                itemsGrid.innerHTML = items.map(item => createItemCard(item)).join('');
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const debouncedSearch = debounce(performClientSideSearch, 150);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+
+            if (searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    if (!isDataLoaded) {
+                        loadVaultItems();
+                    }
+                }, { once: true });
+
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.trim();
+                    debouncedSearch(query);
+                });
+            }
+        });
+
         function copyFromData(btn, type) {
             const value = btn.dataset.copy;
             const typeLabel = type || 'Value';

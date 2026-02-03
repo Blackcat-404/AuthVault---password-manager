@@ -69,7 +69,7 @@ namespace PasswordManager.Controllers
             return View("IndexVault", model);
         }
 
-
+        /*
         [HttpGet]
         public async Task<IActionResult> Settings()
         {
@@ -79,7 +79,7 @@ namespace PasswordManager.Controllers
 
             return View(model);
         }
-
+        */
 
         [HttpGet]
         public async Task<IActionResult> AddItem(string type = "login")

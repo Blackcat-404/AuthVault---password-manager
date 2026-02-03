@@ -20,6 +20,8 @@ namespace PasswordManager.Domain.Entities
         public DateTime? LastLoginAt { get; set; }
         public DateTime? PasswordLastChangedAt { get; set; } = null;
 
+        public int SessionTimeoutMinutes { get; set; } = 15;
+
         public ICollection<Folder> Folders { get; set; } = new List<Folder>();
     }
 }

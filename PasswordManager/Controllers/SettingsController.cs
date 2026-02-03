@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Settings;
 using PasswordManager.Application.Vault;
 using PasswordManager.Infrastructure.Settings;
+using PasswordManager.Models.Requests;
 using PasswordManager.ViewModels.Vault;
 using System.Security.Claims;
 using System.Text;
@@ -189,6 +190,24 @@ namespace PasswordManager.Controllers
                 return File(bytes, "text/plain", "Data.md");
             }
         }
+
+
+        [HttpPost("Settings/SessionTimeout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SessionTimeout([FromBody] SessionTimeoutRequest request)
+        {
+            int userId = GetUserID();
+
+            bool success = await _settingsService.UpdateSessionTimeout(request.TimeoutMinutes, userId);
+
+            if (!success)
+            {
+                return BadRequest(new { success = false, message = "Failed to update session timeout" });
+            }
+
+            return Ok(new { success = true, message = "Session timeout updated successfully" });
+        }
+
 
         private int GetUserID()
         {

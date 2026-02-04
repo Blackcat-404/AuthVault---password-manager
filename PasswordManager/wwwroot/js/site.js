@@ -104,12 +104,12 @@ function getEyeOffIcon() {
 
 // Toggle Sidebar Function
 function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
+    const currentState = localStorage.getItem('sidebarCollapsed') === 'true';
+    const newState = !currentState;
 
-    // Save state to localStorage
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
+    localStorage.setItem('sidebarCollapsed', newState);
+
+    document.documentElement.style.setProperty('--sidebar-state', newState ? 'collapsed' : 'expanded');
 }
 
 // Delete Folder Function
@@ -148,34 +148,12 @@ function deleteFolder(event, folderId, folderName) {
 }
 
 /* ========================================
-   SIDEBAR STATE RESTORATION
+   SIDEBAR STATE - NO LONGER NEEDED
    ======================================== */
-// Restore Sidebar State IMMEDIATELY (before DOMContentLoaded)
-(function () {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-
-    if (savedState === 'true') {
-        
-        const style = document.createElement('style');
-        style.id = 'sidebar-preload';
-        style.textContent = '.sidebar { width: 95px; }';
-        document.head.appendChild(style);
-    }
-})();
+// Sidebar state is now handled by inline script in _VaultSidebar.cshtml
+// and CSS variables. No FOUC possible anymore!
 
 document.addEventListener('DOMContentLoaded', function () {
-    const sidebar = document.getElementById('sidebar');
-    const savedState = localStorage.getItem('sidebarCollapsed');
-
-    const preloadStyle = document.getElementById('sidebar-preload');
-    if (preloadStyle) {
-        preloadStyle.remove();
-    }
-
-    if (savedState === 'true' && sidebar) {
-        sidebar.classList.add('collapsed');
-    }
-
     initializeFoldersScroll();
     initializeTooltipPositioning();
     checkFoldersOverflow();
@@ -247,9 +225,17 @@ function initializeTooltipPositioning() {
 
 function updateTooltipPosition(wrapper, tooltip) {
     const rect = wrapper.getBoundingClientRect();
-    const sidebar = document.getElementById('sidebar');
-    const sidebarRect = sidebar.getBoundingClientRect();
 
+    // Get the currently visible sidebar (either expanded or collapsed)
+    const sidebarExpanded = document.getElementById('sidebar-expanded');
+    const sidebarCollapsed = document.getElementById('sidebar-collapsed');
+    const sidebar = sidebarExpanded && sidebarExpanded.offsetParent !== null
+        ? sidebarExpanded
+        : sidebarCollapsed;
+
+    if (!sidebar) return;
+
+    const sidebarRect = sidebar.getBoundingClientRect();
 
     const left = sidebarRect.right + 12;
     const top = rect.top;

@@ -4,6 +4,7 @@ using Org.BouncyCastle.Asn1.X509;
 using PasswordManager.Application.Vault;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Infrastructure.Security;
+using PasswordManager.Infrastructure.Vault;
 using PasswordManager.ViewModels.Vault;
 using PasswordManager.ViewModels.Vault.VaultItems;
 using System.Security.Claims;
@@ -63,28 +64,16 @@ namespace PasswordManager.Controllers
                 return RedirectToAction("Account", "Login");
             }
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
             var model = await _vaultHomeService.GetHomeDataAsync(userId);
 
             return View("IndexVault", model);
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> Settings()
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            var model = await _vaultSettingsService.GetSettingsDataAsync(userId);
-
-            return View(model);
-        }
-
-
         [HttpGet]
         public async Task<IActionResult> AddItem(string type = "login")
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             var model = new AddItemViewModel
             {
@@ -102,7 +91,7 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(AddItemViewModel model)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             if (model.ItemType == "login")
             {
@@ -159,7 +148,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewItem(int id, string type)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             VaultItemViewModel? item = null;
             IReadOnlyDictionary<int, string> folders = await _getAllFoldersService.GetAllFoldersAsync(userId);
@@ -201,7 +190,7 @@ namespace PasswordManager.Controllers
         public async Task<IActionResult> UpdateField(int id, string itemType, string fieldName, string fieldValue)
         {
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             switch (itemType?.ToLower())
             {
@@ -227,7 +216,7 @@ namespace PasswordManager.Controllers
         public async Task<IActionResult> DeleteItem(int id, string type)
         {
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             switch (type?.ToLower())
             {
@@ -249,7 +238,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Folder(int folderId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             var model = await _getFolderService.GetFolderAsync(userId, folderId);
 
@@ -260,7 +249,7 @@ namespace PasswordManager.Controllers
         [HttpGet]
         public async Task<IActionResult> AddFolder()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
             var model = await _vaultSidebarService.GetSidebarDataAsync(userId);
 
             return View(model);
@@ -294,7 +283,7 @@ namespace PasswordManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteFolder(int folderId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserID();
 
             try
             {
@@ -307,12 +296,9 @@ namespace PasswordManager.Controllers
             }
         }
 
-
-
-        [HttpGet]
-        public IActionResult Search(string query)
+        private int GetUserID()
         {
-            return View("Home");
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
     }
 }

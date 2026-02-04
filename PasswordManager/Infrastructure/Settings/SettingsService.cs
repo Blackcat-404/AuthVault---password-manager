@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
 using System.Text;
 
@@ -11,20 +10,18 @@ namespace PasswordManager.Infrastructure.Settings
     public class SettingsService 
     {
         private readonly AppDbContext _db;
-        private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
         private readonly TokenService _tokenService;
-        public SettingsService(AppDbContext db,EmailService emailService, IEncryptionService encryptionService,TokenService tokenService) 
+        public SettingsService(AppDbContext db, IEncryptionService encryptionService,TokenService tokenService) 
         {
             _db = db;
-            _emailService = emailService;
             _encryptionService = encryptionService;
             _tokenService = tokenService;
         }
 
         public async Task Add2FAAsync(int userId,string email)
         {
-            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.TwoFactorAuthentications, t => t.Token);
+            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.TwoFactorAuthentications, t => t.Token!);
             var expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             var twoFa = await _db.TwoFactorAuthentications
@@ -184,6 +181,28 @@ namespace PasswordManager.Infrastructure.Settings
                 await transaction.RollbackAsync();
                 return false;
             }
+        }
+
+        public async Task<bool> UpdateSessionTimeout(int timeoutMinutes, int userId)
+        {
+            bool success = true;
+            Console.WriteLine(timeoutMinutes);
+            var allowedTimeouts = new[] { 15, 30, 60, 180 };
+            if (!allowedTimeouts.Contains(timeoutMinutes))
+            {
+                return success = false;
+            }
+
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return success = false;
+            }
+
+            user.SessionTimeoutMinutes = timeoutMinutes;
+            await _db.SaveChangesAsync();
+
+            return success;
         }
 
         public async Task<string> ExportUserDataAsTextAsync(int userId)

@@ -224,23 +224,6 @@ function updateFolderItemCount(folderId, count) {
 }
 
 /* ========================================
-   KEYBOARD SHORTCUTS
-   ======================================== */
-/*document.addEventListener('keydown', function (event) {
-    // Shift + S = Toggle Sidebar
-    if (event.shiftKey && event.key === 'S') {
-        event.preventDefault();
-        toggleSidebar();
-    }
-
-    // Shift + G = Open Password Generator
-    if (event.shiftKey && event.key === 'G') {
-        event.preventDefault();
-        openGenerator(event);
-    }
-});*/
-
-/* ========================================
    PASSWORD GENERATOR FUNCTIONS
    ======================================== */
 

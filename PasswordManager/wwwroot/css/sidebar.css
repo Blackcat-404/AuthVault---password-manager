@@ -1,6 +1,5 @@
 ﻿/* ============================================
    SIDEBAR STYLES
-   Complete styling for vault sidebar navigation
    ============================================ */
 
 /* ============================================
@@ -8,104 +7,124 @@
    ============================================ */
 
 .sidebar {
-    width: 280px;
     background: #23273a;
     border-right: 1px solid #2d3142;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
     position: relative;
     z-index: 100;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-    .sidebar.collapsed {
-        width: 95px;
-    }
+/* Expanded sidebar width */
+.sidebar-expanded {
+    width: 280px;
+}
 
-    /* ============================================
+/* Collapsed sidebar width */
+.sidebar-collapsed {
+    width: 95px;
+}
+
+/* ============================================
    SIDEBAR HEADER
    ============================================ */
 
-    .sidebar .sidebar-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px;
-        min-height: 72px;
-    }
-
-    .sidebar.collapsed .sidebar-header {
-        justify-content: center;
-    }
-
-    /* Logo Section */
-    .sidebar .sidebar-header .logo-section {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-left: 12px;
-    }
-
-    .sidebar.collapsed .sidebar-header .logo-section {
-        display: none;
-    }
-
-    .sidebar .sidebar-header .logo-section .logo-text {
-        font-size: 18px;
-        font-weight: 600;
-        white-space: nowrap;
-        justify-content: left;
-        align-items: flex-start;
-    }
-
-    .sidebar .sidebar-header .logo-section .logo-icon {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        flex-shrink: 0;
-    }
-
-/* Toggle Button */
-.sidebar-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
+.sidebar .sidebar-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    min-height: 72px;
+}
+
+.sidebar-collapsed .sidebar-header {
     justify-content: center;
 }
 
-    .sidebar-toggle:hover .toggle-icon {
-        color: #3498db;
-        scale: 1.6;
+/* Logo Section */
+.sidebar .sidebar-header .logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-left: 12px;
+}
+
+.sidebar-collapsed .sidebar-header .logo-section {
+    display: none;
+}
+
+.sidebar .sidebar-header .logo-section .logo-text {
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    justify-content: left;
+    align-items: flex-start;
+}
+
+.sidebar .sidebar-header .logo-section .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   SIDEBAR TOGGLE BUTTON
+   ============================================ */
+
+.sidebar-toggle {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(196, 201, 212, 0.35);
+    border-radius: 8px;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: #9aa1ad;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+    .sidebar-toggle:hover {
+        background: rgba(52, 152, 219, 0.2);
+        border-color: #3498db;
+        color: #5dade2;
     }
 
-.sidebar:not(.collapsed) .sidebar-toggle {
-    position: revert;
+    .sidebar-toggle:active {
+        background: rgba(52, 152, 219, 0.3);
+    }
+
+    .sidebar-toggle .toggle-icon {
+        transition: transform 0.2s ease;
+    }
+
+/* ============================================
+   POSITIONING
+   ============================================ */
+
+.sidebar-expanded .sidebar-toggle {
+    position: static;
 }
 
-.sidebar.collapsed .sidebar-toggle {
+.sidebar-collapsed .sidebar-toggle {
     position: absolute;
     top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.toggle-icon {
-    width: 24px;
-    height: 24px;
-    color: #8b92a7;
-    transition: transform 0.6s ease, color 0.4s, scale 0.4s;
-}
-
-.sidebar.collapsed .toggle-icon {
-    transform: rotate(180deg);
-}
 
 /* ============================================
    SIDEBAR NAVIGATION
@@ -122,7 +141,7 @@
     margin-bottom: 24px;
 }
 
-.sidebar.collapsed .nav-section {
+.sidebar-collapsed .nav-section {
     margin-bottom: 16px;
 }
 
@@ -138,7 +157,7 @@
     overflow: hidden;
 }
 
-.sidebar.collapsed .nav-section-title {
+.sidebar-collapsed .nav-section-title {
     display: none;
 }
 
@@ -169,7 +188,7 @@
         color: #3498db;
     }
 
-.sidebar.collapsed .nav-item {
+.sidebar-collapsed .nav-item {
     justify-content: center;
     padding: 12px;
     gap: 0;
@@ -195,7 +214,7 @@
     overflow: hidden;
 }
 
-.sidebar.collapsed .nav-item-text {
+.sidebar-collapsed .nav-item-text {
     display: none;
 }
 
@@ -208,7 +227,7 @@
     color: #8b92a7;
 }
 
-.sidebar.collapsed .nav-item-count {
+.sidebar-collapsed .nav-item-count {
     display: none;
 }
 
@@ -232,12 +251,12 @@
     padding: 0 12px;
 }
 
-.sidebar.collapsed .nav-section-header {
+.sidebar-collapsed .nav-section-header {
     justify-content: center;
     padding: 0;
 }
 
-    .sidebar.collapsed .nav-section-header .nav-section-title {
+    .sidebar-collapsed .nav-section-header .nav-section-title {
         display: none;
     }
 
@@ -261,7 +280,7 @@
         color: #ffffff;
     }
 
-.sidebar.collapsed .add-folder-btn {
+.sidebar-collapsed .add-folder-btn {
     display: none;
 }
 
@@ -323,7 +342,7 @@
         padding-left: 8px;
     }
 
-.sidebar.collapsed .folder-item {
+.sidebar-collapsed .folder-item {
     padding-left: 12px;
 }
 
@@ -359,9 +378,10 @@
     flex-shrink: 0;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
     margin-right: 4px;
+    transition: transform 0.2s ease;
 }
 
-.sidebar.collapsed .folder-color-indicator {
+.sidebar-collapsed .folder-color-indicator {
     display: none;
 }
 
@@ -371,7 +391,6 @@
 
 .folder-item:hover .folder-color-indicator {
     transform: scale(1.2);
-    transition: transform 0.2s;
 }
 
 /* ============================================
@@ -418,7 +437,7 @@
     opacity: 1;
 }
 
-.sidebar.collapsed .folder-delete-btn {
+.sidebar-collapsed .folder-delete-btn {
     display: none;
 }
 
@@ -557,7 +576,7 @@
 }
 
 /* Hide tooltip in collapsed sidebar */
-.sidebar.collapsed .folder-tooltip {
+.sidebar-collapsed .folder-tooltip {
     display: none;
 }
 
@@ -572,7 +591,7 @@
     font-size: 13px;
 }
 
-.sidebar.collapsed .folders-empty {
+.sidebar-collapsed .folders-empty {
     display: none;
 }
 
@@ -600,7 +619,7 @@
         background: #3d4252;
     }
 
-.sidebar.collapsed .account-item {
+.sidebar-collapsed .account-item {
     justify-content: center;
     padding: 12px;
     gap: 0;
@@ -626,7 +645,7 @@
     align-items: center;
 }
 
-.sidebar.collapsed .account-info {
+.sidebar-collapsed .account-info {
     display: none;
 }
 
@@ -661,7 +680,7 @@
         flex-shrink: 0;
     }
 
-.sidebar.collapsed .logout-btn {
+.sidebar-collapsed .logout-btn {
     justify-content: center;
     padding: 6px 11px;
     gap: 0;

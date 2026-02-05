@@ -62,6 +62,13 @@ namespace PasswordManager.Controllers
                 }
             );
 
+            if (!result.Success)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(error.Key, error.Value);
+                return View("IndexRegister", model);
+            }
+
             return RedirectToAction(actionName: "GetEmailVerificationLinkSent",
                                     controllerName: "EmailVerification");
         }

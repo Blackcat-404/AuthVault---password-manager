@@ -1,5 +1,10 @@
-﻿/* Auth Pages Styles (Login/Register/Forgot Password) */
+﻿/* ========================================
+   AUTH PAGES STYLES (Login/Register/Forgot Password)
+   ======================================== */
 
+/* ========================================
+   LAYOUT
+   ======================================== */
 .auth-page {
     background: linear-gradient(135deg, #1a1d29 0%, #2d3142 100%);
     min-height: 100vh;
@@ -7,8 +12,53 @@
     align-items: center;
     justify-content: center;
     user-select: none;
+    position: relative;
 }
 
+/* ========================================
+   BACK TO WELCOME BUTTON
+   ======================================== */
+.back-to-welcome {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 100;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 8px;
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+    .back-link:hover {
+        background: rgba(52, 152, 219, 0.2);
+        border-color: rgba(52, 152, 219, 0.5);
+        transform: translateX(-4px);
+    }
+
+    .back-link svg {
+        flex-shrink: 0;
+        transition: transform 0.3s;
+    }
+
+    .back-link:hover svg {
+        transform: translateX(-2px);
+    }
+
+/* ========================================
+   LOGIN CONTAINER
+   ======================================== */
 .login-container {
     background: #23273a;
     border-radius: 12px;
@@ -77,7 +127,6 @@
         -ms-user-select: none;
     }
 
-
     .login-container .tagline {
         display: flex;
         align-items: center;
@@ -87,7 +136,9 @@
         margin-bottom: 24px;
     }
 
-
+/* ========================================
+   TABS
+   ======================================== */
 .tabs {
     display: flex;
     gap: 4px;
@@ -121,6 +172,9 @@
         background: #2d3142;
     }
 
+/* ========================================
+   FORM ELEMENTS
+   ======================================== */
 .form-group {
     margin-bottom: 16px;
 }
@@ -156,6 +210,9 @@ input {
         color: #5a6070;
     }
 
+/* ========================================
+   PASSWORD TOGGLE
+   ======================================== */
 .password-wrapper {
     position: relative;
 }
@@ -169,19 +226,23 @@ input {
     border: none;
     padding: 4px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
     .toggle-password svg {
         width: 20px;
         height: 20px;
         color: #8b92a7;
+        transition: color 0.2s;
     }
 
     .toggle-password:hover svg {
         color: #ffffff;
     }
 
-
+/* ========================================
+   CHECKBOX
+   ======================================== */
 .checkbox-group {
     margin-bottom: 28px;
 }
@@ -204,8 +265,11 @@ input {
         font-weight: 400;
         color: #8b92a7;
         cursor: pointer;
-    }     
+    }
 
+/* ========================================
+   BUTTONS
+   ======================================== */
 .submit-btn {
     width: 100%;
     padding: 14px;
@@ -247,8 +311,6 @@ input {
             text-decoration: underline;
         }
 
-
-
 .verify-password {
     text-align: center;
     margin-top: 28px;
@@ -268,14 +330,16 @@ input {
 
     .resend-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgb(119, 119, 207, 0.40);
+        box-shadow: 0 8px 20px rgba(119, 119, 207, 0.40);
     }
 
     .resend-btn:active {
         transform: translateY(0);
     }
 
-
+/* ========================================
+   VALIDATION & MESSAGES
+   ======================================== */
 .text-danger {
     color: #e74c3c;
     font-size: 12px;
@@ -283,11 +347,6 @@ input {
     display: block;
 }
 
-
-
-
-
-/* Success Message */
 .success-message {
     background: rgba(46, 204, 113, 0.1);
     border: 1px solid rgba(46, 204, 113, 0.3);
@@ -311,7 +370,6 @@ input {
         flex: 1;
     }
 
-/* Info Box */
 .info-box {
     background: rgba(52, 152, 219, 0.1);
     border: 1px solid rgba(52, 152, 219, 0.3);
@@ -338,7 +396,9 @@ input {
         margin: 0;
     }
 
-/* Invalid Token Page */
+/* ========================================
+   ERROR PAGES
+   ======================================== */
 .invalid-token-content {
     text-align: center;
     padding: 20px 0;
@@ -398,3 +458,59 @@ input {
         padding: 14px 24px;
         text-decoration: none;
     }
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .back-to-welcome {
+        top: 16px;
+        left: 16px;
+    }
+
+    .back-link {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+    .login-container {
+        padding: 32px 24px;
+        margin: 16px;
+    }
+
+        .login-container .logo-icon {
+            width: 130px;
+            height: 104px;
+        }
+
+            .login-container .logo-icon svg {
+                width: 90px;
+                height: 90px;
+            }
+
+        .login-container .logo-svg {
+            width: 220px;
+        }
+}
+
+@media (max-width: 480px) {
+    .back-link span {
+        display: none;
+    }
+
+    .back-link {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+    }
+
+    .login-container {
+        padding: 24px 20px;
+    }
+}

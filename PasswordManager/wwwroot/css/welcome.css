@@ -49,7 +49,6 @@ body.welcome-page {
     gap: 12px;
     text-decoration: none;
     color: #ffffff;
-    user-select: none;
     transition: opacity 0.2s;
 }
 
@@ -91,7 +90,6 @@ body.welcome-page {
    BUTTONS
    ======================================== */
 .btn {
-    user-select: none;
     padding: 10px 24px;
     border: none;
     border-radius: 8px;
@@ -152,7 +150,6 @@ body.welcome-page {
    HERO SECTION
    ======================================== */
 .hero {
-    user-select: none;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -329,7 +326,6 @@ body.welcome-page {
     padding: 100px 40px;
     background: linear-gradient(180deg, #0a0e1a 0%, #13182e 100%);
     position: relative;
-    user-select: none;
 }
 
 .features-container {
@@ -545,7 +541,6 @@ body.welcome-page {
    CTA SECTION
    ======================================== */
 .cta {
-    user-select: none;
     padding: 120px 40px;
     text-align: center;
     background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
@@ -611,7 +606,6 @@ body.welcome-page {
     background: #0a0e1a;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 80px 40px 40px;
-    user-select: none;
 }
 
 .footer-content {

@@ -9,7 +9,6 @@
 
 .vault-page {
     background: #1a1d29;
-    user-select: none;
 }
 
 .app-container {
@@ -40,7 +39,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    user-select: none;
 }
 
 /* Header Title Section */
@@ -249,7 +247,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    user-select: none;
     min-height: 500px;
     text-align: center;
     padding: 40px;

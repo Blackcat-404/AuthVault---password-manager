@@ -134,10 +134,13 @@
             <div class="checkbox">
                 <input asp-for="AcceptTerms" />
                 <label asp-for="AcceptTerms">
-                   I accept the terms of service
+                    I accept the terms of service(I understand that this is at my own risk.)
                 </label>
             </div>
             <span asp-validation-for="AcceptTerms" class="text-danger"></span>
+            <a href="/Files/Terms.txt" download>
+                 <h5>Download Terms</h5>
+            </a>
         </div>
 
         <button type="submit" class="submit-btn">

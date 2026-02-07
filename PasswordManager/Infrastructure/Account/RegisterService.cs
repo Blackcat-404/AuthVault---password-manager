@@ -35,17 +35,6 @@ namespace PasswordManager.Infrastructure.Register
                 result.AddError(nameof(dto.Name), "Are you serious, dude?");
                 return result;
             }*/
-            
-            var loginExists = await _db.Users.AnyAsync(
-                u => u.Login == dto.Login &&
-                u.EmailVerificationStatus == EmailVerificationStatus.Verified
-            );
-
-            if (loginExists)
-            {
-                result.AddError(nameof(dto.Login), "This login is already taken");
-                return result;
-            }
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -55,7 +44,7 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
+            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token!);
             DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             if (user == null)
@@ -64,7 +53,7 @@ namespace PasswordManager.Infrastructure.Register
                 byte[] encryptionSalt = _encryptionService.GenerateSalt();
                 byte[] authHash = _encryptionService.DeriveAuthHash(dto.Password!, authSalt);
 
-                
+
 
                 var userNew = new User
                 {
@@ -104,6 +93,5 @@ namespace PasswordManager.Infrastructure.Register
 
             return result;
         }
-
     }
-}   
+}

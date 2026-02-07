@@ -1,51 +1,4 @@
 ﻿/* ========================================
-   WELCOME PAGE SCRIPTS
-   ======================================== */
-
-// Smooth scroll to anchor links
-document.addEventListener('DOMContentLoaded', function () {
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Intersection Observer for fade-in animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe feature cards
-    document.querySelectorAll('.feature-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-        observer.observe(card);
-    });
-});
-
-/* ========================================
    TOGGLE PASSWORD VISIBILITY
    ======================================== */
 
@@ -269,23 +222,6 @@ function updateFolderItemCount(folderId, count) {
         }
     }
 }
-
-/* ========================================
-   KEYBOARD SHORTCUTS
-   ======================================== */
-/*document.addEventListener('keydown', function (event) {
-    // Shift + S = Toggle Sidebar
-    if (event.shiftKey && event.key === 'S') {
-        event.preventDefault();
-        toggleSidebar();
-    }
-
-    // Shift + G = Open Password Generator
-    if (event.shiftKey && event.key === 'G') {
-        event.preventDefault();
-        openGenerator(event);
-    }
-});*/
 
 /* ========================================
    PASSWORD GENERATOR FUNCTIONS

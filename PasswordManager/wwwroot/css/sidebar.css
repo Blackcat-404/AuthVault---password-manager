@@ -80,9 +80,8 @@
    ============================================ */
 
 .sidebar-toggle {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(196, 201, 212, 0.35);
+    background: transparent;
+    border: none;
     border-radius: 8px;
     padding: 8px;
     width: 40px;
@@ -93,21 +92,33 @@
     cursor: pointer;
     flex-shrink: 0;
     color: #9aa1ad;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-    .sidebar-toggle:hover {
+.sidebar-expanded .sidebar-toggle {
+    background: transparent;
+}
+
+    .sidebar-expanded .sidebar-toggle:hover {
+        background: rgba(52, 152, 219, 0.08);
+        color: #3498db;
+    }
+
+
+.sidebar-collapsed .sidebar-toggle {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(196, 201, 212, 0.35);
+}
+
+    .sidebar-collapsed .sidebar-toggle:hover {
         background: rgba(52, 152, 219, 0.2);
         border-color: #3498db;
         color: #5dade2;
     }
 
-    .sidebar-toggle:active {
+    .sidebar-collapsed .sidebar-toggle:active {
         background: rgba(52, 152, 219, 0.3);
-    }
-
-    .sidebar-toggle .toggle-icon {
-        transition: transform 0.2s ease;
     }
 
 /* ============================================

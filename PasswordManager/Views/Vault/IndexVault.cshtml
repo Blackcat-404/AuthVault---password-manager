@@ -649,7 +649,7 @@
             navigator.clipboard.writeText(value).then(() => {
                 showNotification(`${typeLabel} copied to clipboard!`);
             }).catch(err => {
-                console.error('Copy failed:', err)м=;
+                console.error('Copy failed:', err);
                 showNotification('Failed to copy', 'error');
             });
         }

@@ -437,12 +437,12 @@
                                             }
                                         </div>
                                         <div class="field-actions">
-                                            <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardNumber', 'Card number')" title="Copy card number">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                                </svg>
-                                            </button>
+                                        <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardNumber', 'Card Number')" title="Copy card number">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                            </svg>
+                                        </button>
                                             <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit card number">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -1208,11 +1208,11 @@
                         }
 
                         // Update copy button visibility for fields with copy buttons
-                        const fieldsWithCopy = ['WebURL', 'CardNumber', 'CardholderName'];
+                        const fieldsWithCopy = ['WebURL', 'CardNumber', 'CardholderName', 'Login'];
                         if (fieldsWithCopy.includes(fieldName)) {
                             const copyBtn = fieldActions.querySelector('.copy-btn');
                             if (copyBtn) {
-                                copyBtn.style.display = isEmpty ? 'none' : '';
+                                copyBtn.style.display = '';
                             }
                         }
                     }

@@ -157,18 +157,15 @@
                                     <div class="editable-field" data-field="Login" data-id="@login.Id" data-type="Login">
                                         <!-- View Mode -->
                                         <div class="field-value-container">
-                                            <span class="field-value">@(string.IsNullOrEmpty(login.Login) ? "Not set" : @login.Login)</span>
+                                            <span class="field-value">@if (login.Login != null && login.Login.Any()){@string.Join(Environment.NewLine, login.Login)}else{<span class="text-muted">Not set</span>}</span>
                                         </div>
                                         <div class="field-actions">
-                                            @if (!string.IsNullOrEmpty(login.Login))
-                                            {
-                                                <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@login.Login', 'Username')" title="Copy username">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                                    </svg>
-                                                </button>
-                                            }
+                                            <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@login.Login', 'Username')" title="Copy username">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                </svg>
+                                            </button>
                                             <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit username">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -202,24 +199,31 @@
                                     <div class="editable-field editable-field-password" data-field="Password" data-id="@login.Id" data-type="Login">
                                         <!-- View Mode -->
                                         <div class="field-value-container">
-                                            <input type="password" class="password-display-input" value="@login.Password" readonly tabindex="-1">
+                                            @if (string.IsNullOrEmpty(login.Password))
+                                            {
+                                                <span class="field-value"><span class="text-muted">Not set</span></span>
+                                            }
+                                            else
+                                            {
+                                                <input type="password" class="password-display-input" value="@login.Password" readonly tabindex="-1">
+                                            }
                                         </div>
                                         <div class="field-actions">
-                                            <button type="button" class="field-action-btn toggle-btn" onclick="togglePasswordVisibility(this, true)" title="Toggle password visibility">
-                                                <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="m15 18-.722-3.25" />
-                                                    <path d="M2 8a10.645 10.645 0 0 0 20 0" />
-                                                    <path d="m20 15-1.726-2.05" />
-                                                    <path d="m4 15 1.726-2.05" />
-                                                    <path d="m9 18 .722-3.25" />
-                                                </svg>
-                                                <svg class="eye-open" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                    <circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                            </button>
                                             @if (!string.IsNullOrEmpty(login.Password))
                                             {
+                                                <button type="button" class="field-action-btn toggle-btn" onclick="togglePasswordVisibility(this, true)" title="Toggle password visibility">
+                                                    <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="m15 18-.722-3.25" />
+                                                        <path d="M2 8a10.645 10.645 0 0 0 20 0" />
+                                                        <path d="m20 15-1.726-2.05" />
+                                                        <path d="m4 15 1.726-2.05" />
+                                                        <path d="m9 18 .722-3.25" />
+                                                    </svg>
+                                                    <svg class="eye-open" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                                        <circle cx="12" cy="12" r="3" />
+                                                    </svg>
+                                                </button>
                                                 <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@login.Password', 'Password')" title="Copy password">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
@@ -237,7 +241,7 @@
                                         <!-- Edit Mode -->
                                         <div class="edit-mode-container password-edit-mode" style="display: none;">
                                             <div class="password-input-group">
-                                                <input type="password" class="form-input edit-input edit-password-input" value="@login.Password">
+                                                <input type="password" class="form-input edit-input edit-password-input" value="@(login.Password ?? "")">
                                                 <button type="button" class="field-action-btn toggle-btn" onclick="togglePasswordVisibility(this, false)" title="Toggle password visibility">
                                                     <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <path d="m15 18-.722-3.25" />
@@ -286,16 +290,22 @@
                                 </div>
 
                                 <!-- URL -->
-                                @if (login.WebURL == null) login.WebURL = "";
                                 <div class="field-group">
                                     <label class="field-label">Website URL</label>
                                     <div class="editable-field" data-field="WebURL" data-id="@login.Id" data-type="Login">
                                         <!-- View Mode -->
                                         <div class="field-value-container">
-                                            <a href="@(login.WebURL.StartsWith("http://") || login.WebURL.StartsWith("https://") ? login.WebURL : "https://" + login.WebURL)"
-                                               target="_blank"
-                                               class="field-value link"
-                                               rel="noopener noreferrer">@login.WebURL</a>
+                                            @if (string.IsNullOrEmpty(login.WebURL))
+                                            {
+                                                <span class="field-value"><span class="text-muted">Not set</span></span>
+                                            }
+                                            else
+                                            {
+                                                <a href="@(login.WebURL.StartsWith("http://") || login.WebURL.StartsWith("https://") ? login.WebURL : "https://" + login.WebURL)"
+                                                   target="_blank"
+                                                   class="field-value link"
+                                                   rel="noopener noreferrer">@login.WebURL</a>
+                                            }
                                         </div>
                                         <div class="field-actions">
                                             <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@login.WebURL', 'URL')" title="Copy URL">
@@ -313,7 +323,7 @@
                                         </div>
                                         <!-- Edit Mode -->
                                         <div class="edit-mode-container" style="display: none;">
-                                            <input type="url" class="form-input edit-input" value="@login.WebURL" />
+                                            <input type="url" class="form-input edit-input" value="@(login.WebURL ?? "")" />
                                             <div class="edit-actions">
                                                 <button type="button" class="field-action-btn save-btn" onclick="saveEdit(this)" title="Save">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -417,18 +427,22 @@
                                     <label class="field-label">Card Number</label>
                                     <div class="editable-field" data-field="CardNumber" data-id="@card.Id" data-type="Card">
                                         <div class="field-value-container">
-                                            <span class="field-value">@card.CardNumber</span>
+                                            @if (string.IsNullOrEmpty(card.CardNumber))
+                                            {
+                                                <span class="field-value"><span class="text-muted">Not set</span></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="field-value">@card.CardNumber</span>
+                                            }
                                         </div>
                                         <div class="field-actions">
-                                            @if (!string.IsNullOrEmpty(card.CardNumber))
-                                            {
-                                                <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardNumber', 'Card number')" title="Copy card number">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                                    </svg>
-                                                </button>
-                                            }
+                                            <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardNumber', 'Card number')" title="Copy card number">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                </svg>
+                                            </button>
                                             <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit card number">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -437,7 +451,7 @@
                                             </button>
                                         </div>
                                         <div class="edit-mode-container" style="display: none;">
-                                            <input type="text" class="form-input edit-input" value="@card.CardNumber" maxlength="19" oninput="formatCardNumber(this)" />
+                                            <input type="text" class="form-input edit-input" value="@(card.CardNumber ?? "")" maxlength="19" oninput="formatCardNumber(this)" />
                                             <div class="edit-actions">
                                                 <button type="button" class="field-action-btn save-btn" onclick="saveEdit(this)" title="Save">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -461,7 +475,14 @@
                                         <label class="field-label">Exp. Month</label>
                                         <div class="editable-field" data-field="ExpireMonth" data-id="@card.Id" data-type="Card">
                                             <div class="field-value-container">
-                                                <span class="field-value">@card.ExpireMonth</span>
+                                                @if (string.IsNullOrEmpty(card.ExpireMonth))
+                                                {
+                                                    <span class="field-value">Month</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="field-value">@card.ExpireMonth</span>
+                                                }
                                             </div>
                                             <div class="field-actions">
                                                 <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit month">
@@ -500,7 +521,14 @@
                                         <label class="field-label">Exp. Year</label>
                                         <div class="editable-field" data-field="ExpireYear" data-id="@card.Id" data-type="Card">
                                             <div class="field-value-container">
-                                                <span class="field-value">@card.ExpireYear</span>
+                                                @if (string.IsNullOrEmpty(card.ExpireYear))
+                                                {
+                                                    <span class="field-value">Year</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="field-value">@card.ExpireYear</span>
+                                                }
                                             </div>
                                             <div class="field-actions">
                                                 <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit year">
@@ -537,23 +565,26 @@
                                 </div>
 
                                 <!-- CardholderName -->
-                                @if (card.CardholderName == null) card.CardholderName = "";
                                 <div class="field-group">
                                     <label class="field-label">Cardholder Name</label>
                                     <div class="editable-field" data-field="CardholderName" data-id="@card.Id" data-type="Card">
                                         <div class="field-value-container">
-                                            <span class="field-value">@card.CardholderName</span>
+                                            @if (string.IsNullOrEmpty(card.CardholderName))
+                                            {
+                                                <span class="field-value"><span class="text-muted">Not set</span></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="field-value">@card.CardholderName</span>
+                                            }
                                         </div>
                                         <div class="field-actions">
-                                            @if (!string.IsNullOrEmpty(card.CardholderName))
-                                            {
-                                                <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardholderName', 'Cardholder Name')" title="Copy cardholder name">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                                    </svg>
-                                                </button>
-                                            }
+                                            <button type="button" class="field-action-btn copy-btn" onclick="copyToClipboard('@card.CardholderName', 'Cardholder Name')" title="Copy cardholder name">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                </svg>
+                                            </button>
                                             <button type="button" class="field-action-btn edit-btn" onclick="enableEdit(this)" title="Edit cardholder name">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
@@ -562,7 +593,7 @@
                                             </button>
                                         </div>
                                         <div class="edit-mode-container" style="display: none;">
-                                            <input type="text" class="form-input edit-input" value="@card.CardholderName" maxlength="50" />
+                                            <input type="text" class="form-input edit-input" value="@(card.CardholderName ?? "")" maxlength="50" />
                                             <div class="edit-actions">
                                                 <button type="button" class="field-action-btn save-btn" onclick="saveEdit(this)" title="Save">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -826,19 +857,15 @@
            ======================================== */
 
         function togglePasswordVisibility(btn, isViewMode) {
-            // Get the editable field wrapper
             const editableField = btn.closest('.editable-field');
-
             let input, eyeClosed, eyeOpen;
 
             if (isViewMode) {
-                // View mode - input is in .field-value-container
                 const container = editableField.querySelector('.field-value-container');
                 input = container.querySelector('input');
                 eyeClosed = btn.querySelector('.eye-closed');
                 eyeOpen = btn.querySelector('.eye-open');
             } else {
-                // Edit mode - input is in .password-input-group
                 const container = btn.closest('.password-input-group');
                 input = container.querySelector('input');
                 eyeClosed = btn.querySelector('.eye-closed');
@@ -970,7 +997,10 @@
             const itemId = editableField.dataset.id;
             const itemType = editableField.dataset.type;
 
-            let newValue = editInput.value;
+            // Trim the value and check if empty
+            let newValue = editInput.value.trim();
+            const isEmpty = newValue === '';
+
             let displayValue = newValue || 'No notes';
             if (fieldName === 'Content') {
                 displayValue = newValue || 'No content';
@@ -982,19 +1012,29 @@
 
             try {
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const formData = new URLSearchParams({
+                    id: itemId,
+                    itemType: itemType,
+                    fieldName: fieldName,
+                    __RequestVerificationToken: token
+                });
+
+                // Add fieldValue only if not empty, otherwise add isEmpty flag
+                if (!isEmpty) {
+                    formData.append('fieldValue', newValue);
+                } else {
+                    formData.append('fieldValue', '');
+                    formData.append('isEmpty', 'true');
+                }
+
                 const response = await fetch('/Vault/UpdateField', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'RequestVerificationToken': token
                     },
-                    body: new URLSearchParams({
-                        id: itemId,
-                        itemType: itemType,
-                        fieldName: fieldName,
-                        fieldValue: newValue,
-                        __RequestVerificationToken: token
-                    })
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -1065,16 +1105,22 @@
             const itemId = editableField.dataset.id;
             const itemType = editableField.dataset.type;
 
+            // Get value and trim it (except for SELECT)
             let newValue = editInput.value;
+            if (editInput.tagName !== 'SELECT') {
+                newValue = newValue.trim();
+            }
+
+            const isEmpty = newValue === '';
             let displayValue = newValue;
 
             if (editInput.tagName === 'SELECT') {
                 const selectedOption = editInput.options[editInput.selectedIndex];
                 displayValue = selectedOption ? selectedOption.text : 'No Folder';
-            }
-
-            if (editInput.tagName === 'TEXTAREA') {
+            } else if (editInput.tagName === 'TEXTAREA') {
                 displayValue = newValue || 'No notes';
+            } else if (isEmpty) {
+                displayValue = 'Not set';
             }
 
             btn.disabled = true;
@@ -1083,19 +1129,29 @@
 
             try {
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const formData = new URLSearchParams({
+                    id: itemId,
+                    itemType: itemType,
+                    fieldName: fieldName,
+                    __RequestVerificationToken: token
+                });
+
+                // Add fieldValue only if not empty, otherwise add isEmpty flag
+                if (!isEmpty) {
+                    formData.append('fieldValue', newValue);
+                } else {
+                    formData.append('fieldValue', '');
+                    formData.append('isEmpty', 'true');
+                }
+
                 const response = await fetch('/Vault/UpdateField', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'RequestVerificationToken': token
                     },
-                    body: new URLSearchParams({
-                        id: itemId,
-                        itemType: itemType,
-                        fieldName: fieldName,
-                        fieldValue: newValue,
-                        __RequestVerificationToken: token
-                    })
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -1104,18 +1160,30 @@
                     const isPasswordField = editableField.classList.contains('editable-field-password');
 
                     if (isPasswordField) {
-                        const viewInput = viewContainer.querySelector('.password-display-input');
-                        if (viewInput) {
-                            viewInput.value = newValue;
-                            viewInput.type = 'password';
+                        // Update password field view
+                        if (isEmpty) {
+                            viewContainer.innerHTML = '<span class="field-value"><span class="text-muted">Not set</span></span>';
+                        } else {
+                            viewContainer.innerHTML = '<input type="password" class="password-display-input" value="' + newValue + '" readonly tabindex="-1">';
                         }
 
-                        const viewToggleBtn = fieldActions.querySelector('.toggle-btn');
-                        if (viewToggleBtn) {
-                            viewToggleBtn.querySelector('.eye-closed').style.display = 'block';
-                            viewToggleBtn.querySelector('.eye-open').style.display = 'none';
+                        // Update field actions visibility
+                        const copyBtn = fieldActions.querySelector('.copy-btn');
+                        const toggleBtn = fieldActions.querySelector('.toggle-btn');
+
+                        if (isEmpty) {
+                            if (copyBtn) copyBtn.style.display = 'none';
+                            if (toggleBtn) toggleBtn.style.display = 'none';
+                        } else {
+                            if (copyBtn) copyBtn.style.display = '';
+                            if (toggleBtn) {
+                                toggleBtn.style.display = '';
+                                toggleBtn.querySelector('.eye-closed').style.display = 'block';
+                                toggleBtn.querySelector('.eye-open').style.display = 'none';
+                            }
                         }
 
+                        // Reset edit mode password visibility
                         editInput.type = 'password';
                         const editToggleBtn = editContainer.querySelector('.toggle-btn');
                         if (editToggleBtn) {
@@ -1123,9 +1191,29 @@
                             editToggleBtn.querySelector('.eye-open').style.display = 'none';
                         }
                     } else {
+                        // Update regular fields (including WebURL, CardNumber, CardholderName, etc.)
                         const fieldValue = viewContainer.querySelector('.field-value');
                         if (fieldValue) {
-                            fieldValue.textContent = displayValue;
+                            if (isEmpty && editInput.tagName !== 'SELECT') {
+                                fieldValue.innerHTML = '<span class="text-muted">Not set</span>';
+                            } else if (fieldName === 'WebURL' && !isEmpty) {
+                                // Reconstruct URL link
+                                const url = displayValue.startsWith('http://') || displayValue.startsWith('https://')
+                                    ? displayValue
+                                    : 'https://' + displayValue;
+                                fieldValue.outerHTML = `<a href="${url}" target="_blank" class="field-value link" rel="noopener noreferrer">${displayValue}</a>`;
+                            } else {
+                                fieldValue.textContent = displayValue;
+                            }
+                        }
+
+                        // Update copy button visibility for fields with copy buttons
+                        const fieldsWithCopy = ['WebURL', 'CardNumber', 'CardholderName'];
+                        if (fieldsWithCopy.includes(fieldName)) {
+                            const copyBtn = fieldActions.querySelector('.copy-btn');
+                            if (copyBtn) {
+                                copyBtn.style.display = isEmpty ? 'none' : '';
+                            }
                         }
                     }
 

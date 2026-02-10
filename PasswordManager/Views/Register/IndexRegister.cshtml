@@ -7,6 +7,25 @@
     Layout = "_Layout";
 }
 
+<!-- Back to Welcome Button -->
+<div class="back-to-welcome">
+    <a asp-controller="Welcome" asp-action="IndexWelcome" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+        </svg>
+        <span>Back to Welcome</span>
+    </a>
+</div>
+
 <div class="login-container">
 
     <!-- Application logo -->
@@ -134,10 +153,13 @@
             <div class="checkbox">
                 <input asp-for="AcceptTerms" />
                 <label asp-for="AcceptTerms">
-                   I accept the terms of service
+                    I accept the terms of service(I understand that this is at my own risk.)
                 </label>
             </div>
             <span asp-validation-for="AcceptTerms" class="text-danger"></span>
+            <a href="/Files/Terms.txt" download>
+                 <h5>Download Terms</h5>
+            </a>
         </div>
 
         <button type="submit" class="submit-btn">

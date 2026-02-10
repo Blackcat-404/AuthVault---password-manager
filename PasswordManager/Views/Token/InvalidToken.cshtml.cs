@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace PasswordManager.Views.Account
+namespace PasswordManager.Views.Token
 {
-    public class EmailVerificationModel : PageModel
+    public class InvalidTokenModel : PageModel
     {
         public void OnGet()
         {

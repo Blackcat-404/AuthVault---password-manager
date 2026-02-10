@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Email Verification";
+    ViewData["BodyClass"] = "auth-page";
+    Layout = "_Layout";
+    var userId = TempData["userId"];
+}
+
+<div class="login-container">
+    <!-- Application logo -->
+    <div class="error-icon" style="background: rgba(52, 152, 219, 0.1); border-color: rgba(52, 152, 219, 0.3);">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="80"
+             height="80"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             style="color: #3498db;">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+    </div>
+    <div class="tagline">
+        <p>Check your email inbox</p>
+    </div>
+    <div class="invalid-token-content">
+        <div class="forgot-password">
+            <a asp-controller="Account" asp-action="Login">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     style="vertical-align: middle; margin-right: 4px;">
+                    <path d="m12 19-7-7 7-7" />
+                    <path d="M19 12H5" />
+                </svg>
+                Back to login
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--2FA FLOW -->
+<script>
+    const userId = @userId;
+    let pollInterval;
+
+    async function checkVerificationStatus() {
+        const response = await fetch(`/Account/Login/2FA/CheckStatus?userId=${userId}`);
+        const data = await response.json();
+
+        if (data.success && data.verified) {
+            clearInterval(pollInterval);
+            window.location.href = '@Url.Action("Home", "Vault")';
+        }
+    }
+
+    pollInterval = setInterval(checkVerificationStatus, 2000);
+
+    setTimeout(() => {
+        clearInterval(pollInterval);
+        alert('Verification timeout. Please try logging in again.');
+        window.location.href = '@Url.Action("GetLogin", "Login")';
+    }, 5 * 60 * 1000);
+</script>
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true" />
+}

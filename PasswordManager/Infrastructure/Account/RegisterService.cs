@@ -12,16 +12,16 @@ namespace PasswordManager.Infrastructure.Register
     public class RegisterService : IRegisterService
     {
         private readonly AppDbContext _db;
-        private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
+        private readonly TokenService _tokenService;
 
         public RegisterService(AppDbContext db,
-                                EmailService emailService,
-                                IEncryptionService encryptionService)
+                                IEncryptionService encryptionService,
+                                TokenService tokenService)
         {
             _db = db;
-            _emailService = emailService;
             _encryptionService = encryptionService;
+            _tokenService = tokenService;
         }
 
 
@@ -35,17 +35,6 @@ namespace PasswordManager.Infrastructure.Register
                 result.AddError(nameof(dto.Name), "Are you serious, dude?");
                 return result;
             }*/
-            
-            var loginExists = await _db.Users.AnyAsync(
-                u => u.Login == dto.Name &&
-                u.EmailVerificationStatus == EmailVerificationStatus.Verified
-            );
-
-            if (loginExists)
-            {
-                result.AddError(nameof(dto.Name), "This login is already taken");
-                return result;
-            }
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -55,7 +44,7 @@ namespace PasswordManager.Infrastructure.Register
                 return result;
             }
 
-            int verificationCode = VerificationCodeGenerator.Generate();
+            string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token!);
             DateTime expiresAt = DateTime.UtcNow.AddMinutes(5);
 
             if (user == null)
@@ -64,9 +53,11 @@ namespace PasswordManager.Infrastructure.Register
                 byte[] encryptionSalt = _encryptionService.GenerateSalt();
                 byte[] authHash = _encryptionService.DeriveAuthHash(dto.Password!, authSalt);
 
+
+
                 var userNew = new User
                 {
-                    Login = dto.Name!,
+                    Login = dto.Login!,
                     Email = dto.Email!,
 
                     AuthHash = authHash,
@@ -74,8 +65,8 @@ namespace PasswordManager.Infrastructure.Register
                     EncryptionSalt = encryptionSalt,
 
                     EmailVerificationStatus = EmailVerificationStatus.NotVerified,
-                    EmailVerificationCode = verificationCode,
-                    EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                    Token = token,
+                    TokenExpiresAt = DateTime.UtcNow.AddMinutes(5),
                     LastLoginAt = null,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -92,28 +83,15 @@ namespace PasswordManager.Infrastructure.Register
                 user.AuthSalt = authSalt;
                 user.EncryptionSalt = encryptionSalt;
 
-                user.Login = dto.Name!;
-                user.EmailVerificationCode = verificationCode;
-                user.EmailVerificationExpiresAt = expiresAt;
+                user.Login = dto.Login!;
+                user.Token = token;
+                user.TokenExpiresAt = expiresAt;
             }
 
             await _db.SaveChangesAsync();
-            await SendVerificationEmailAsync(dto.Name, dto.Email, verificationCode);
+            await _tokenService.SendTokenToEmailAsync(dto.Login, dto.Email, 5, $"https://localhost:7108/Account/Register/VerifyEmail?token={token}");
 
             return result;
         }
-
-        public async Task SendVerificationEmailAsync(string Name, string Email, int verificationCode)
-        {
-            string bodystr = "Hello, " + Name + "\nYour verification code is: " + verificationCode +
-                "\n\nThis code expires in 5 minutes\n" +
-                "If you did not register, please ignore this email.";
-
-            await _emailService.SendAsync(
-                    to: Email!,
-                    subject: "Email verification code",
-                    body: bodystr
-            );
-        }
     }
-}   
+}

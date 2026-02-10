@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Settings;
 using PasswordManager.Application.Vault;
 using PasswordManager.Infrastructure.Settings;
+using PasswordManager.Models.Requests;
 using PasswordManager.ViewModels.Vault;
 using System.Security.Claims;
 using System.Text;
@@ -40,17 +41,29 @@ namespace PasswordManager.Controllers
             return View("FAEmail", model);
         }
 
-        [HttpGet("Settings/2FA/Code")]
-        public async Task<IActionResult> Get2FACode()
+        [HttpGet("Settings/2FA/EmailVerification")]
+        public async Task<IActionResult> GetEmailVerification(string token)
         {
-            var userId = GetUserID();
-            var model = await _vaultSettingsService.Get2FACodeAsync(userId);
+            bool IsValidToken = await _settingsService.Verify2FAToken(token);
+            if (!IsValidToken)
+            {
+                return View("~/Views/Token/InvalidToken.cshtml");
+            }
 
-            return View("FACode", model);
+            var email = TempData["email"] as string;
+            await _settingsService.Add2FAEmailAsync(token, email!);
+
+            return View("~/Views/Token/Success.cshtml");
+        }
+
+        [HttpGet("Settings/2FA/EmailVerificationLinkSent")]
+        public IActionResult Get2FAEmailVerificationLinkSent()
+        {
+            return View("~/Views/Token/TokenSent.cshtml");
         }
 
         [HttpPost("Settings/EmailChange")]
-        public async Task<IActionResult> PostFAEmailChange()
+        public IActionResult PostFAEmailChange()
         {
             return RedirectToAction("Get2FAEmail");
         }
@@ -64,37 +77,10 @@ namespace PasswordManager.Controllers
             }
 
             var userId = GetUserID();
-
             await _settingsService.Add2FAAsync(userId,model.Email);
 
-            TempData["2FA_Email"] = model.Email;
-            return RedirectToAction("Get2FACode");
-        }
-
-        [HttpPost("Settings/2FA/Code")]
-        public async Task<IActionResult> PostVerifyCode(FAuthenticationCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("FACode", model);
-            }
-
-            var userId = GetUserID();
-            var email = TempData["2FA_Email"] as string;
-
-            if (email == null)
-            {
-                return RedirectToAction("Get2FAEmail");
-            }
-
-            var isValid = await _settingsService.Verify2FACodeAsync(userId, model.Code, email);
-            if (!isValid)
-            {
-                ModelState.AddModelError("Code","Code is wrong");
-                return View("FACode", model);
-            }
-
-            return RedirectToAction("GetSettings");
+            TempData["email"] = model.Email;
+            return RedirectToAction("Get2FAEmailVerificationLinkSent");
         }
 
         [HttpPost("Settings/Toggle2FA")]
@@ -204,6 +190,24 @@ namespace PasswordManager.Controllers
                 return File(bytes, "text/plain", "Data.md");
             }
         }
+
+
+        [HttpPost("Settings/SessionTimeout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SessionTimeout([FromBody] SessionTimeoutRequest request)
+        {
+            int userId = GetUserID();
+
+            bool success = await _settingsService.UpdateSessionTimeout(request.TimeoutMinutes, userId);
+
+            if (!success)
+            {
+                return BadRequest(new { success = false, message = "Failed to update session timeout" });
+            }
+
+            return Ok(new { success = true, message = "Session timeout updated successfully" });
+        }
+
 
         private int GetUserID()
         {

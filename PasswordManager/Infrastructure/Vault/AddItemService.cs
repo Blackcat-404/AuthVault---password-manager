@@ -23,6 +23,17 @@ namespace PasswordManager.Infrastructure.Vault
 
         public async Task AddLoginAsync(LoginItemDto dto)
         {
+            
+            if (dto.Password == null)
+            {
+                Console.WriteLine("null");
+            }
+            else
+            {
+                Console.WriteLine($"Password: {dto.Password}");
+            }
+
+
             byte[]? encryptionKey = _sessionEncryptionService.GetEncryptionKey(dto.UserId);
 
             if (encryptionKey == null)

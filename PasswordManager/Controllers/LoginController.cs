@@ -27,24 +27,40 @@ namespace PasswordManager.Controllers
         }
 
         [HttpGet("Login/2FA")]
-        public IActionResult Get2FA()
+        public async Task<IActionResult> Get2FA(string token)
         {
-            return View("FAuthentication");
-        }
-
-        [HttpPost("Login/2FA")]
-        public async Task<IActionResult> PostVerifyCodeAsync(Login2FAViewModel model)
-        {
-            Console.WriteLine(model.Code);
-            var id = Convert.ToInt32(TempData["userId"]);
-            if (!await _loginService.Verify2FACode(id,model.Code))
+            if (string.IsNullOrEmpty(token))
             {
-                return RedirectToAction();
+                return View("~/Views/Token/InvalidToken.cshtml");
             }
 
-            await _authService.SignInAsync(HttpContext, id);
+            var userId = await _loginService.GetUserIdByToken(token);
 
-            return RedirectToAction("Home", "Vault");
+            if (userId == null)
+            {
+                return View("~/Views/Token/InvalidToken.cshtml");
+            }
+
+            if (!await _loginService.Verify2FAToken(userId.Value, token))
+            {
+                return View("~/Views/Token/InvalidToken.cshtml");
+            }
+
+            return View("~/Views/Token/Success.cshtml");
+        }
+
+        [HttpGet("Login/2FA/CheckStatus")]
+        public async Task<IActionResult> Check2FAStatus(int userId)
+        {
+            var isVerified = await _loginService.IsTokenVerified(userId);
+
+            if (isVerified)
+            {
+                await _authService.SignInAsync(HttpContext, userId);
+                return Json(new { success = true, verified = true });
+            }
+
+            return Json(new { success = true, verified = false });
         }
 
         /// <summary>
@@ -73,25 +89,21 @@ namespace PasswordManager.Controllers
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(error.Key, error.Value);
-
                 return View("IndexLogin", model);
             }
+
+            var user = result.Value!;
 
             //2FA Checking
             if (await _loginService.Has2FAAsync(model.Email!))
             {
-                var u = result.Value!;
-                await _loginService.Send2FACode(u.Id);
+                await _loginService.Send2FACode(user.Id);
+                TempData["userId"] = user.Id;
 
-                TempData["userId"] = u.Id;
-                return RedirectToAction("Get2FA");
+                return View("~/Views/Token/TokenSent.cshtml");
             }
 
-            Console.WriteLine("no 2FA");
-
-            var user = result.Value!;
             await _authService.SignInAsync(HttpContext, user.Id);
-
             return RedirectToAction("Home", "Vault");
         }
 

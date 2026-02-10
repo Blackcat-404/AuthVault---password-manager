@@ -10,14 +10,14 @@
         <a href="@Url.Action("IndexWelcome", "Welcome")" class="logo">
             <div class="logo-icon">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                     width="24"
-                     height="24"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round">
                     <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
                 </svg>
             </div>
@@ -25,7 +25,11 @@
         </a>
         <ul class="nav-menu">
             <li><a href="#features" class="btn btn-ghost">Features</a></li>
-            <li><a href="#" class="btn btn-ghost">Support</a></li>
+            <li>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-ghost">
+                    Log in
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
@@ -35,38 +39,95 @@
     <div class="grid-pattern"></div>
     <div class="hero-content">
         <div class="hero-badge">
-            <span>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+            </svg>
+            <span>SELF-HOSTED • OPEN SOURCE • PRIVACY-FIRST</span>
+        </div>
+
+        <h1 class="hero-title">
+            Your passwords<br />
+            Your server<br />
+            Your control
+        </h1>
+
+        <p class="hero-subtitle">
+            A self-hosted password manager for those who refuse to trust their secrets to corporate clouds.
+            Deploy on your own machine in minutes.
+        </p>
+
+        <div class="hero-actions">
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-large">
+                Get Started
+            </a>
+            <a href="https://github.com/Blackcat-404/AuthVault---password-manager" target="_blank" class="btn btn-white btn-large">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                     width="24"
-                     height="24"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                View on GitHub
+            </a>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
                      viewBox="0 0 24 24"
                      fill="none"
                      stroke="currentColor"
                      stroke-width="2"
                      stroke-linecap="round"
                      stroke-linejoin="round">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
                 </svg>
-            </span>
-            <span>
-                THE MOST SECURE PASSWORD MANAGER
-            </span>
-        </div>
-
-        <h1 class="hero-title">
-            One key —<br />
-            Everything that matters
-        </h1>
-
-        <p class="hero-subtitle">
-            Store passwords, cards, and important notes in one secure place.
-        </p>
-
-        <div class="hero-actions">
-            <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-large">Sign up</a>
-
-            <a asp-controller="Account" asp-action="Login" class="btn btn-white btn-large">Log in</a>
+                <span class="stat-text">100% Open Source</span>
+            </div>
+            <div class="stat">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+                <span class="stat-text">Self-Hosted</span>
+            </div>
+            <div class="stat">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <path d="M12 17h.01" />
+                </svg>
+                <span class="stat-text">Forever Free</span>
+            </div>
         </div>
     </div>
 </section>
@@ -74,163 +135,230 @@
 <!-- Features section -->
 <section class="features" id="features">
     <div class="features-container">
-        <h2 class="section-title">Why choose us?</h2>
+        <div class="section-header">
+            <p class="section-subtitle">TAKE BACK CONTROL</p>
+            <h2 class="section-title">Why self-host?</h2>
+            <p class="section-intro">
+                Because your passwords are too important to trust to someone else's server
+            </p>
+        </div>
 
         <div class="features-grid">
-
-            <!-- Feature: Encryption -->
+            <!-- Feature: Self-hosted -->
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
+                         width="32"
+                         height="32"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
                          stroke-width="2"
                          stroke-linecap="round"
                          stroke-linejoin="round">
-                        <circle cx="12" cy="16" r="1" />
-                        <rect x="3" y="10" width="18" height="12" rx="2" />
-                        <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                     </svg>
                 </div>
-                <h3 class="feature-title"></h3>
+                <h3 class="feature-title">Self-hosted freedom</h3>
                 <p class="feature-description">
-
+                    Host your vault on your own machine. No third-party servers, no cloud dependencies.
+                    Your data never leaves your computer.
                 </p>
             </div>
 
-            <!-- Feature: Sync -->
+            <!-- Feature: Open Source -->
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
+                         width="32"
+                         height="32"
+                         viewBox="0 0 24 24"
+                         fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">100% Open Source</h3>
+                <p class="feature-description">
+                    Full transparency with code on GitHub. Fork, audit, or contribute.
+                    No backdoors, no hidden trackers, no proprietary lock-in.
+                </p>
+            </div>
+
+            <!-- Feature: True Ownership -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="32"
+                         height="32"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
                          stroke-width="2"
                          stroke-linecap="round"
                          stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-                        <path d="M2 12h20" />
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                     </svg>
                 </div>
-                <h3 class="feature-title"></h3>
+                <h3 class="feature-title">True ownership</h3>
                 <p class="feature-description">
-
+                    You own your data completely. No subscriptions, no account limits, no corporate surveillance.
+                    Deploy once, use forever.
                 </p>
             </div>
 
-            <!-- Feature: Password generator -->
+            <!-- Feature: Zero-trust -->
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
+                         width="32"
+                         height="32"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
                          stroke-width="2"
                          stroke-linecap="round"
                          stroke-linejoin="round">
-                        <path d="M11 10.27 7 3.34" />
-                        <path d="m11 13.73-4 6.93" />
-                        <path d="M12 22v-2" />
-                        <path d="M12 2v2" />
-                        <path d="M14 12h8" />
-                        <path d="m17 20.66-1-1.73" />
-                        <path d="m17 3.34-1 1.73" />
-                        <path d="M2 12h2" />
-                        <path d="m20.66 17-1.73-1" />
-                        <path d="m20.66 7-1.73 1" />
-                        <path d="m3.34 17 1.73-1" />
-                        <path d="m3.34 7 1.73 1" />
-                        <circle cx="12" cy="12" r="2" />
-                        <circle cx="12" cy="12" r="8" />
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <circle cx="12" cy="12" r="4" />
                     </svg>
                 </div>
-                <h3 class="feature-title">Password generator</h3>
+                <h3 class="feature-title">Zero-trust architecture</h3>
                 <p class="feature-description">
-                    Create strong and unique passwords with one click.
-                    Customizable length and complexity for maximum security.
+                    No cloud providers to trust. No companies with access. All encryption happens locally.
+                    The only person you trust is yourself.
                 </p>
             </div>
 
-            <!-- Feature: Organization -->
+            <!-- Feature: Offline -->
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
+                         width="32"
+                         height="32"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
                          stroke-width="2"
                          stroke-linecap="round"
                          stroke-linejoin="round">
-                        <path d="M20 5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2.5a1.5 1.5 0 0 1 1.2.6l.6.8a1.5 1.5 0 0 0 1.2.6z" />
-                        <path d="M3 8.268a2 2 0 0 0-1 1.738V19a2 2 0 0 0 2 2h11a2 2 0 0 0 1.732-1" />
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                        <line x1="12" x2="12.01" y1="20" y2="20" />
                     </svg>
                 </div>
-                <h3 class="feature-title">Smart organization</h3>
+                <h3 class="feature-title">Works offline</h3>
                 <p class="feature-description">
-
-                    Find any entry in seconds using fast search.
+                    No internet? No problem. Access your passwords anytime, anywhere.
+                    True independence from network availability.
                 </p>
             </div>
 
-            <!-- Feature: Card storage -->
+            <!-- Feature: Developer-friendly -->
             <div class="feature-card">
                 <div class="feature-icon">
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
+                         width="32"
+                         height="32"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
                          stroke-width="2"
                          stroke-linecap="round"
                          stroke-linejoin="round">
-                        <path d="M16 10h2" />
-                        <path d="M16 14h2" />
-                        <path d="M6.17 15a3 3 0 0 1 5.66 0" />
-                        <circle cx="9" cy="11" r="2" />
-                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
                     </svg>
                 </div>
-                <h3 class="feature-title">Secure card storage</h3>
+                <h3 class="feature-title">Built for developers</h3>
                 <p class="feature-description">
-                    Safely store credit cards and payment details.
-
+                    Clean ASP.NET Core architecture, well-documented code.
+                    Perfect for learning, extending, or building your own features.
                 </p>
             </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Feature: Two-factor authentication -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="36"
-                         height="36"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2"
-                         stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-                        <path d="M6.376 18.91a6 6 0 0 1 11.249.003" />
-                        <circle cx="12" cy="11" r="4" />
-                    </svg>
-                </div>
-                <h3 class="feature-title"> </h3>
-                <p class="feature-description">
+<!-- Additional Features section -->
+<section class="additional-features">
+    <div class="additional-features-container">
+        <h2 class="section-title">Everything you need</h2>
 
-                </p>
+        <div class="features-list">
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Password generator with customizable complexity</span>
             </div>
-
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Organize with custom folders and tags</span>
+            </div>
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Secure storage for credit cards and notes</span>
+            </div>
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Two-factor authentication support</span>
+            </div>
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Export data in multiple formats</span>
+            </div>
+            <div class="feature-item">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>AES-256 encryption on all data</span>
+            </div>
         </div>
     </div>
 </section>
@@ -238,28 +366,138 @@
 <!-- Call-to-action section -->
 <section class="cta">
     <div class="cta-content">
-        <h2 class="cta-title">Ready to get started?</h2>
+        <h2 class="cta-title">Ready to take control?</h2>
         <p class="cta-subtitle">
-            Join thousands of users who trust us with their digital security
+            Deploy your own password vault in minutes. No credit card, no tracking, no BS.
         </p>
-        <a href="@Url.Action("Register", "Account")" class="btn btn-white btn-large">
-            Create a free account →
-        </a>
+        <div class="cta-buttons">
+            <a href="https://github.com/Blackcat-404/AuthVault---password-manager#readme" target="_blank" class="btn btn-ghost btn-large">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                Read Full Documentation
+            </a>
+        </div>
     </div>
 </section>
 
 <!-- Footer -->
 <footer class="footer">
-    <p>&copy; 2026 AuthVault. All rights reserved.</p>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>AuthVault</h4>
+            <p>Self-hosted password manager for privacy-conscious users</p>
+        </div>
+        <div class="footer-section">
+            <h4>Resources</h4>
+            <ul>
+                <li><a href="https://github.com/Blackcat-404/AuthVault---password-manager" target="_blank">GitHub</a></li>
+                <li><a href="https://github.com/Blackcat-404/AuthVault---password-manager#readme" target="_blank">Documentation</a></li>
+                <li><a href="https://github.com/Blackcat-404/AuthVault---password-manager/issues" target="_blank">Report Issues</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 AuthVault. Open source under MIT License.</p>
+    </div>
 </footer>
-
 
 @section Scripts
 {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        /* ========================================
+           COPY CODE FUNCTIONALITY
+           ======================================== */
+        function copyCode(btn) {
+            const codeBlock = btn.previousElementSibling;
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                // Store original SVG
+                const originalHTML = btn.innerHTML;
+
+                // Show checkmark
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+                btn.style.color = '#4ade80';
+
+                // Restore original after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        /* ========================================
+           SMOOTH SCROLL & ANIMATIONS
+           ======================================== */
+        document.addEventListener('DOMContentLoaded', function () {
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+
+                    if (target) {
+                        const navHeight = document.querySelector('.navbar').offsetHeight;
+                        const targetPosition = target.offsetTop - navHeight - 20;
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Intersection Observer for fade-in animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe feature cards with staggered animation
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+                observer.observe(card);
+            });
+
+            // Observe step cards
+            document.querySelectorAll('.step-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `all 0.6s ease ${index * 0.15}s`;
+                observer.observe(card);
+            });
+        });
+    </script>
 }
+
 @section Styles
 {
     <link rel="stylesheet" href="~/css/welcome.css" asp-append-version="true" />

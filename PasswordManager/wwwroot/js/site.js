@@ -1,51 +1,4 @@
 ﻿/* ========================================
-   WELCOME PAGE SCRIPTS
-   ======================================== */
-
-// Smooth scroll to anchor links
-document.addEventListener('DOMContentLoaded', function () {
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Intersection Observer for fade-in animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe feature cards
-    document.querySelectorAll('.feature-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-        observer.observe(card);
-    });
-});
-
-/* ========================================
    TOGGLE PASSWORD VISIBILITY
    ======================================== */
 
@@ -104,12 +57,12 @@ function getEyeOffIcon() {
 
 // Toggle Sidebar Function
 function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
+    const currentState = localStorage.getItem('sidebarCollapsed') === 'true';
+    const newState = !currentState;
 
-    // Save state to localStorage
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebarCollapsed', isCollapsed);
+    localStorage.setItem('sidebarCollapsed', newState);
+
+    document.documentElement.style.setProperty('--sidebar-state', newState ? 'collapsed' : 'expanded');
 }
 
 // Delete Folder Function
@@ -148,34 +101,12 @@ function deleteFolder(event, folderId, folderName) {
 }
 
 /* ========================================
-   SIDEBAR STATE RESTORATION
+   SIDEBAR STATE - NO LONGER NEEDED
    ======================================== */
-// Restore Sidebar State IMMEDIATELY (before DOMContentLoaded)
-(function () {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-
-    if (savedState === 'true') {
-        
-        const style = document.createElement('style');
-        style.id = 'sidebar-preload';
-        style.textContent = '.sidebar { width: 95px; }';
-        document.head.appendChild(style);
-    }
-})();
+// Sidebar state is now handled by inline script in _VaultSidebar.cshtml
+// and CSS variables. No FOUC possible anymore!
 
 document.addEventListener('DOMContentLoaded', function () {
-    const sidebar = document.getElementById('sidebar');
-    const savedState = localStorage.getItem('sidebarCollapsed');
-
-    const preloadStyle = document.getElementById('sidebar-preload');
-    if (preloadStyle) {
-        preloadStyle.remove();
-    }
-
-    if (savedState === 'true' && sidebar) {
-        sidebar.classList.add('collapsed');
-    }
-
     initializeFoldersScroll();
     initializeTooltipPositioning();
     checkFoldersOverflow();
@@ -247,9 +178,17 @@ function initializeTooltipPositioning() {
 
 function updateTooltipPosition(wrapper, tooltip) {
     const rect = wrapper.getBoundingClientRect();
-    const sidebar = document.getElementById('sidebar');
-    const sidebarRect = sidebar.getBoundingClientRect();
 
+    // Get the currently visible sidebar (either expanded or collapsed)
+    const sidebarExpanded = document.getElementById('sidebar-expanded');
+    const sidebarCollapsed = document.getElementById('sidebar-collapsed');
+    const sidebar = sidebarExpanded && sidebarExpanded.offsetParent !== null
+        ? sidebarExpanded
+        : sidebarCollapsed;
+
+    if (!sidebar) return;
+
+    const sidebarRect = sidebar.getBoundingClientRect();
 
     const left = sidebarRect.right + 12;
     const top = rect.top;
@@ -283,23 +222,6 @@ function updateFolderItemCount(folderId, count) {
         }
     }
 }
-
-/* ========================================
-   KEYBOARD SHORTCUTS
-   ======================================== */
-/*document.addEventListener('keydown', function (event) {
-    // Shift + S = Toggle Sidebar
-    if (event.shiftKey && event.key === 'S') {
-        event.preventDefault();
-        toggleSidebar();
-    }
-
-    // Shift + G = Open Password Generator
-    if (event.shiftKey && event.key === 'G') {
-        event.preventDefault();
-        openGenerator(event);
-    }
-});*/
 
 /* ========================================
    PASSWORD GENERATOR FUNCTIONS

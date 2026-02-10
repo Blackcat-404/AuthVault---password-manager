@@ -9,6 +9,8 @@ namespace PasswordManager.ViewModels.Vault
         public string? FAEmail { get; set; }
         public bool Is2FAEnabled { get; set; }
         public string accountCreatedOn { get; set; } = null!;
+        public DateTime? PasswordLastChangeAt { get; set; }
+        public int SessionTimeoutMinutes { get; set; }
     }
 
     public class FAuthenticationEmailViewModel

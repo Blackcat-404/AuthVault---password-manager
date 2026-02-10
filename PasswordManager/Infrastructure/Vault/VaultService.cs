@@ -85,9 +85,10 @@ namespace PasswordManager.Infrastructure.Vault
             {
                 Sidebar = await GetSidebarDataAsync(userId),
                 Email = email!,
-                FAEmail = (user == null)?null:user.Email,
-                Is2FAEnabled = (user == null)?false:user.IsEnabled,
-                accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy")
+                FAEmail = (user == null) ? null : user.Email,
+                Is2FAEnabled = (user == null) ? false : user.IsEnabled,
+                accountCreatedOn = accountCreatedAt.ToString("MMMM dd, yyyy"),
+                PasswordLastChangeAt = (user == null) ? null : user.User.PasswordLastChangedAt
             };
             return model;
         }

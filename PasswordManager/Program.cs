@@ -53,6 +53,7 @@ namespace PasswordManager
             builder.Services.AddScoped<IDeleteFolderService, DeleteFolderService>();
             builder.Services.AddScoped<IEncryptionService, EncryptionService>();
             builder.Services.AddScoped<ISessionEncryptionService, SessionEncryptionService>();
+            builder.Services.AddScoped<TokenService>();
 
             builder.Services.AddScoped<SettingsService>();
 
@@ -64,8 +65,8 @@ namespace PasswordManager
                     options.AccessDeniedPath = "/Welcome";
                     options.LogoutPath = "/Account/Logout"; 
 
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(200); ///
-                    options.SlidingExpiration = false;
+                    options.ExpireTimeSpan = TimeSpan.FromHours(3);
+                    options.SlidingExpiration = true;
 
                     options.Cookie.HttpOnly = true;
                     options.Cookie.SameSite = SameSiteMode.Strict;
@@ -76,7 +77,7 @@ namespace PasswordManager
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.IdleTimeout = TimeSpan.FromHours(3);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
@@ -95,6 +96,7 @@ namespace PasswordManager
             {
                 app.UseDeveloperExceptionPage();
             }*/
+
             app.UseSession();
 
             app.UseExceptionHandler("/Error");
@@ -107,7 +109,7 @@ namespace PasswordManager
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseMiddleware<EncryptionKeyValidationMiddleware>();
+            app.UseMiddleware<SessionAndEncryptionValidationMiddleware>();
 
             app.MapGet("/", context =>
             {

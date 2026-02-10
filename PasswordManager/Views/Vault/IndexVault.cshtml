@@ -169,7 +169,7 @@
                                             </div>
                                             <div class="item-info">
                                                 <div class="item-name">@login.Title</div>
-                                                <div class="item-username">@(login.Login ?? "No username")</div>
+                                                <div class="item-username">@(string.IsNullOrWhiteSpace(login.Login) ? "No username" : login.Login)</div>
                                             </div>
                                             <div class="item-actions">
                                                 <a href="@Url.Action("ViewItem", "Vault", new { id = item.Id, type = itemType })"

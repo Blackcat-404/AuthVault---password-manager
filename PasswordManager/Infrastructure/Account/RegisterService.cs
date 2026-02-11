@@ -89,7 +89,7 @@ namespace PasswordManager.Infrastructure.Register
             }
 
             await _db.SaveChangesAsync();
-            await _tokenService.SendTokenToEmailAsync(dto.Login, dto.Email, 5, $"https://localhost:7108/Account/Register/VerifyEmail?token={token}");
+            await _tokenService.SendTokenToEmailAsync(dto.Login, dto.Email, 5, $"{dto.BaseUrl}/Account/Register/VerifyEmail?token={token}");
 
             return result;
         }

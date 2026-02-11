@@ -1,20 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PasswordManager.Data;
-using PasswordManager.Domain.Entities;
 using PasswordManager.Infrastructure.Email;
 using System.Linq.Expressions;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace PasswordManager.Infrastructure.Security
 {
     public class TokenService
     {
-        private readonly AppDbContext _db;
         private readonly EmailService _emailService;
 
-        public TokenService(AppDbContext db , EmailService emailService)
+        public TokenService(EmailService emailService)
         {
-            _db = db;
             _emailService = emailService;
         }
 

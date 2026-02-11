@@ -83,7 +83,8 @@ namespace PasswordManager.Controllers
                 {
                     Email = model.Email!,
                     Password = model.Password!
-                });
+                }
+            );
 
             if (!result.Success)
             {
@@ -97,7 +98,8 @@ namespace PasswordManager.Controllers
             //2FA Checking
             if (await _loginService.Has2FAAsync(model.Email!))
             {
-                await _loginService.Send2FACode(user.Id);
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                await _loginService.Send2FACode(user.Id,baseUrl);
                 TempData["userId"] = user.Id;
 
                 return View("~/Views/Token/TokenSent.cshtml");

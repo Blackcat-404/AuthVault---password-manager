@@ -19,7 +19,7 @@ namespace PasswordManager.Infrastructure.Settings
             _tokenService = tokenService;
         }
 
-        public async Task Add2FAAsync(int userId,string email)
+        public async Task Add2FAAsync(int userId,string email,string baseURL)
         {
             string token = await _tokenService.GenerateUniqueResetTokenAsync(_db.TwoFactorAuthentications, t => t.Token!);
             var expiresAt = DateTime.UtcNow.AddMinutes(5);
@@ -40,13 +40,13 @@ namespace PasswordManager.Infrastructure.Settings
                 };
 
                 _db.TwoFactorAuthentications.Add(twoFa);
-                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"https://localhost:7108/Vault/Settings/2FA/EmailVerification?token={token}");
+                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"{baseURL}/Vault/Settings/2FA/EmailVerification?token={token}");
             }
             else
             {
                 twoFa.Token = token;
                 twoFa.TokenExpiresAt = expiresAt;
-                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"https://localhost:7108/Vault/Settings/2FA/EmailVerification?token={token}");
+                await _tokenService.SendTokenToEmailAsync(user!.Login, email, 5, $"{baseURL}/Vault/Settings/2FA/EmailVerification?token={token}");
             }
 
             await _db.SaveChangesAsync();

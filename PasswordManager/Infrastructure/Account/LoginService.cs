@@ -5,7 +5,6 @@ using PasswordManager.Application.Security;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Domain.Enums;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
 
 
@@ -16,17 +15,14 @@ namespace PasswordManager.Infrastructure.Login
         private readonly AppDbContext _db;
         private readonly IEncryptionService _encryptionService;
         private readonly ISessionEncryptionService _sessionEncryptionService;
-        private readonly EmailService _emailService;
         private readonly TokenService _tokenService;
 
         public LoginService(AppDbContext db, 
             IEncryptionService encryptionService, 
             ISessionEncryptionService sessionEncryptionService, 
-            EmailService emailService, 
             TokenService tokenService)
         {
             _db = db;
-            _emailService = emailService;
             _encryptionService = encryptionService;
             _sessionEncryptionService = sessionEncryptionService;
             _tokenService = tokenService;
@@ -95,7 +91,7 @@ namespace PasswordManager.Infrastructure.Login
                 .FirstOrDefaultAsync();
         }
     
-        public async Task Send2FACode(int userId)
+        public async Task Send2FACode(int userId,string baseURL)
         {
             var user = await _db.TwoFactorAuthentications
                 .FirstOrDefaultAsync(u =>
@@ -112,7 +108,7 @@ namespace PasswordManager.Infrastructure.Login
             user.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
 
             await _db.SaveChangesAsync();
-            await _tokenService.SendTokenToEmailAsync(user.User.Login, user.Email!, 5, $"https://localhost:7108/Account/Login/2FA?token={token}");
+            await _tokenService.SendTokenToEmailAsync(user.User.Login, user.Email!, 5, $"{baseURL}/Account/Login/2FA?token={token}");
         }
 
         public async Task<bool> Verify2FAToken(int userId, string token)

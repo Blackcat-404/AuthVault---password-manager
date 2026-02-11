@@ -2,7 +2,6 @@
 using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.Data;
 using PasswordManager.Domain.Entities;
-using PasswordManager.Infrastructure.Email;
 using PasswordManager.Infrastructure.Security;
 
 namespace PasswordManager.Infrastructure.ForgotPassword
@@ -10,14 +9,12 @@ namespace PasswordManager.Infrastructure.ForgotPassword
     public class PasswordResetService : IResetPasswordService
     {
         private readonly AppDbContext _db;
-        private readonly EmailService _emailService;
         private readonly IEncryptionService _encryptionService;
         private readonly TokenService _tokenService;
 
-        public PasswordResetService(AppDbContext db, EmailService emailService, IEncryptionService encryptionService,TokenService tokenService)
+        public PasswordResetService(AppDbContext db, IEncryptionService encryptionService,TokenService tokenService)
         {
             _db = db;
-            _emailService = emailService;
             _encryptionService = encryptionService;
             _tokenService = tokenService;
         }
@@ -54,7 +51,7 @@ namespace PasswordManager.Infrastructure.ForgotPassword
                 _db.PasswordResetTokens.Add(resetToken);
             }
 
-            await _tokenService.SendTokenToEmailAsync(user.Login, dto.Email, 30, $"https://localhost:7108/Account/ForgotPassword/ResetPassword?token={token}");
+            await _tokenService.SendTokenToEmailAsync(user.Login, dto.Email, 30, $"{dto.BaseUrl}/Account/ForgotPassword/ResetPassword?token={token}");
             await _db.SaveChangesAsync();
         }
 

@@ -77,7 +77,8 @@ namespace PasswordManager.Controllers
             }
 
             var userId = GetUserID();
-            await _settingsService.Add2FAAsync(userId,model.Email);
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            await _settingsService.Add2FAAsync(userId,model.Email,baseUrl);
 
             TempData["email"] = model.Email;
             return RedirectToAction("Get2FAEmailVerificationLinkSent");

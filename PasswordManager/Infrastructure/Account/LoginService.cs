@@ -95,24 +95,28 @@ namespace PasswordManager.Infrastructure.Login
                 .FirstOrDefaultAsync();
         }
     
-        public async Task Send2FACode(int userId)
+        public async Task Send2FACode(int userId, string baseUrl)
         {
-            var user = await _db.TwoFactorAuthentications
-                .FirstOrDefaultAsync(u =>
-                    u.UserId == userId
-                );
+            var twoFa = await _db.TwoFactorAuthentications
+                .FirstOrDefaultAsync(u => u.UserId == userId);
 
-            if (user == null)
-            {
+            if (twoFa == null)
                 return;
-            }
 
-            var token = await _tokenService.GenerateUniqueResetTokenAsync(_db.Users, t => t.Token);
-            user.Token = token;
-            user.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return;
+
+            var token = await _tokenService.GenerateUniqueResetTokenAsync(
+                _db.TwoFactorAuthentications, t => t.Token!);
+
+            twoFa.Token = token;
+            twoFa.TokenExpiresAt = DateTime.UtcNow.AddMinutes(5);
 
             await _db.SaveChangesAsync();
-            await _tokenService.SendTokenToEmailAsync(user.User.Login, user.Email!, 5, $"https://localhost:7108/Account/Login/2FA?token={token}");
+            await _tokenService.SendTokenToEmailAsync(
+                user.Login, twoFa.Email!, 5,
+                $"{baseUrl}/Account/Login/2FA?token={token}");
         }
 
         public async Task<bool> Verify2FAToken(int userId, string token)

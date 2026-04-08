@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.X509;
 using PasswordManager.Application.Vault;
 using PasswordManager.Domain.Entities;
 using PasswordManager.Infrastructure.Security;

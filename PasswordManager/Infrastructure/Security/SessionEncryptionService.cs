@@ -59,5 +59,44 @@ namespace PasswordManager.Infrastructure.Security
                 session.Clear();
             }
         }
+
+        public void SetPendingEncryptionKey(int userId, byte[] encryptionKey)
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            session?.Set($"PendingEncryptionKey_{userId}", encryptionKey);
+        }
+
+        public void ActivatePendingEncryptionKey(int userId)
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session == null) return;
+
+            var pendingKey = session.Get($"PendingEncryptionKey_{userId}");
+            if (pendingKey != null)
+            {
+                session.Set($"EncryptionKey_{userId}", pendingKey);
+                session.SetInt32("CurrentUserId", userId);
+                Array.Clear(pendingKey, 0, pendingKey.Length);
+                session.Remove($"PendingEncryptionKey_{userId}");
+            }
+        }
+
+        public void SetPending2FAUserId(int userId)
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            session?.SetInt32("Pending2FAUserId", userId);
+        }
+
+        public int? GetPending2FAUserId()
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            return session?.GetInt32("Pending2FAUserId");
+        }
+
+        public void ClearPending2FAUserId()
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            session?.Remove("Pending2FAUserId");
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PasswordManager.Application.Account.Register;
 using PasswordManager.ViewModels;
 
@@ -41,6 +42,7 @@ namespace PasswordManager.Controllers
         /// <returns>Redirects to login on success, returns view with error on failure</returns>
         [HttpPost("Register")]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("auth")]
         public async Task<IActionResult> PostRegister(RegisterViewModel model)
         {
             if (!ModelState.IsValid)

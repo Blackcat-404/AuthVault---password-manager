@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 using PasswordManager.Application.Account.Email;
 using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.Application.Account.Login;
@@ -83,6 +85,33 @@ namespace PasswordManager
             });
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    await context.HttpContext.Response.WriteAsync(
+                        "Too many requests. Please try again later.", token);
+                };
+
+                // Login: 10 attempts per minute per IP
+                options.AddFixedWindowLimiter("login", opt =>
+                {
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.PermitLimit = 10;
+                    opt.QueueLimit = 0;
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+
+                // Register / ForgotPassword: 5 attempts per minute per IP
+                options.AddFixedWindowLimiter("auth", opt =>
+                {
+                    opt.Window = TimeSpan.FromMinutes(1);
+                    opt.PermitLimit = 5;
+                    opt.QueueLimit = 0;
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+            });
 
             var app = builder.Build();
 
@@ -105,7 +134,22 @@ namespace PasswordManager
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers["X-Frame-Options"] = "DENY";
+                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+                context.Response.Headers["Content-Security-Policy"] =
+                    "default-src 'self'; " +
+                    "script-src 'self' 'unsafe-inline'; " +
+                    "style-src 'self' 'unsafe-inline'; " +
+                    "img-src 'self' data:; " +
+                    "font-src 'self';";
+                await next();
+            });
+
             app.UseRouting();
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
 

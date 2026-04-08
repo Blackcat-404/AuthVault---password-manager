@@ -2,7 +2,6 @@
     ViewData["Title"] = "Email Verification";
     ViewData["BodyClass"] = "auth-page";
     Layout = "_Layout";
-    var userId = TempData["userId"];
 }
 
 <div class="login-container">
@@ -49,11 +48,10 @@
 
 <!--2FA FLOW -->
 <script>
-    const userId = @userId;
     let pollInterval;
 
     async function checkVerificationStatus() {
-        const response = await fetch(`/Account/Login/2FA/CheckStatus?userId=${userId}`);
+        const response = await fetch('/Account/Login/2FA/CheckStatus');
         const data = await response.json();
 
         if (data.success && data.verified) {

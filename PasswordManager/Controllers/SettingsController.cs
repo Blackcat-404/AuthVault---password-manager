@@ -160,6 +160,7 @@ namespace PasswordManager.Controllers
         }
 
         [HttpPost("Settings/DeleteAccount/Password")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostDeleteAccountPassword(DeleteAccountViewModel model)
         {
             if (!ModelState.IsValid)

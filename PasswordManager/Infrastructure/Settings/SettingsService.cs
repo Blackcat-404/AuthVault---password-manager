@@ -64,14 +64,7 @@ namespace PasswordManager.Infrastructure.Settings
             }
 
             if (record.TokenExpiresAt < DateTime.UtcNow)
-            {
                 return false;
-            }
-
-            if (record.Token != token)
-            {
-                return false;
-            }
 
             return true;
         }

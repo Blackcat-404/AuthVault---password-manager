@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PasswordManager.Application.Account.ForgotPassword;
 using PasswordManager.ViewModels;
 
@@ -20,6 +21,8 @@ namespace PasswordManager.Controllers
         }
 
         [HttpPost("ForgotPassword")]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("auth")]
         public async Task<IActionResult> PostForgotPassword(ForgotPasswordViewModel model)
         {
             if (!ModelState.IsValid)

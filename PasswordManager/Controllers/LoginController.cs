@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PasswordManager.Application.Account.Login;
 using PasswordManager.Application.Security;
 using PasswordManager.ViewModels;
@@ -13,11 +14,13 @@ namespace PasswordManager.Controllers
     {
         private readonly ILoginService _loginService;
         private readonly IAuthService _authService;
+        private readonly ISessionEncryptionService _sessionEncryptionService;
 
-        public LoginController(ILoginService loginService, IAuthService authService)
+        public LoginController(ILoginService loginService, IAuthService authService, ISessionEncryptionService sessionEncryptionService)
         {
             _loginService = loginService;
             _authService = authService;
+            _sessionEncryptionService = sessionEncryptionService;
         }
 
         [HttpGet("Login")]
@@ -50,13 +53,19 @@ namespace PasswordManager.Controllers
         }
 
         [HttpGet("Login/2FA/CheckStatus")]
-        public async Task<IActionResult> Check2FAStatus(int userId)
+        public async Task<IActionResult> Check2FAStatus()
         {
-            var isVerified = await _loginService.IsTokenVerified(userId);
+            var userId = _sessionEncryptionService.GetPending2FAUserId();
+            if (userId == null)
+                return Json(new { success = false, verified = false });
+
+            var isVerified = await _loginService.IsTokenVerified(userId.Value);
 
             if (isVerified)
             {
-                await _authService.SignInAsync(HttpContext, userId);
+                _sessionEncryptionService.ActivatePendingEncryptionKey(userId.Value);
+                _sessionEncryptionService.ClearPending2FAUserId();
+                await _authService.SignInAsync(HttpContext, userId.Value);
                 return Json(new { success = true, verified = true });
             }
 
@@ -73,6 +82,7 @@ namespace PasswordManager.Controllers
 
         [HttpPost("Login")]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> PostLogin(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -97,8 +107,18 @@ namespace PasswordManager.Controllers
             //2FA Checking
             if (await _loginService.Has2FAAsync(model.Email!))
             {
-                await _loginService.Send2FACode(user.Id);
-                TempData["userId"] = user.Id;
+                // Move encryption key to pending until 2FA is verified
+                var activeKey = _sessionEncryptionService.GetEncryptionKey(user.Id);
+                if (activeKey != null)
+                {
+                    _sessionEncryptionService.ClearEncryptionKey(user.Id);
+                    _sessionEncryptionService.SetPendingEncryptionKey(user.Id, activeKey);
+                }
+
+                _sessionEncryptionService.SetPending2FAUserId(user.Id);
+
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                await _loginService.Send2FACode(user.Id, baseUrl);
 
                 return View("~/Views/Token/TokenSent.cshtml");
             }

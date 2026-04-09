@@ -9,13 +9,19 @@ public class ApplicationService(DockerService docker)
         if (await docker.IsAppRunningAsync())
         {
             Display.Warning("AuthVault is already running.");
+            ShowUrl();
             return 0;
         }
 
         Display.Step("Starting AuthVault containers...");
         bool ok = await docker.ComposeStartAsync();
 
-        if (ok) Display.Success("AuthVault started.");
+        if (ok)
+        {
+            Display.Success("AuthVault started.");
+            ShowUrl();
+        }
+
         return ok ? 0 : 1;
     }
 
@@ -40,14 +46,31 @@ public class ApplicationService(DockerService docker)
 
         var status = await docker.ComposeStatusAsync();
         if (string.IsNullOrWhiteSpace(status))
-        {
             Display.Warning("No containers found. Run [bold]authvault install[/] first.");
-        }
         else
-        {
-            Display.Info(status);
-        }
+            Display.Raw(status);
+
+        ShowUrl();
 
         return 0;
+    }
+
+    static void ShowUrl()
+    {
+        var port = ReadHttpsPort();
+        Display.Info("\nAuthVault address:");
+        Display.Link($"https://localhost:{port}");
+    }
+
+    static int ReadHttpsPort()
+    {
+        if (!File.Exists(InstallPaths.EnvFile)) return 7108;
+
+        var line = File.ReadLines(InstallPaths.EnvFile)
+            .FirstOrDefault(l => l.StartsWith("HTTPS_PORT="));
+
+        if (line is null) return 7108;
+
+        return int.TryParse(line.Split('=')[1].Trim(), out var port) ? port : 7108;
     }
 }

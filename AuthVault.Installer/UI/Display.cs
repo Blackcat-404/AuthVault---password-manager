@@ -65,6 +65,11 @@ public static class Display
         return AnsiConsole.Ask($"  [steelblue1]?[/] {question}", defaultValue);
     }
 
+    public static void Raw(string text)
+    {
+        AnsiConsole.WriteLine(text);
+    }
+
     public static void Link(string url)
     {
         AnsiConsole.MarkupLine($"  [steelblue1][link={url}]{url}[/][/]");

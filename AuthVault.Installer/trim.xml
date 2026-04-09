@@ -1,0 +1,3 @@
+<linker>
+  <assembly fullname="Spectre.Console" preserve="all" />
+</linker>

@@ -3,6 +3,11 @@ name: Build and release installer
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to upload assets to (e.g. v1.0.0)'
+        required: true
 
 jobs:
   build:
@@ -56,4 +61,4 @@ jobs:
       - name: Upload to release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload ${{ github.ref_name }} ./${{ matrix.asset }}
+        run: gh release upload ${{ github.event.inputs.tag || github.ref_name }} ./${{ matrix.asset }}

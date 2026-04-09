@@ -365,3 +365,11 @@ FodyWeavers.xsd
 # DataBase secrets
 appsettings.json
 appsettings.Development.json
+# AuthVault — generated / secret files
+.env
+PasswordManager/certs/
+
+# Installer build output
+AuthVault.Installer/bin/
+AuthVault.Installer/obj/
+AuthVault.Installer/publish/

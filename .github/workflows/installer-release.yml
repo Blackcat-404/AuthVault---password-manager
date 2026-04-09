@@ -1,0 +1,57 @@
+name: Build and release installer
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - rid: linux-x64
+            asset: authvault-linux-x64
+          - rid: linux-arm64
+            asset: authvault-linux-arm64
+          - rid: win-x64
+            asset: authvault-win-x64.exe
+          - rid: osx-x64
+            asset: authvault-macos-x64
+          - rid: osx-arm64
+            asset: authvault-macos-arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish installer
+        run: |
+          dotnet publish AuthVault.Installer/AuthVault.Installer.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:DebugType=none \
+            -o ./dist/${{ matrix.rid }}
+
+      - name: Rename binary
+        run: |
+          src="./dist/${{ matrix.rid }}/authvault"
+          # Windows output has .exe
+          if [ "${{ matrix.rid }}" = "win-x64" ]; then
+            src="./dist/${{ matrix.rid }}/authvault.exe"
+          fi
+          cp "$src" "./${{ matrix.asset }}"
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset }}

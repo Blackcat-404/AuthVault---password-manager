@@ -152,6 +152,25 @@ public class DockerService(PlatformService platform)
         return await IsDockerAvailableAsync();
     }
 
+    // Diagnostics
+
+    public async Task DiagnoseFailureAsync()
+    {
+        var (_, logs, _) = await platform.RunAsync("docker", "logs authvault-db");
+
+        if (logs.Contains("Password did not match") || logs.Contains("18456"))
+        {
+            Display.Warning("The database rejected the SA password.");
+            Display.Info("This happens when the Docker volume already contains a database");
+            Display.Info("initialized with a different password.\n");
+            Display.Info("To fix, remove the old data and reinstall:");
+            Display.Info("  [bold]docker rm -f authvault-app authvault-db[/]");
+            Display.Info("  [bold]docker volume rm authvault-data[/]");
+            Display.Info("  [bold]authvault install[/]");
+            Display.Info("\n[yellow]Warning:[/] this will delete all saved passwords.");
+        }
+    }
+
     // Helpers
 
     async Task<bool> IsDockerAvailableAsync()

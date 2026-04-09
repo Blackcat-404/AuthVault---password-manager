@@ -57,7 +57,11 @@ class Program
         config.WriteComposeFile(cfg);
 
         // 7. Pull images and start containers (migrations run at app startup)
-        if (!await docker.ComposeUpAsync()) return 1;
+        if (!await docker.ComposeUpAsync())
+        {
+            await docker.DiagnoseFailureAsync();
+            return 1;
+        }
 
         Display.Success("\nAuthVault installed and running!");
         Display.Info($"Open [bold]https://localhost:{cfg.HttpsPort}[/] in your browser.");

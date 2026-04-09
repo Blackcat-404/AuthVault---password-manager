@@ -263,7 +263,7 @@ public class CertificateService(PlatformService platform)
 
     static IEnumerable<string> GetBrowserProfileDirs()
     {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var home = InstallPaths.GetRealHome();
 
         var roots = new[]
         {

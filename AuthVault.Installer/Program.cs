@@ -24,7 +24,7 @@ class Program
             "stop"      => await app.StopAsync(),
             "status"    => await app.StatusAsync(),
             "update"    => await UpdateCommand(docker),
-            "uninstall" => await UninstallCommand(docker, certs),
+            "uninstall" => await UninstallCommand(platform, docker, certs),
             _           => ShowHelp()
         };
     }
@@ -61,6 +61,11 @@ class Program
 
         Display.Success("\nAuthVault installed and running!");
         Display.Info($"Open [bold]https://localhost:{cfg.HttpsPort}[/] in your browser.");
+
+        // 8. Offer to install binary to PATH (Linux/macOS only)
+        if (platform.CurrentOS != OS.Windows)
+            InstallToPath(platform);
+
         return 0;
     }
 
@@ -74,7 +79,7 @@ class Program
         return ok ? 0 : 1;
     }
 
-    static async Task<int> UninstallCommand(DockerService docker, CertificateService certs)
+    static async Task<int> UninstallCommand(PlatformService platform, DockerService docker, CertificateService certs)
     {
         Display.Section("Uninstalling AuthVault");
 
@@ -90,10 +95,71 @@ class Program
         await certs.RemoveTrustAsync();
         certs.DeleteCertFiles();
 
+        // Remove from /usr/local/bin if installed there
+        if (platform.CurrentOS != OS.Windows)
+            RemoveFromPath(platform);
+
         Display.Success("AuthVault uninstalled.");
         Display.Info("Database volume [bold]authvault-data[/] was kept. To also delete vault data:");
         Display.Info("  [bold]docker volume rm authvault-data[/]");
         return 0;
+    }
+
+    static void InstallToPath(PlatformService platform)
+    {
+        const string target = "/usr/local/bin/authvault";
+
+        Display.Section("Add to PATH");
+        Display.Info("Moving the installer to [bold]/usr/local/bin/authvault[/] lets you run");
+        Display.Info("[bold]authvault start/stop/update[/] from any directory.");
+        Display.Info("[yellow]If you skip this, you must always run the binary with[/] [bold]./authvault-...[/]");
+        Display.Info("from the folder where it was downloaded.\n");
+
+        if (!Display.Confirm("Install authvault to /usr/local/bin/?"))
+        {
+            Display.Info("Skipped. Run commands with [bold]./authvault-linux-x64 <command>[/] (or your platform binary).");
+            return;
+        }
+
+        var self = Environment.ProcessPath!;
+
+        try
+        {
+            if (File.Exists(target))
+                File.Delete(target);
+
+            File.Copy(self, target);
+
+            // chmod +x
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "chmod", Arguments = $"+x {target}",
+                UseShellExecute = false
+            })?.WaitForExit();
+
+            Display.Success($"Installed to {target}. You can now run [bold]authvault <command>[/] from anywhere.");
+        }
+        catch
+        {
+            Display.Warning("Could not write to /usr/local/bin/ — try running the installer with sudo.");
+        }
+    }
+
+    static void RemoveFromPath(PlatformService platform)
+    {
+        const string target = "/usr/local/bin/authvault";
+
+        if (!File.Exists(target)) return;
+
+        try
+        {
+            File.Delete(target);
+            Display.Success("Removed authvault from /usr/local/bin/");
+        }
+        catch
+        {
+            Display.Warning($"Could not remove {target} — delete it manually with: [bold]sudo rm {target}[/]");
+        }
     }
 
     static int ShowHelp()

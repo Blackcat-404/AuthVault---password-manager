@@ -95,14 +95,16 @@ public static class Display
 
     public static void Help()
     {
+        var exe = Path.GetFileName(Environment.ProcessPath) ?? "authvault";
+
         AnsiConsole.WriteLine();
         AnsiConsole.Write(new Panel(
-            "[bold]authvault install[/]   — Full installation (first-time setup)\n" +
-            "[bold]authvault start[/]     — Start AuthVault\n" +
-            "[bold]authvault stop[/]      — Stop AuthVault\n" +
-            "[bold]authvault status[/]    — Show running status\n" +
-            "[bold]authvault update[/]    — Apply updates and restart\n" +
-            "[bold]authvault uninstall[/] — Remove AuthVault and certificates")
+            $"[bold]{exe} install[/]   — Full installation (first-time setup)\n" +
+            $"[bold]{exe} start[/]     — Start AuthVault\n" +
+            $"[bold]{exe} stop[/]      — Stop AuthVault\n" +
+            $"[bold]{exe} status[/]    — Show running status\n" +
+            $"[bold]{exe} update[/]    — Apply updates and restart\n" +
+            $"[bold]{exe} uninstall[/] — Remove AuthVault and certificates")
             .Header("[steelblue1]Commands[/]")
             .BorderColor(Color.Grey));
     }

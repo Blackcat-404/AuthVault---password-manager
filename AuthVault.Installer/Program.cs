@@ -48,6 +48,7 @@ class Program
 
         // 4. Create install directory (~/.authvault/)
         Directory.CreateDirectory(InstallPaths.InstallDir);
+        await platform.ChownToRealUserAsync(InstallPaths.InstallDir);
 
         // 5. Generate HTTPS certificates
         if (!await certs.SetupAsync(cfg.HttpsPort)) return 1;
@@ -97,7 +98,7 @@ class Program
         await docker.ComposeDownAsync(withVolumes: false);
 
         await certs.RemoveTrustAsync();
-        certs.DeleteCertFiles();
+        await certs.DeleteCertFilesAsync();
 
         // Remove from /usr/local/bin if installed there
         if (platform.CurrentOS != OS.Windows)

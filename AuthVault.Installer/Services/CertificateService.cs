@@ -38,13 +38,20 @@ public class CertificateService(PlatformService platform)
         Display.Success("Certificate trust removed");
     }
 
-    public void DeleteCertFiles()
+    public async Task DeleteCertFilesAsync()
     {
-        if (Directory.Exists(InstallPaths.CertsDir))
+        if (!Directory.Exists(InstallPaths.CertsDir)) return;
+
+        if (platform.CurrentOS == OS.Windows)
         {
             Directory.Delete(InstallPaths.CertsDir, recursive: true);
-            Display.Success("Certificate files deleted");
         }
+        else
+        {
+            await platform.RunAsync("rm", $"-rf \"{InstallPaths.CertsDir}\"", sudo: true);
+        }
+
+        Display.Success("Certificate files deleted");
     }
 
     // Certificate generation

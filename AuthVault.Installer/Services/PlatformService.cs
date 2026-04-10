@@ -125,6 +125,18 @@ public class PlatformService
             Display.Warning("Could not install nss-tools. Firefox may not trust the certificate automatically.");
     }
 
+    // Ownership
+
+    public async Task ChownToRealUserAsync(string path)
+    {
+        if (CurrentOS == OS.Windows) return;
+
+        var sudoUser = Environment.GetEnvironmentVariable("SUDO_USER");
+        if (string.IsNullOrEmpty(sudoUser)) return; // not running under sudo, already correct owner
+
+        await RunAsync("chown", $"-R {sudoUser}:{sudoUser} \"{path}\"", sudo: true);
+    }
+
     // Package manager helpers
 
     public async Task<(int ExitCode, string Output, string Error)> InstallPackageAsync(string package)

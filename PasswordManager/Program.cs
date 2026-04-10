@@ -116,11 +116,27 @@ namespace PasswordManager
 
             var app = builder.Build();
 
-            // Auto-run migrations on startup (works inside Docker container)
+            // Auto-run migrations on startup with retry (DB may not be ready immediately)
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                db.Database.Migrate();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var retries = 10;
+
+                while (true)
+                {
+                    try
+                    {
+                        db.Database.Migrate();
+                        break;
+                    }
+                    catch (Exception ex) when (retries-- > 0)
+                    {
+                        logger.LogWarning("DB not ready, retrying in 3s... ({Retries} left). {Message}",
+                            retries, ex.Message);
+                        Thread.Sleep(3000);
+                    }
+                }
             }
 
             // Configure the HTTP request pipeline

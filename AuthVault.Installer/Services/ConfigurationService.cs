@@ -3,12 +3,11 @@ using AuthVault.Installer.UI;
 namespace AuthVault.Installer.Services;
 
 public record AppConfig(
-    int    HttpsPort,
-    int    HttpPort,
+    int HttpsPort,
+    int HttpPort,
     string DbPassword,
-    string SqlServerImage,
     string EmailHost,
-    int    EmailPort,
+    int EmailPort,
     string EmailUser,
     string EmailPassword,
     string EmailFrom);
@@ -24,17 +23,16 @@ public class ConfigurationService
         Display.Section("Configuration");
         Display.Info("Press [bold]Enter[/] to accept defaults shown in brackets.\n");
 
-        int  httpsPort  = Display.AskInt("HTTPS port", 7108);
-        int  httpPort   = Display.AskInt("HTTP port",  5168);
-        var  dbPassword = PromptDbPassword();
-        var  sqlImage   = PromptSqlServerVersion();
-        var  emailHost  = Display.Ask("SMTP host", "smtp.gmail.com");
-        int  emailPort  = Display.AskInt("SMTP port", 587);
-        var  emailUser  = Display.Ask("SMTP username (your email)");
-        var  emailPass  = Display.AskSecret("SMTP password / app-password");
-        var  emailFrom  = Display.Ask("From address shown in emails", emailUser);
+        int httpsPort = Display.AskInt("HTTPS port", 7108);
+        int httpPort = Display.AskInt("HTTP port", 5168);
+        var dbPassword = PromptDbPassword();
+        var emailHost = Display.Ask("SMTP host", "smtp.gmail.com");
+        int emailPort = Display.AskInt("SMTP port", 587);
+        var emailUser = Display.Ask("SMTP username (your email)");
+        var emailPass = Display.AskSecret("SMTP password / app-password");
+        var emailFrom = Display.Ask("From address shown in emails", emailUser);
 
-        return new AppConfig(httpsPort, httpPort, dbPassword, sqlImage,
+        return new AppConfig(httpsPort, httpPort, dbPassword,
             emailHost, emailPort, emailUser, emailPass, emailFrom);
     }
 
@@ -42,8 +40,8 @@ public class ConfigurationService
 
     public void WriteEnvFile(AppConfig cfg)
     {
-        var connStr = $"Server=authvault-db,1433;Database=AuthVaultDb;" +
-                      $"User Id=sa;Password={cfg.DbPassword};TrustServerCertificate=True";
+        var connStr = $"Host=authvault-db;Port=5432;Database=authvaultdb;" +
+                      $"Username=authvault;Password={cfg.DbPassword}";
 
         var lines = new[]
         {
@@ -52,7 +50,6 @@ public class ConfigurationService
             $"HTTPS_PORT={cfg.HttpsPort}",
             $"HTTP_PORT={cfg.HttpPort}",
             $"DB_PASSWORD={Quote(cfg.DbPassword)}",
-            $"MSSQL_IMAGE={cfg.SqlServerImage}",
             "",
             "# ASP.NET Core environment variable overrides",
             $"ConnectionStrings__DefaultConnection={Quote(connStr)}",
@@ -94,19 +91,20 @@ public class ConfigurationService
                   - authvault-net
 
               authvault-db:
-                image: ${{MSSQL_IMAGE:-mcr.microsoft.com/mssql/server:2022-latest}}
+                image: postgres:16-alpine
                 container_name: authvault-db
                 environment:
-                  ACCEPT_EULA: "Y"
-                  MSSQL_SA_PASSWORD: "${{DB_PASSWORD}}"
+                  POSTGRES_DB: authvaultdb
+                  POSTGRES_USER: authvault
+                  POSTGRES_PASSWORD: "${{DB_PASSWORD}}"
                 volumes:
-                  - authvault-data:/var/opt/mssql
+                  - authvault-data:/var/lib/postgresql/data
                 healthcheck:
-                  test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" -No 2>/dev/null || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" -No"]
-                  interval: 10s
+                  test: ["CMD-SHELL", "pg_isready -U authvault -d authvaultdb"]
+                  interval: 5s
                   timeout: 5s
-                  retries: 15
-                  start_period: 30s
+                  retries: 10
+                  start_period: 10s
                 restart: unless-stopped
                 networks:
                   - authvault-net
@@ -126,25 +124,11 @@ public class ConfigurationService
 
     // Helpers
 
-    static string PromptSqlServerVersion()
-    {
-        var versions = new Dictionary<string, string>
-        {
-            ["SQL Server 2022 (recommended)"] = "mcr.microsoft.com/mssql/server:2022-latest",
-            ["SQL Server 2025"              ] = "mcr.microsoft.com/mssql/server:2025-latest",
-            ["SQL Server 2019"              ] = "mcr.microsoft.com/mssql/server:2019-latest",
-            ["SQL Server 2017"              ] = "mcr.microsoft.com/mssql/server:2017-latest",
-        };
-
-        var selected = Display.Select("Select SQL Server version", versions.Keys);
-        return versions[selected];
-    }
-
     string PromptDbPassword()
     {
         while (true)
         {
-            var pass    = Display.AskSecret("SQL Server SA password (min 8 chars, upper+lower+number+symbol)");
+            var pass = Display.AskSecret("PostgreSQL password (min 8 characters)");
             var confirm = Display.AskSecret("Confirm password");
 
             if (pass != confirm)

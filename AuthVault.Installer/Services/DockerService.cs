@@ -158,7 +158,7 @@ public class DockerService(PlatformService platform)
     {
         var (_, logs, _) = await platform.RunAsync("docker", "logs authvault-db");
 
-        if (logs.Contains("Password did not match") || logs.Contains("18456"))
+        if (logs.Contains("password authentication failed") || logs.Contains("FATAL"))
         {
             Display.Warning("The database rejected the SA password.");
             Display.Info("This happens when the Docker volume already contains a database");

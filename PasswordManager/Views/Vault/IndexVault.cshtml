@@ -169,7 +169,21 @@
                                             </div>
                                             <div class="item-info">
                                                 <div class="item-name">@login.Title</div>
-                                                <div class="item-username">@(string.IsNullOrWhiteSpace(login.Login) ? "No username" : login.Login)</div>
+                                                <div class="item-username" style="display:flex;align-items:center;gap:4px;">
+                                                    @(string.IsNullOrWhiteSpace(login.Login) ? "No username" : login.Login)
+                                                    @if (!string.IsNullOrWhiteSpace(login.Login))
+                                                    {
+                                                        <button class="item-action-btn item-action-btn--inline"
+                                                                title="Copy username"
+                                                                data-copy="@login.Login"
+                                                                onclick="copyFromData(this, 'Username')">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                                            </svg>
+                                                        </button>
+                                                    }
+                                                </div>
                                             </div>
                                             <div class="item-actions">
                                                 <a href="@Url.Action("ViewItem", "Vault", new { id = item.Id, type = itemType })"
@@ -439,10 +453,13 @@
                         </svg>
                     </div>
                 `;
+                const usernameCopyBtn = item.login
+                    ? `<button class="item-action-btn item-action-btn--inline" title="Copy username" data-copy="${escapeHtml(item.login)}" onclick="copyFromData(this, 'Username')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg></button>`
+                    : '';
                 itemInfo = `
                     <div class="item-info">
                         <div class="item-name">${escapeHtml(item.title)}</div>
-                        <div class="item-username">${item.login ? escapeHtml(item.login) : 'No username'}</div>
+                        <div class="item-username" style="display:flex;align-items:center;gap:4px;">${item.login ? escapeHtml(item.login) : 'No username'}${usernameCopyBtn}</div>
                     </div>
                 `;
                 if (item.password) {
@@ -455,11 +472,15 @@
                         </button>
                     `;
                 }
+                const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>`;
                 if (item.webURL) {
-                    itemDetails = `
+                    itemDetails += `
                         <div class="item-detail">
                             <div class="item-detail-label">URL</div>
-                            <div class="item-detail-value">${escapeHtml(item.webURL)}</div>
+                            <div class="item-detail-value item-detail-inline">
+                                <span class="item-url">${escapeHtml(item.webURL)}</span>
+                                <button class="item-action-btn item-action-btn--inline" title="Copy URL" data-copy="${escapeHtml(item.webURL)}" onclick="copyFromData(this, 'URL')">${copyIconSvg}</button>
+                            </div>
                         </div>
                     `;
                 }

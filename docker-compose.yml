@@ -12,6 +12,9 @@ services:
         ports:
             - "${HTTPS_PORT:-7108}:${HTTPS_PORT:-7108}"
             - "${HTTP_PORT:-5168}:${HTTP_PORT:-5168}"
+        dns:
+            - 8.8.8.8
+            - 8.8.4.4
         depends_on:
             authvault-db:
                 condition: service_healthy

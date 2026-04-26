@@ -373,3 +373,5 @@ PasswordManager/certs/
 AuthVault.Installer/bin/
 AuthVault.Installer/obj/
 AuthVault.Installer/publish/
+
+README.md

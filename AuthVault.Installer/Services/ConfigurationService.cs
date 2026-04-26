@@ -83,6 +83,9 @@ public class ConfigurationService
                 ports:
                   - "${{HTTPS_PORT}}:${{HTTPS_PORT}}"
                   - "${{HTTP_PORT}}:${{HTTP_PORT}}"
+                dns:
+                  - 8.8.8.8
+                  - 8.8.4.4
                 depends_on:
                   authvault-db:
                     condition: service_healthy
